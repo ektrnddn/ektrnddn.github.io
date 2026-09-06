@@ -1,0 +1,46 @@
+---
+// Row of headline numbers that count up when scrolled into view.
+interface Item { value: string; label: string; sub?: string }
+interface Props { items: Item[]; compact?: boolean }
+const { items, compact = false } = Astro.props;
+---
+<div class:list={['numbers', { compact }]} data-numbers>
+  {items.map((it) => (
+    <div class="num">
+      <div class="val" data-count={it.value}>{it.value}</div>
+      <div class="label">{it.label}</div>
+      {it.sub && <div class="sub mono">{it.sub}</div>}
+    </div>
+  ))}
+</div>
+<style>
+  .numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; }
+  .num { border-top: 2px solid var(--ink); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .val { font-family: var(--serif); font-weight: 300; font-size: clamp(38px, 4vw, 56px); line-height: 1; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .compact .val { font-size: clamp(30px, 3vw, 40px); }
+  .label { font-size: 15px; line-height: 1.45; color: var(--text); }
+  .sub { color: var(--muted); }
+</style>
+<script>
+  // Count up numbers like "6,953", "60.9%", "×100", "7,000+", "~2,000". Non-numeric text is left as is.
+  const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const run = (el: HTMLElement) => {
+    const target = el.dataset.count ?? '';
+    if (reduce) { el.textContent = target; return; }
+    const m = target.match(/^([^0-9]*)([0-9][0-9,]*(?:\.[0-9]+)?)(.*)$/);
+    if (!m) return;
+    const [, pre, numStr, post] = m;
+    const decimals = (numStr.split('.')[1] ?? '').length;
+    const end = parseFloat(numStr.replace(/,/g, ''));
+    const useComma = numStr.includes(',');
+    const t0 = performance.now(); const dur = 1400;
+    const fmt = (v: number) => { let s = v.toFixed(decimals); if (useComma) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ','); return pre + s + post; };
+    const tick = (now: number) => { const p = Math.min(1, (now - t0) / dur); el.textContent = fmt(end * ease(p)); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  };
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) if (e.isIntersecting) { e.target.querySelectorAll<HTMLElement>('[data-count]').forEach(run); io.unobserve(e.target); }
+  }, { threshold: 0.3 });
+  document.querySelectorAll('[data-numbers]').forEach((n) => io.observe(n));
+</script>

@@ -1,0 +1,140 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectHeader from '../../components/ProjectHeader.astro';
+import ProjectNav from '../../components/ProjectNav.astro';
+import Section from '../../components/Section.astro';
+import Numbers from '../../components/Numbers.astro';
+import Stepper from '../../components/Stepper.astro';
+import Funnel from '../../components/Funnel.astro';
+import FigureGrid from '../../components/FigureGrid.astro';
+import Explorer from '../../components/Explorer.astro';
+import PubItem from '../../components/PubItem.astro';
+import { publications } from '../../data/load';
+const entry = (await getEntry('research', 'dual-agn-census'))!;
+const pubs = entry.data.publications.map((id) => publications.find((p) => p.id === id)!).filter(Boolean);
+---
+<Base title={entry.data.title} description={entry.data.summary} image="/figures/dr_z_bigmac_duals.jpg">
+  <ProjectHeader entry={entry} />
+
+  <section class="wrap">
+    <Numbers items={[
+      { value: '6,953', label: 'dual AGN in DESI DR1' },
+      { value: '~2,000', label: 'close pairs, less than 15 kpc apart' },
+      { value: '~100', label: 'dwarf dual AGN, where a handful existed' },
+      { value: '~120', label: 'dual AGN above z = 2, three times the previous census' },
+    ]} />
+  </section>
+
+  <Section num="1" title="Where the pairs are" lede="Every dual AGN candidate to date on one plane, redshift against projected separation. The DESI sample fills the region nobody had covered uniformly.">
+    <Explorer src={entry.data.explorer!} title="Interactive redshift–separation figure for DESI DR1 dual AGN" />
+    <div class="gap"></div>
+    <div class="split">
+      <div class="prose">
+        <p>The floor at 1.6″ is the DESI fibre diameter: closer pairs blend into one spectrum and need HST or Gaia to split. Above it, the shaded density is where DESI dominates. The histogram on top compares the DESI sample, with and without completeness weights, against everything published before; the survey adds pairs across the full range of lookback time rather than at one epoch.</p>
+      </div>
+      <div class="side">
+        <div><div class="mono"><b>Literature</b></div>Mostly the Big Multi-AGN Catalog (Pfeifle et al. 2025), plus COSMOS-Web, HST and Euclid duals.</div>
+        <div><div class="mono"><b>Try</b></div>Drag across the histogram to select a redshift range, or filter surveys by name.</div>
+      </div>
+    </div>
+  </Section>
+
+  <Section num="2" title="How the census is built" lede="From 17 million spectra to a clean, completeness-corrected sample of pairs with two active nuclei.">
+    <div class="split">
+      <Funnel title="Selection" rows={[
+        { value: 17000000, display: '17 M', label: 'DESI DR1 sources with secure redshifts and SED-fitted properties' },
+        { value: 85336, display: '85,336', label: 'physically associated galaxy pairs' },
+        { value: 7125, display: '7,125', label: 'pairs where both members are robust AGN' },
+        { value: 6953, display: '6,953', label: 'after cleaning, in the final figure' },
+      ]} />
+      <div class="side">
+        <div><div class="mono"><b>Pair criteria</b></div>Projected separation under 50 kpc, velocity difference under 600 km/s (200 km/s for broad-line quasars), angular separation above 1.6″.</div>
+        <div><div class="mono"><b>Physical properties</b></div>Stellar mass, star formation rate and AGN luminosity from CIGALE SED fits that include stellar, dust and AGN emission (Siudek et al. 2024).</div>
+      </div>
+    </div>
+    <div class="gap"></div>
+    <Stepper label="Pipeline" steps={[
+      { title: 'Parent catalogue', tag: '17 M sources', detail: 'The DESI DR1 AGN host galaxy value-added catalogue: good fibres, secure redshifts, spectral type galaxy or quasar, cross-matched to Legacy Surveys photometry, with stellar mass, specific star formation rate and bolometric luminosity from CIGALE.' },
+      { title: 'Find the pairs', tag: 'per HEALPix', detail: 'Within each sky region, every pair closer than 50 kpc in projection and 600 km/s in velocity is a physically associated pair. Pairs closer than the 1.6″ fibre are dropped because their light is blended.' },
+      { title: 'Classify the AGN', tag: 'AGN/QSO VAC', detail: 'Emission-line diagnostics (BPT, WHAN, MEx, KEx) separate star-forming galaxies, Seyferts and LINERs; WISE colours catch obscured AGN; the quasar pipeline, QuasarNet and the Mg II afterburner catch broad-line objects. A dual AGN is a pair where both members carry a robust classification.' },
+      { title: 'Clean', tag: 'imaging flags', detail: 'Legacy Surveys mask bits remove objects near bright stars and bad pixels; S/N ≥ 5 in g, r, z and reduced χ² ≤ 10 keep only reliable SED fits. Photometric shredding is handled with care: close pairs naturally have neighbours in their apertures, and a blunt cut would throw away exactly the clumpy, star-forming dwarfs we want.' },
+      { title: 'Correct for missing fibres', tag: 'PIP + U(θ)', detail: 'DESI cannot place two fibres on close neighbours in one pass, so many pairs are observed only partially. Pairwise inverse-probability weights from the fibre-assignment history, with angular upweighting for the pairs that had no chance at all (about 12% at 2″), restore the true counts (Bianchi et al. 2025).' },
+      { title: 'Count', tag: '6,953 pairs', detail: 'The result is the largest uniform dual AGN sample so far: enough to split by separation, mass, redshift and DESI tracer and still have statistics in every bin.' },
+    ]} />
+    <div class="gap"></div>
+    <FigureGrid cols={3} figures={[
+      { src: '/figures/papers/census-agn-selection.jpg', label: 'Who counts as an AGN.', caption: 'Selection methods across the sample and the emission-line diagrams used to classify members.' },
+      { src: '/figures/papers/census-pip-weights.jpg', label: 'Completeness.', caption: 'Cumulative distributions of pairwise inverse-probability weights per DESI tracer.' },
+      { src: '/figures/papers/census-examples.jpg', label: 'What they look like.', caption: 'Example candidate dual AGN on Legacy Surveys imaging.' },
+    ]} />
+  </Section>
+
+  <Section num="3" title="What we found" lede="With thousands of pairs the sample can be cut every way that matters.">
+    <div class="findings">
+      <div class="finding">
+        <h3>Every tracer, every epoch.</h3>
+        <p>Dual AGN turn up in all four DESI target classes, from nearby bright galaxies to high-redshift quasars, so one survey traces the whole merger sequence across cosmic time.</p>
+        <FigureGrid figures={[{ src: '/figures/papers/census-tracers.jpg', caption: 'The dual AGN sample split by DESI target class and redshift.', span: 2 }]} />
+      </div>
+      <div class="finding">
+        <h3>They live in star-forming mergers.</h3>
+        <p>Secondaries form stars 1.3 to 2 times faster than mass-matched controls; primaries barely move. The starburst fraction climbs from 23% for single AGN to 36% for primaries and 45% for secondaries.</p>
+        <FigureGrid figures={[{ src: '/figures/papers/census-host-props.jpg', caption: 'Host stellar mass and specific star formation rate for primaries, secondaries and isolated AGN.', span: 2 }]} />
+      </div>
+      <div class="finding">
+        <h3>A 3 : 1 mass ratio, kept across cosmic time.</h3>
+        <p>Primaries are the most massive hosts at every epoch; secondaries sit 0.2 to 0.6 dex below single AGN. The AGN luminosity boost is strongest at low redshift and vanishes by z ≈ 1.</p>
+        <FigureGrid figures={[{ src: '/figures/papers/census-z-evolution.jpg', caption: 'Redshift evolution of host stellar mass and specific star formation rate for dual AGN members.', span: 2 }]} />
+      </div>
+      <div class="finding">
+        <h3>The closer they get, the more lopsided.</h3>
+        <p>Below 10 kpc the mass asymmetry grows to two dex. Secondary star formation rises as separation shrinks while primaries stay flat, the signature of tidal gas funnelling into the smaller galaxy.</p>
+        <FigureGrid figures={[{ src: '/figures/papers/census-separation-trends.jpg', caption: 'Median host mass, star formation and offset from the main sequence as a function of projected separation.', span: 2 }]} />
+      </div>
+      <div class="finding">
+        <h3>Major mergers dominate.</h3>
+        <p>62% of pairs are major mergers, 18% minor and 20% very minor. Pairs with only one active nucleus show a symmetric mass distribution at small separations: equal-mass pairs are less likely to light up both black holes at once.</p>
+        <FigureGrid figures={[{ src: '/figures/papers/census-mass-ratios.jpg', caption: 'Merger mass ratios for the dual AGN sample against projected separation.', span: 2 }]} />
+      </div>
+      <div class="finding">
+        <h3>The dual fraction over cosmic time.</h3>
+        <p>The ratio of dual to single AGN, corrected for fibre incompleteness, compared with SDSS, HSC, COSMOS-Web and Swift/BAT samples.</p>
+        <FigureGrid figures={[{ src: '/figures/papers/census-dual-fraction.jpg', caption: 'Redshift evolution of the dual AGN fraction for DESI compared with literature samples.', span: 2 }]} />
+      </div>
+    </div>
+    <div class="gap"></div>
+    <FigureGrid cols={2} figures={[
+      { src: '/figures/papers/census-spectra-examples.jpg', label: 'Spectra.', caption: 'Example systems: Legacy Survey image of the pair and the DESI spectra of both members.' },
+      { src: '/figures/papers/census-separation-hist.jpg', label: 'Dual, one-AGN, inactive.', caption: 'Separation and redshift distributions of dual AGN, one-AGN and inactive galaxy pairs.' },
+    ]} />
+  </Section>
+
+  <Section num="4" title="What it means for LISA and pulsar timing" lede="ASTRID, matched to the DESI selection, fast-forwards these pairs to their mergers.">
+    <div class="split">
+      <div class="prose">
+        <p>In Chen, Zhou, Dadiani et al. (2025) the mock DESI catalogue reproduces the observed dual fraction, so its future can be trusted: 76% of DESI-like pairs merge by z = 0 and 37% of the low-redshift mergers land in LISA's band. The same forecast gives full-sky merger rates and the share of the nanohertz gravitational-wave background that descends from pairs we can already see in DESI.</p>
+      </div>
+      <div class="side">
+        <div><div class="mono"><b>Read more</b></div><a href="/research/#the-gravitational-wave-connection">The gravitational-wave connection</a></div>
+      </div>
+    </div>
+    <div class="gap"></div>
+    <FigureGrid cols={2} figures={[
+      { src: '/figures/papers/census-merger-fraction.jpg', label: 'Merger fraction.', caption: 'Redshift evolution of the merger fraction for DESI-selected dual AGN in the mock, with the LISA-detectable share.' },
+      { src: '/figures/papers/gw-four-systems.jpg', label: 'Four futures.', caption: 'Four example dual AGN systems in ASTRID and their evolution to black hole mergers.' },
+    ]} />
+  </Section>
+
+  <Section title="Papers">
+    <div class="pubs">{pubs.map((p, i) => <PubItem pub={p} n={i + 1} />)}</div>
+  </Section>
+
+  <ProjectNav current="dual-agn-census" />
+</Base>
+<style>
+  .gap { height: 28px; }
+  .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
+  .finding :global(.figgrid) { gap: 0; }
+  .finding :global(.figbtn) { padding: 8px; }
+</style>

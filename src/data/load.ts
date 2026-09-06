@@ -7,6 +7,7 @@ import educationRaw from './education.yaml?raw';
 import grantsRaw from './grants.yaml?raw';
 import experienceRaw from './experience.yaml?raw';
 import awardsRaw from './awards.yaml?raw';
+import pathRaw from './path.yaml?raw';
 
 function load<T>(raw: string): T {
   return yaml.load(raw) as T;
@@ -30,6 +31,7 @@ export interface Education { degree: string; institution: string; place: string;
 export interface Grant { name: string; body: string; years: string | number; note?: string }
 export interface Experience { role: string; org: string; place: string; start: string | number; end: string | number; bullets?: string[] }
 export interface Award { year: number | string; title: string; place?: string }
+export interface PathItem { when: string; what: string; where?: string }
 
 export const profile = load<Profile>(profileRaw);
 export const publications = load<Publication[]>(publicationsRaw);
@@ -38,6 +40,7 @@ export const education = load<Education[]>(educationRaw);
 export const grants = load<Grant[]>(grantsRaw);
 export const experience = load<Experience[]>(experienceRaw);
 export const awards = load<Award[]>(awardsRaw);
+export const path = load<PathItem[]>(pathRaw);
 
 export function pubLink(p: Publication): { label: string; url: string } | null {
   if (p.arxiv) return { label: `arXiv:${p.arxiv}`, url: `https://arxiv.org/abs/${p.arxiv}` };

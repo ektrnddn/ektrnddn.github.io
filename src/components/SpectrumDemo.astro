@@ -1,0 +1,70 @@
+---
+// Interactive explainer: narrow lines stay at the systemic redshift while the broad line
+// shifts with the binary's orbital velocity. Slider sets the velocity offset.
+---
+<div class="spec" data-spec>
+  <div class="head">
+    <div class="mono"><b>Try it</b> · drag the velocity offset. Narrow lines come from the host and stay put; the broad line follows the orbiting black hole.</div>
+  </div>
+  <svg viewBox="0 0 800 300" class="plot" aria-label="Sketch of an AGN spectrum with a shifted broad line">
+    <defs><linearGradient id="bl" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8b1e2a" stop-opacity=".35"/><stop offset="1" stop-color="#8b1e2a" stop-opacity="0"/></linearGradient></defs>
+    <line x1="40" y1="250" x2="770" y2="250" stroke="#e3ddd4"/>
+    <line x1="40" y1="30" x2="40" y2="250" stroke="#e3ddd4"/>
+    <g data-ticks font-family="IBM Plex Mono, monospace" font-size="11" fill="#6b645c"></g>
+    <text x="405" y="288" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#6b645c">velocity relative to the host [km/s]</text>
+    <path data-continuum d="" fill="none" stroke="#c9c2b8" stroke-width="1"/>
+    <path data-broad d="" fill="url(#bl)" stroke="#8b1e2a" stroke-width="1.8"/>
+    <path data-narrow d="" fill="none" stroke="#1a1714" stroke-width="1.6"/>
+    <line data-sys x1="405" y1="40" x2="405" y2="250" stroke="#1a1714" stroke-dasharray="3 4"/>
+    <line data-peak x1="405" y1="40" x2="405" y2="250" stroke="#8b1e2a" stroke-dasharray="3 4"/>
+    <text data-syslabel x="405" y="30" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#1a1714">host (narrow lines)</text>
+    <text data-peaklabel x="405" y="58" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8b1e2a">broad line</text>
+  </svg>
+  <div class="controls">
+    <label class="mono">velocity offset <b data-vout>0 km/s</b></label>
+    <input type="range" min="-3000" max="3000" step="50" value="0" data-v aria-label="velocity offset in km/s" />
+    <label class="check"><input type="checkbox" data-dp /> <span>double-peaked (both black holes active)</span></label>
+  </div>
+  <div class="readout mono" data-readout></div>
+</div>
+<style>
+  .spec { border: 1px solid var(--rule); background: var(--paper); padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .plot { width: 100%; height: auto; display: block; }
+  .controls { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+  .readout { min-height: 18px; }
+  @media (max-width: 900px) { .controls { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-spec]').forEach((root) => {
+    const svg = root.querySelector('svg')!;
+    const q = (s: string) => svg.querySelector(s)!;
+    const vIn = root.querySelector<HTMLInputElement>('[data-v]')!;
+    const dp = root.querySelector<HTMLInputElement>('[data-dp]')!;
+    const vout = root.querySelector('[data-vout]')!;
+    const readout = root.querySelector('[data-readout]')!;
+    const X0 = 40, X1 = 770, Y0 = 250, VMAX = 5000;
+    const xv = (v: number) => X0 + ((v + VMAX) / (2 * VMAX)) * (X1 - X0);
+    const gauss = (x: number, mu: number, s: number) => Math.exp(-0.5 * ((x - mu) / s) ** 2);
+    const ticks = q('[data-ticks]');
+    ticks.innerHTML = [-4000, -2000, 0, 2000, 4000].map((v) => `<text x="${xv(v)}" y="266" text-anchor="middle">${v}</text>`).join('');
+    const path = (f: (v: number) => number, fill = false) => {
+      let d = ''; for (let v = -VMAX; v <= VMAX; v += 25) { const x = xv(v), y = Y0 - f(v); d += (v === -VMAX ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' '; }
+      return fill ? d + `L${X1} ${Y0} L${X0} ${Y0} Z` : d;
+    };
+    q('[data-continuum]').setAttribute('d', path((v) => 12 + 6 * Math.sin(v / 900)));
+    q('[data-narrow]').setAttribute('d', path((v) => 12 + 6 * Math.sin(v / 900) + 150 * gauss(v, 0, 110) + 60 * gauss(v, -1400, 90) + 90 * gauss(v, 1000, 90)));
+    const render = () => {
+      const v = parseFloat(vIn.value); const two = dp.checked;
+      const broad = (x: number) => two ? 55 * gauss(x, v, 700) + 45 * gauss(x, -v * 0.6, 750) : 70 * gauss(x, v, 900);
+      q('[data-broad]').setAttribute('d', path((x) => 12 + broad(x), true));
+      q('[data-peak]').setAttribute('x1', String(xv(v))); q('[data-peak]').setAttribute('x2', String(xv(v)));
+      q('[data-peaklabel]').setAttribute('x', String(xv(v)));
+      vout.textContent = `${v > 0 ? '+' : ''}${v} km/s`;
+      const a = Math.abs(v);
+      readout.textContent = a < 500 ? 'Ordinary AGN: broad and narrow lines share one redshift.' : a < 1000 ? 'Mild offset. Could be an asymmetric broad-line region rather than a binary.' : a < 2000 ? '|Δv| > 1,000 km/s: one of 4,862 DESI DR1 broad-line galaxies at this level.' : '|Δv| > 2,000 km/s: one of 826 strong candidates worth follow-up for orbital motion.';
+    };
+    vIn.addEventListener('input', render); dp.addEventListener('change', render); render();
+  });
+</script>

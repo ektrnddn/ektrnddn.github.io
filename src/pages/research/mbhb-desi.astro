@@ -1,0 +1,100 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectHeader from '../../components/ProjectHeader.astro';
+import ProjectNav from '../../components/ProjectNav.astro';
+import Section from '../../components/Section.astro';
+import Numbers from '../../components/Numbers.astro';
+import Stepper from '../../components/Stepper.astro';
+import Funnel from '../../components/Funnel.astro';
+import SpectrumDemo from '../../components/SpectrumDemo.astro';
+const entry = (await getEntry('research', 'mbhb-desi'))!;
+---
+<Base title={entry.data.title} description={entry.data.summary} image="/figures/binary_desi.jpg">
+  <ProjectHeader entry={entry} />
+
+  <section class="wrap">
+    <Numbers items={[
+      { value: '135,851', label: 'broad-line galaxies and quasars in DESI DR1' },
+      { value: '4,862', label: 'with broad lines offset by more than 1,000 km/s' },
+      { value: '826', label: 'offset by more than 2,000 km/s, the strong candidates' },
+      { value: '192', label: 'published binary candidates from imaging surveys; 83% are DESI targets' },
+    ]} />
+  </section>
+
+  <Section num="1" title="The idea" lede="A bound binary is a single point of light. Its spectrum still moves.">
+    <div class="split">
+      <div class="prose">
+        <p>Once two black holes are gravitationally bound, at a hundredth of a parsec or less, no telescope resolves them. But the gas orbiting each black hole, the broad-line region, moves with it at thousands of kilometres per second. The narrow lines come from the host galaxy and mark its systemic redshift. If the broad lines are shifted against them, something is dragging the broad-line gas along an orbit. It is the radial-velocity method for exoplanets, applied to black holes.</p>
+        <p>Shen and Loeb (2010) laid out the signatures: two active black holes give double-peaked broad lines; one active black hole gives a single peak displaced from the narrow lines; and either should drift over time as the orbit turns. The catch is that a lopsided broad-line region, a disk emitter, can mimic a shift in a single spectrum. Repeated observations and consistent shifts across several lines are what separate a binary from a disk.</p>
+      </div>
+      <div class="side">
+        <div><div class="mono"><b>Regimes</b></div>Wide binaries: small velocity differences, asymmetric profiles. Moderate: clear double peaks, radial-velocity drifts. Very close: merged broad-line regions, no coherent drift.</div>
+        <div><div class="mono"><b>References</b></div>Shen &amp; Loeb 2010; Tsalmantza et al. 2011; Eracleous et al. 2012; Guo et al. 2019.</div>
+      </div>
+    </div>
+    <div class="gap"></div>
+    <SpectrumDemo />
+  </Section>
+
+  <Section num="2" title="The search in DESI DR1" lede="Measure the offset for every broad-line spectrum, then chase the outliers.">
+    <div class="split">
+      <Funnel title="From spectra to candidates" rows={[
+        { value: 135851, display: '135,851', label: 'DESI DR1 spectra with a fitted broad line' },
+        { value: 4862, display: '4,862', label: 'broad-line offset above 1,000 km/s' },
+        { value: 826, display: '826', label: 'above 2,000 km/s' },
+        { value: 400, display: '~400', label: 'after visual inspection, the cautious set' },
+      ]} />
+      <div class="side">
+        <div><div class="mono"><b>Plus</b></div>About 2,000 spectra whose broad-line fits show a significant second component, flagged by χ² at more than 3σ, catch double-peaked profiles the shift alone misses.</div>
+        <div><div class="mono"><b>Tool</b></div>FastSpecFit, the DESI spectral fitting pipeline, gives the velocity shift between narrow and broad components for every line.</div>
+      </div>
+    </div>
+    <div class="gap"></div>
+    <Stepper label="Method" steps={[
+      { title: 'Measure the shifts', tag: 'FastSpecFit', detail: 'For every broad-line galaxy, the velocity offset between the broad component and the narrow lines, in every line where both are fitted. Large χ² in the broad fit flags a second peak.' },
+      { title: 'Threshold', tag: '1,000 / 2,000 km/s', detail: 'Two cuts on the absolute offset produce a wide net of 4,862 objects and a strong set of 826. Nearly 2,000 more come from the χ² criterion.' },
+      { title: 'Classify the profiles', tag: 'four classes', detail: 'Following Tsalmantza et al. (2011) and Decarli et al. (2013): binary candidates have bell-shaped broad lines with the same large shift in every line; double-peaked emitters have symmetric red and blue horns from a disk; asymmetric profiles have a symmetric base with a displaced peak; the rest are complex or modest shifts.' },
+      { title: 'Watch for motion', tag: 'time domain', detail: 'Objects with several DESI epochs, archival SDSS spectra and ZTF light curves are checked for drifting peaks and periodicity. For a binary of a few thousandths of a parsec the period is a few hundred days, in reach; wider ones with periods above about 1,200 days will need patience.' },
+      { title: 'Cross-check the known candidates', tag: '192 systems', detail: 'Periodicity searches in CRTS (111), PTF (50), PS1 (26) and DES with SDSS (4) proposed 192 binaries; 83% are DESI targets. Twenty-four wide, low-redshift ones were selected first for spectroscopic follow-up.' },
+    ]} />
+  </Section>
+
+  <Section num="3" title="Early results" lede="A catalogue paper is in preparation. A few of the systems already stand out.">
+    <div class="findings">
+      <div class="finding">
+        <h3>A PTF candidate, re-fit in DESI.</h3>
+        <p>The photometric period of 490.5 days and the DESI broad-line fit give a separation of 0.003 to 0.012 pc and a total mass between 10⁸·⁴ and 10⁹·⁹ solar masses, depending on the assumed mass model.</p>
+      </div>
+      <div class="finding">
+        <h3>A two-redshift system.</h3>
+        <p>An asymmetric broad line at z = 0.3889 sitting on a host at z = 0.3727: a 3,500 km/s offset that survives in more than one line.</p>
+      </div>
+      <div class="finding">
+        <h3>The many-epoch set.</h3>
+        <p>Objects observed repeatedly by DESI are the first place a drifting peak can be caught. These are being tracked epoch by epoch.</p>
+      </div>
+      <div class="finding">
+        <h3>Where the results live.</h3>
+        <p>Plots, tables and per-object pages are on the DESI collaboration server while the paper is under construction. <a href={entry.data.internal_results} target="_blank" rel="noopener">Results page (DESI members)</a>. A public version arrives with the paper.</p>
+      </div>
+    </div>
+  </Section>
+
+  <Section num="4" title="Why it matters">
+    <div class="split">
+      <div class="prose">
+        <p>Sub-parsec binaries are the systems that emit gravitational waves in the pulsar-timing band today and, once they shrink further, in LISA's band. How many exist per unit volume, at which masses and redshifts, sets both the amplitude of the nanohertz background and LISA's event rate. A candidate catalogue with a known selection function is the input those forecasts need, and step 04 is how the search scales to the full survey.</p>
+      </div>
+      <div class="side">
+        <div><div class="mono"><b>Next</b></div><a href="/research/scaling-up/">Step 04 · Scaling up</a></div>
+        <div><div class="mono"><b>Before</b></div><a href="/research/dual-agn-census/">Step 02 · The wide pairs</a></div>
+      </div>
+    </div>
+  </Section>
+
+  <ProjectNav current="mbhb-desi" />
+</Base>
+<style>
+  .gap { height: 28px; }
+</style>

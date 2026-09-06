@@ -1,0 +1,16 @@
+---
+interface Props { num?: string; title: string; lede?: string; id?: string; tight?: boolean }
+const { num, title, lede, id, tight = false } = Astro.props;
+---
+<section class:list={['sec wrap', { tight }]} id={id}>
+  <div class="section-head">
+    {num && <span class="num">§ {num}</span>}
+    <h2>{title}</h2>
+    {lede && <p class="lede-sm">{lede}</p>}
+  </div>
+  <div class="body"><slot /></div>
+</section>
+<style>
+  .body { padding-top: 24px; }
+  .tight .section-head { padding-top: 40px; }
+</style>

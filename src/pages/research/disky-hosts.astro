@@ -1,0 +1,116 @@
+---
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectHeader from '../../components/ProjectHeader.astro';
+import ProjectNav from '../../components/ProjectNav.astro';
+import Section from '../../components/Section.astro';
+import Numbers from '../../components/Numbers.astro';
+import Stepper from '../../components/Stepper.astro';
+import FigureGrid from '../../components/FigureGrid.astro';
+import PubItem from '../../components/PubItem.astro';
+import { publications } from '../../data/load';
+const entry = (await getEntry('research', 'disky-hosts'))!;
+const pubs = entry.data.publications.map((id) => publications.find((p) => p.id === id)!).filter(Boolean);
+---
+<Base title={entry.data.title} description={entry.data.summary} image="/figures/papers/hosts-decomposition.jpg">
+  <ProjectHeader entry={entry} />
+
+  <section class="wrap">
+    <Numbers items={[
+      { value: '~1,000', label: 'dual AGN host galaxies decomposed star by star' },
+      { value: '60.9%', label: 'are disk-dominated, D/T ≥ 0.5, peaking near 0.7' },
+      { value: '35%', label: 'of pairs are disk + disk, the most common pairing' },
+      { value: '19%', label: 'are bulge + bulge, the least common' },
+    ]} />
+  </section>
+
+  <Section num="1" title="The question" lede="Before cataloguing merging black holes in the real universe, learn what their homes should look like.">
+    <div class="split">
+      <div class="prose">
+        <p>The standard picture says two accreting black holes a few kiloparsecs apart live in a galaxy merger, and a merger leaves a disturbed, bulge-dominated remnant. If that were the whole story, dual AGN hosts at cosmic noon would be easy to spot in images. The first published kpc-scale dual quasar at z = 2.17 was found in two compact disks instead, so the question was open.</p>
+        <p>Answering it needs a simulation that follows black-hole pairs at kiloparsec resolution across a cosmological volume. ASTRID does: a 250 (cMpc/h)³ box with 2 × 5500³ particles, more than ten thousand massive AGN already at z = 2, three percent of them in pairs, and a sub-grid dynamical-friction model instead of pinning black holes to the potential minimum, so pairs one kiloparsec apart evolve physically.</p>
+      </div>
+      <div class="side">
+        <div><div class="mono"><b>Sample</b></div>Pairs closer than 30 kpc, both black holes above 10⁷ M☉ and brighter than 10⁴³ erg/s, at z = 2.</div>
+        <div><div class="mono"><b>Tool</b></div>MORDOR, a public kinematic decomposition code (Zana et al. 2022).</div>
+        <div><div class="mono"><b>Question</b></div>Are dual AGN hosts disks or bulges, and does it depend on separation, mass or luminosity?</div>
+      </div>
+    </div>
+  </Section>
+
+  <Section num="2" title="How the decomposition works" lede="Every star is sorted by how tightly it is bound and how circular its orbit is. No images involved, only dynamics.">
+    <Stepper label="Kinematic decomposition" steps={[
+      { title: 'Extract the stars of each host', detail: 'Pull every star particle belonging to the galaxy around each black hole, for the dual, the one-AGN comparison pairs and the isolated AGN sample.' },
+      { title: 'Compute the gravitational potential', detail: 'The expensive step: the potential ψ(r) of every particle, needed for the binding energy E = ½v² + ψ. Stars with E ≥ 0 are unbound and excluded.' },
+      { title: 'Recentre and align', detail: 'A shrinking-sphere recentring finds the true centre, then the stellar spin axis is rotated onto z so that circularity is measured in the plane of rotation.' },
+      { title: 'Split by binding energy', detail: 'Bin the energy distribution and find its natural minimum, E_cut. Stars below it are the tightly bound core, stars above it the loosely bound envelope.' },
+      { title: 'Measure circularity', detail: 'η = j_z / j_circ(E): the angular momentum along the spin axis divided by the most a star could have on a circular orbit at the same energy. η ≈ 1 is a disk star, η ≈ 0 a spheroidal one. Using energy rather than radius makes it orbit-invariant.' },
+      { title: 'Classify and sum', detail: 'Tightly bound stars go to bulge (η < 0), thin disk (η > 0.7) or pseudo-bulge; loosely bound ones to stellar halo, thin or thick disk. D/T = (thin + thick + pseudo-bulge) / M⋆. Disk-dominated means D/T ≥ 0.5.' },
+    ]} />
+    <div class="gap"></div>
+    <FigureGrid cols={2} figures={[
+      { src: '/figures/papers/hosts-decomposition.jpg', label: 'The method at work.', caption: 'Stellar density maps and energy–circularity diagrams for dual AGN hosts of each pairing: bulge/bulge, disk/disk, disk/bulge, and pairs sharing one galaxy. The dashed vertical line is η = 0.7; the horizontal one is E_cut.' },
+      { src: '/figures/papers/hosts-examples.jpg', label: 'What a pair looks like.', caption: 'Simulated dual AGN and one-AGN pairs in ASTRID, in the same galaxy and in different galaxies.' },
+    ]} />
+  </Section>
+
+  <Section num="3" title="What we found">
+    <div class="findings">
+      <div class="finding">
+        <h3>The hosts are disks.</h3>
+        <p>60.9% of dual AGN hosts have D/T ≥ 0.5, and the distribution peaks near 0.7. The wrecked-remnant picture does not describe the typical host at z = 2.</p>
+        <FigureGrid cols={2} figures={[{ src: '/figures/papers/hosts-dt-distribution.jpg', caption: 'Distribution of the disk-to-total ratio for dual AGN hosts against all galaxies and the isolated AGN sample.', span: 2 }]} />
+      </div>
+      <div class="finding">
+        <h3>More massive, more disky, but through pseudo-bulges.</h3>
+        <p>The disk fraction rises with stellar mass, and at the high-mass end it is the pseudo-bulge component that dominates, not a thin disk.</p>
+        <FigureGrid cols={2} figures={[{ src: '/figures/papers/hosts-mass-fractions.jpg', caption: 'Mass fractions of the five kinematic components as a function of host stellar mass.', span: 2 }]} />
+      </div>
+      <div class="finding">
+        <h3>Pairs tend to match.</h3>
+        <p>Most pairs live in two galaxies of the same morphology: disk + disk is the most common combination at 35%, bulge + bulge the rarest at 19%.</p>
+        <FigureGrid cols={2} figures={[{ src: '/figures/papers/hosts-pair-morphology.jpg', caption: 'Disk and bulge hosts of dual AGN systems as a function of black hole properties.', span: 2 }]} />
+      </div>
+      <div class="finding">
+        <h3>Separation, mass and luminosity do not change the answer.</h3>
+        <p>D/T is flat against black hole separation, black hole mass and AGN luminosity: morphology is not set by how close or how bright the pair is.</p>
+        <FigureGrid cols={2} figures={[{ src: '/figures/papers/hosts-dt-separation.jpg', caption: 'Disk-to-total ratio versus pair separation, for pairs in different galaxies and in the same galaxy.', span: 2 }]} />
+      </div>
+    </div>
+  </Section>
+
+  <Section num="4" title="Does it match the real sky?" lede="Kinematics are invisible to a telescope, so we made mock images and measured them the way observers do.">
+    <div class="prose">
+      <p>Mock images of the same hosts, analysed with Statmorph, give Sérsic indices and half-mass radii that agree with HST measurements of z ≈ 2 dual quasars. In the Gini–M20 plane the mocks separate into disks and mergers the way real galaxies do. Two ASTRID systems land right on top of the observed disk–disk dual quasar, and JWST-like mocks show what the same hosts would look like in NIRCam.</p>
+    </div>
+    <div class="gap"></div>
+    <FigureGrid cols={3} figures={[
+      { src: '/figures/papers/hosts-sersic.jpg', label: 'Sérsic index.', caption: 'D/T against the Sérsic index and half-mass radius from mock images, compared with observed dual quasar hosts.' },
+      { src: '/figures/papers/hosts-gini-m20.jpg', label: 'Gini–M20.', caption: 'Gini coefficient against M20 for all dual AGN hosts, coloured by Sérsic index, with the merger and disk regions marked.' },
+      { src: '/figures/papers/hosts-jwst-mocks.jpg', label: 'JWST mocks.', caption: 'Stellar surface density and NIRCam F150W and F356W mock images of three pairs, face-on and edge-on.' },
+    ]} />
+  </Section>
+
+  <Section num="5" title="Why it matters for the next steps">
+    <div class="split">
+      <div class="prose">
+        <p>This sets the expectation for step 02: when DESI delivers thousands of real dual AGN, their hosts should be ordinary star-forming disks rather than obvious wrecks, and morphology alone will not select them. It also fixes the reference frame for the ASTRID mocks used in the gravitational-wave forecasts.</p>
+      </div>
+      <div class="side">
+        <div><div class="mono"><b>Next</b></div><a href="/research/dual-agn-census/">Step 02 · The wide pairs</a></div>
+      </div>
+    </div>
+  </Section>
+
+  <Section title="Paper">
+    <div class="pubs">{pubs.map((p, i) => <PubItem pub={p} n={i + 1} />)}</div>
+  </Section>
+
+  <ProjectNav current="disky-hosts" />
+</Base>
+<style>
+  .gap { height: 28px; }
+  .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
+  .finding :global(.figgrid) { gap: 0; }
+  .finding :global(.figbtn) { padding: 8px; }
+</style>

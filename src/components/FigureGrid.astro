@@ -1,0 +1,50 @@
+---
+// Paper figures with captions; click to open full size in a dialog.
+interface Fig { src: string; caption: string; label?: string; span?: 1 | 2 }
+interface Props { figures: Fig[]; cols?: 2 | 3 }
+const { figures, cols = 2 } = Astro.props;
+---
+<div class:list={['figgrid', `cols${cols}`]} data-figgrid>
+  {figures.map((f, i) => (
+    <figure class:list={['fig', { wide: f.span === 2 }]}>
+      <button type="button" class="figbtn" data-src={f.src} data-cap={f.caption} aria-label="Open figure">
+        <img src={f.src} alt={f.caption} loading="lazy" />
+      </button>
+      <figcaption class="caption">{f.label && <b>{f.label}</b>} {f.caption}</figcaption>
+    </figure>
+  ))}
+</div>
+<dialog class="lightbox" data-lightbox>
+  <button type="button" class="close" aria-label="Close" data-close>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4l12 12M16 4L4 16"/></svg>
+  </button>
+  <img alt="" />
+  <p class="caption"></p>
+</dialog>
+<style>
+  .figgrid { display: grid; gap: 28px 24px; }
+  .cols2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fig { margin: 0; display: flex; flex-direction: column; }
+  .fig.wide { grid-column: span 2; }
+  .figbtn { appearance: none; border: 1px solid var(--rule); background: var(--paper); padding: 12px; cursor: zoom-in; transition: border-color .2s; display: block; width: 100%; }
+  .figbtn:hover { border-color: var(--ink); }
+  .figbtn img { width: 100%; height: auto; display: block; }
+  .lightbox { border: 0; padding: 0; background: var(--bg); max-width: min(96vw, 1400px); width: auto; }
+  .lightbox::backdrop { background: rgba(26, 23, 20, .85); }
+  .lightbox img { max-width: 92vw; max-height: 82vh; width: auto; height: auto; display: block; margin: 0 auto; padding: 20px 20px 0; }
+  .lightbox .caption { padding: 12px 20px 20px; max-width: 900px; }
+  .close { position: absolute; top: 10px; right: 10px; appearance: none; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  @media (max-width: 900px) { .cols2, .cols3 { grid-template-columns: minmax(0, 1fr); } .fig.wide { grid-column: auto; } }
+</style>
+<script>
+  const dlg = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  if (dlg) {
+    const img = dlg.querySelector('img')!; const cap = dlg.querySelector('.caption')!;
+    document.querySelectorAll<HTMLButtonElement>('.figbtn').forEach((b) => b.addEventListener('click', () => {
+      img.src = b.dataset.src ?? ''; cap.textContent = b.dataset.cap ?? ''; dlg.showModal();
+    }));
+    dlg.querySelector('[data-close]')?.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  }
+</script>

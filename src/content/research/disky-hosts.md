@@ -1,24 +1,25 @@
 ---
-title: "Dual AGN host galaxies are disky"
-slug: disky-hosts
-order: 3
-scale: "host galaxies"
-status: "ASTRID · z ≈ 2 · 2024"
+title: "What do the hosts look like? Dual AGN host galaxies are disky"
+order: 1
+step: "01"
+stage: "Setting the stage"
+scale: "Host galaxies, pairs closer than 30 kpc"
+data: "ASTRID cosmological simulation, z ≈ 2"
+with: "Tiziana Di Matteo, Nianyi Chen, Patrick Lachance, Yue Shen, Yu-Ching Chen, Rupert Croft, Yueying Ni, Simeon Bird"
+status: "Published in The Open Journal of Astrophysics, 2024"
+status_kind: published
 summary: >-
-  Kinematic decomposition of about 1,000 dual AGN hosts at z = 2 in the ASTRID
-  simulation: 61% are disk-dominated rather than the disturbed remnants merger
-  theory expects.
+  Merger theory expects the hosts of two accreting black holes to be wrecked,
+  bulge-dominated remnants. Kinematic decomposition of about 1,000 dual AGN hosts in
+  ASTRID says otherwise: 61% are disk-dominated, and mock images match the HST view
+  of real dual quasars at cosmic noon.
+hook: "Before counting pairs in the real universe, learn what their homes look like."
+key: { value: "60.9%", label: "of dual AGN hosts are disk-dominated" }
+sep: 1
+sep_label: "two galaxies, two black holes, ≲ 30 kpc apart"
 figure: /figures/disky_sfr_figure.jpg
 figure_caption: >-
-  Mock images and stellar circularity–energy diagrams for dual AGN hosts of each
+  Mock stellar density maps and energy–circularity diagrams for dual AGN hosts of each
   morphological pairing.
 publications: [dadiani2024-disky]
 ---
-
-Before cataloguing merging black holes, the question is what their hosts look
-like. Using MORDOR to decompose stellar kinematics into thin and thick disks,
-pseudo-bulges, bulges and spheroidal haloes, 60.9% of hosts have a disk-to-total
-ratio of at least 0.5, peaking near 0.7, with pseudo-bulges dominating the
-high-mass end. Mock Statmorph images match HST Sérsic indices and half-mass radii
-at z ∼ 2, and two systems land in disk galaxies matching recently discovered dual
-quasars at the same epoch.

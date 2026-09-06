@@ -1,0 +1,16 @@
+---
+interface Props { src: string; title: string; hint?: string; height?: number }
+const { src, title, hint = 'Wheel zooms, drag pans, drag on the histogram selects a redshift range, double-click resets.', height = 920 } = Astro.props;
+---
+<section class="explorer">
+  <div class="head">
+    <div class="mono"><b>Interactive figure</b> · {hint}</div>
+    <a href={src} target="_blank" rel="noopener" class="link-ul">Open full screen</a>
+  </div>
+  <iframe src={src} title={title} loading="lazy" allow="fullscreen" style={`height:${height}px`}></iframe>
+</section>
+<style>
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; padding: 12px 0; flex-wrap: wrap; }
+  iframe { display: block; width: 100%; border: 1px solid var(--rule); background: #0d0d0d; }
+  @media (max-width: 900px) { iframe { height: 640px !important; } }
+</style>
