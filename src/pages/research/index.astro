@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import ResearchRow from '../../components/ResearchRow.astro';
+import { profile } from '../../data/load';
+const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
+---
+<Base title="Research" description={profile.research_lede}>
+  <section class="wrap">
+    <SectionHead title="Research" lede={profile.research_lede} />
+    <div class="rrows">
+      {research.map((entry, i) => <ResearchRow entry={entry} index={i + 1} />)}
+    </div>
+  </section>
+</Base>
+<style>
+  .rrows { padding-top: 24px; display: flex; flex-direction: column; }
+  .rrows :global(.rrow:last-child) { border-bottom: 1px solid var(--rule); }
+</style>

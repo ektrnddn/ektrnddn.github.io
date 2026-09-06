@@ -1,0 +1,7 @@
+---
+interface Props { kind?: 'right' | 'down' | 'ext' }
+const { kind = 'right' } = Astro.props;
+---
+{kind === 'right' && <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10"/><path d="M9 4l4 4-4 4"/></svg>}
+{kind === 'down' && <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v9"/><path d="M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>}
+{kind === 'ext' && <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12L12 4"/><path d="M6 4h6v6"/></svg>}

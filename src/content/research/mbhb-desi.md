@@ -8,7 +8,7 @@ summary: >-
   Sub-parsec binaries betray themselves through Doppler shifts of their broad
   emission lines. Velocity-offset searches in DESI, then variational autoencoders
   on DR3 to find binary signatures at population scale.
-figure: /figures/binary_desi.png
+figure: /figures/binary_desi.jpg
 figure_caption: >-
   Specific star formation rate versus stellar mass for DESI dual AGN hosts in three
   redshift bins, over the parent galaxy population.

@@ -6,6 +6,23 @@ affiliation: McWilliams Center for Cosmology and Astrophysics, Carnegie Mellon U
 location: Pittsburgh, PA
 email: edadiani@andrew.cmu.edu
 tagline: Massive black hole pairs, from kiloparsecs to sub-parsec, across cosmic time.
+hero:
+  # Rendered as: {start} <em>{emphasis}</em> {end}
+  start: "Massive black hole pairs,"
+  emphasis: "from kiloparsecs to sub-parsec,"
+  end: "across cosmic time."
+  lede: >-
+    I use DESI spectroscopy, the ASTRID cosmological simulation and machine learning
+    to find and count dual and binary AGN, and to forecast what LISA and pulsar timing
+    arrays will detect.
+  figure: /figures/dr_z_bigmac_duals.jpg
+  figure_alt: Redshift versus projected separation for DESI DR1 dual AGN
+  figure_caption: >-
+    Redshift versus projected separation for 6,953 DESI DR1 dual AGN, against every
+    literature candidate to date. Dadiani et al. 2026.
+research_lede: >-
+  One question at three separation scales: where are the massive black hole pairs,
+  how many are there, and which ones will gravitational-wave detectors hear?
 bio: >-
   I study massive black hole pairs: where they are, how many exist, and which ones
   LISA and pulsar timing arrays will eventually detect. The work spans the full

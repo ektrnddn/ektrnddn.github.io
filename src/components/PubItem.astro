@@ -1,0 +1,33 @@
+---
+import { pubLink, type Publication } from '../data/load';
+interface Props { pub: Publication; n: number }
+const { pub, n } = Astro.props;
+const link = pubLink(pub);
+const authors = pub.authors.replace(/Dadiani E\./g, '<strong>Dadiani E.</strong>');
+---
+<div class="pub grid12">
+  <div class="n">[{n}]</div>
+  <div class="body">
+    <span set:html={authors} />, {pub.year}.
+    <span class="title">{pub.title}.</span>
+    <span class="venue">{pub.venue}.</span>
+  </div>
+  <div class="links">
+    {link && <a href={link.url} target="_blank" rel="noopener">{link.label}</a>}
+    {pub.extras?.map((e) => <a href={e.url} target="_blank" rel="noopener">{e.label}</a>)}
+  </div>
+</div>
+<style>
+  .pub { padding: 22px 0; border-top: 1px solid var(--rule); }
+  .n { grid-column: span 1; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .body { grid-column: span 9; font-size: 15px; line-height: 1.6; color: var(--text); }
+  .body strong { color: var(--ink); font-weight: 500; }
+  .title { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--ink); }
+  .venue { color: var(--text); }
+  .links { grid-column: span 2; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: 14px; text-align: right; }
+  @media (max-width: 900px) {
+    .pub { padding: 16px 0; }
+    .n { display: none; }
+    .links { flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 16px; text-align: left; }
+  }
+</style>

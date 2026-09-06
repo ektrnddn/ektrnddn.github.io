@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import PubItem from '../components/PubItem.astro';
+import { publications, talks } from '../data/load';
+
+const sorted = [...publications].sort((a, b) => b.year - a.year);
+const years = [...new Set(sorted.map((p) => p.year))];
+let n = 0;
+const byYear = years.map((y) => ({ year: y, items: sorted.filter((p) => p.year === y).map((p) => ({ p, n: ++n })) }));
+const kinds: Record<string, string> = { talk: 'Talk', organizer: 'Organiser', school: 'School', workshop: 'Workshop' };
+const talksSorted = [...talks].sort((a, b) => b.year - a.year);
+---
+<Base title="Publications" description="Papers and talks by Ekaterine Dadiani.">
+  <section class="wrap">
+    <SectionHead title="Publications">
+      <span class="mono aside-link">{publications.length} papers</span>
+    </SectionHead>
+    {byYear.map(({ year, items }) => (
+      <div class="year grid12">
+        <div class="ylabel mono"><b>{year}</b></div>
+        <div class="ylist">{items.map(({ p, n }) => <PubItem pub={p} n={n} />)}</div>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Talks and schools" />
+    <div class="talks rows">
+      {talksSorted.map((t) => (
+        <div class="row grid12 talk">
+          <div class="years">{t.year}</div>
+          <div class="kind mono">{kinds[t.kind] ?? t.kind}</div>
+          <div class="what">{t.event} <span class="note">· {t.place}</span></div>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .year { padding-top: 24px; align-items: start; }
+  .ylabel { grid-column: span 1; padding-top: 24px; font-size: 13px; }
+  .ylist { grid-column: span 11; }
+  .ylist :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
+  .talks { padding-top: 24px; }
+  .talk { gap: 24px; }
+  .talk .years { grid-column: span 1; }
+  .talk .kind { grid-column: span 2; padding-top: 3px; }
+  .talk .what { grid-column: span 9; }
+  @media (max-width: 900px) {
+    .year { padding-top: 12px; }
+    .ylabel { padding-top: 0; }
+    .talk { gap: 2px; }
+  }
+</style>

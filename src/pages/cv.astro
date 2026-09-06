@@ -1,0 +1,130 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Arrow from '../components/Arrow.astro';
+import { profile, education, grants, experience, awards } from '../data/load';
+import lastBuilt from '../../public/cv/last-built.txt?raw';
+const pdf = '/cv/Ekaterine_Dadiani_CV.pdf';
+---
+<Base title="Curriculum vitae" description={`Curriculum vitae of ${profile.name}, ${profile.title} at Carnegie Mellon University.`}>
+  <section class="wrap top grid12">
+    <div class="intro">
+      <h1>Curriculum vitae</h1>
+      <p class="lede">The PDF is compiled from the LaTeX source on every change, so it is always the current version. The same content follows as a web page.</p>
+      <div class="actions">
+        <a class="btn" href={pdf}>Download PDF <Arrow kind="down" /></a>
+        <span class="mono">Last built {lastBuilt.trim()}</span>
+      </div>
+    </div>
+    <div class="contact">
+      <div class="mono"><b>{profile.name}</b></div>
+      <div>{profile.title}</div>
+      <div>{profile.affiliation}</div>
+      <div>{profile.location}</div>
+      <a href={`mailto:${profile.email}`}>{profile.email}</a>
+    </div>
+  </section>
+
+  <section class="wrap pdfwrap">
+    <object data={`${pdf}#view=FitH`} type="application/pdf" class="pdf" aria-label="CV PDF">
+      <p class="prose">Your browser does not display PDFs inline. <a href={pdf}>Download the PDF</a>.</p>
+    </object>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Education" />
+    <div class="rows">
+      {education.map((e) => (
+        <div class="row grid12 r">
+          <div class="years">{e.start} – {e.end}</div>
+          <div class="what"><b>{e.degree}</b>, {e.institution}, {e.place}. {e.note && <span class="note">{e.note}</span>}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Grants and fellowships" />
+    <div class="rows">
+      {grants.map((g) => (
+        <div class="row grid12 r">
+          <div class="years">{g.years}</div>
+          <div class="what"><b>{g.name}</b>, {g.body}. {g.note && <span class="note">{g.note}</span>}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Collaborations" />
+    <div class="rows">
+      {profile.collaborations.map((c) => (
+        <div class="row grid12 r">
+          <div class="years">since {c.since}</div>
+          <div class="what"><b>{c.name}</b>. <span class="note">{c.role}.</span></div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Experience" />
+    <div class="rows">
+      {experience.map((x) => (
+        <div class="row grid12 r">
+          <div class="years">{x.start}{x.end !== x.start && ` – ${x.end}`}</div>
+          <div class="what">
+            <b>{x.role}</b>, {x.org}, {x.place}.
+            {x.bullets && <ul>{x.bullets.map((b) => <li>{b}</li>)}</ul>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Awards" />
+    <div class="rows">
+      {awards.map((a) => (
+        <div class="row grid12 r">
+          <div class="years">{a.year}</div>
+          <div class="what">{a.title}{a.place && <span class="note">, {a.place}</span>}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Skills and interests" />
+    <div class="rows">
+      <div class="row grid12 r">
+        <div class="years">Technical</div>
+        <div class="what">{profile.skills.join(' · ')}</div>
+      </div>
+      <div class="row grid12 r">
+        <div class="years">Outside work</div>
+        <div class="what">{profile.hobbies.join(' · ')}</div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .top { padding-top: 72px; padding-bottom: 40px; align-items: end; }
+  .intro { grid-column: span 8; display: flex; flex-direction: column; gap: 22px; }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(36px, 4.4vw, 60px); line-height: 1.04; letter-spacing: -.02em; }
+  .actions { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .contact { grid-column: 10 / span 3; display: flex; flex-direction: column; gap: 4px; font-size: 14px; line-height: 1.5; color: var(--text); border-left: 1px solid var(--rule); padding-left: 20px; }
+  .pdfwrap { padding-bottom: 16px; }
+  .pdf { display: block; width: 100%; height: 1000px; border: 1px solid var(--rule); background: var(--paper); }
+  .r { gap: 24px; }
+  .r .years { grid-column: span 2; }
+  .r .what { grid-column: span 10; }
+  .r .what b { font-weight: 500; }
+  @media (max-width: 900px) {
+    .top { padding-top: 32px; padding-bottom: 24px; }
+    .contact { border-left: 0; padding-left: 0; }
+    .pdfwrap { display: none; }
+    .r { gap: 2px; }
+  }
+</style>

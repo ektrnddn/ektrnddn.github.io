@@ -1,18 +1,136 @@
 ---
-// Placeholder until the design direction is chosen. Replaced by the real home page.
-import { profile, publications } from '../data/load';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import ResearchRow from '../components/ResearchRow.astro';
+import PubItem from '../components/PubItem.astro';
+import Arrow from '../components/Arrow.astro';
+import { profile, publications, education, grants } from '../data/load';
+import lastBuilt from '../../public/cv/last-built.txt?raw';
+
+const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
+const selected = publications.filter((p) => p.selected);
+const fellowships = grants.filter((g) => /fellow|pathway/i.test(g.name));
+const cvRows = [
+  ...education.filter((e) => /Ph\.D|M\.Sc|B\.Sc/.test(e.degree)).map((e) => ({
+    sort: e.start, years: `${e.start} – ${e.end}`, text: `${e.degree}, ${e.institution}.`,
+    note: e.degree.startsWith('Ph.D') ? `Advisors ${profile.advisors.join(' and ')}.` : undefined,
+  })),
+  ...fellowships.map((g) => ({ sort: parseInt(String(g.years)), years: String(g.years).replace(/(\d)–(\d)/, '$1 – $2'), text: `${g.name}.`, note: undefined })),
+  { sort: 2022.9, years: '2023 – present', text: profile.collaborations.map((c) => `${c.name} (${c.role})`).join('; ') + '.', note: undefined },
+].sort((a, b) => b.sort - a.sort);
+const h = profile.hero;
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{profile.name}</title>
-  </head>
-  <body>
-    <h1>{profile.name}</h1>
-    <p>{profile.title}, {profile.affiliation}.</p>
-    <p><a href="/cv/Ekaterine_Dadiani_CV.pdf">CV (PDF)</a></p>
-    <p>{publications.length} publications loaded.</p>
-  </body>
-</html>
+<Base>
+  <section class="hero wrap grid12">
+    <div class="hero-text">
+      <p class="eyebrow">{profile.title} · Carnegie Mellon University · McWilliams Center</p>
+      <h1>{h.start} <em>{h.emphasis}</em> {h.end}</h1>
+      <p class="lede">{h.lede}</p>
+      <div class="actions">
+        <a class="btn" href="/research/dual-agn-census/">Read the DESI dual AGN census <Arrow /></a>
+        <a class="link-ul" href="/cv/Ekaterine_Dadiani_CV.pdf">Curriculum vitae (PDF)</a>
+      </div>
+    </div>
+    <figure class="hero-fig">
+      <div class="figure"><img src={h.figure} alt={h.figure_alt} width="1600" height="1314" fetchpriority="high" /></div>
+      <figcaption class="caption"><b>Figure 1.</b> {h.figure_caption}</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap about">
+    <SectionHead num="1" title="About" />
+    <div class="grid12 about-grid">
+      <p class="bio">{profile.bio}</p>
+      <div class="facts">
+        <div class="fact">
+          <div class="mono"><b>Advisors</b></div>
+          <div>{profile.advisors.join(', ')}</div>
+        </div>
+        <div class="fact">
+          <div class="mono"><b>Collaborations</b></div>
+          <div>{profile.collaborations.map((c) => c.name).join(' · ')}</div>
+        </div>
+        <div class="fact">
+          <div class="mono"><b>Fellowships</b></div>
+          <div>{fellowships.map((g) => `${g.name.replace(' Data Science Fellowship', ' Fellow')} (${g.years})`).join(' · ')}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead num="2" title="Research" lede={profile.research_lede} />
+    <div class="rrows">
+      {research.map((entry, i) => <ResearchRow entry={entry} index={i + 1} />)}
+    </div>
+    <p class="more"><a class="link-ul" href="/research/">All research, including earlier work</a></p>
+  </section>
+
+  <section class="wrap">
+    <SectionHead num="3" title="Selected publications">
+      <a class="link-ul aside-link" href="/publications/">All publications and talks</a>
+    </SectionHead>
+    <div class="pubs">
+      {selected.map((p, i) => <PubItem pub={p} n={i + 1} />)}
+    </div>
+  </section>
+
+  <section class="wrap cv grid12">
+    <div class="cv-left">
+      <SectionHead num="4" title="Curriculum vitae" />
+      <p class="prose">Built automatically from the LaTeX source, so the PDF here is always the current one.</p>
+      <div class="actions">
+        <a class="btn" href="/cv/Ekaterine_Dadiani_CV.pdf">Download PDF <Arrow kind="down" /></a>
+        <span class="mono">Last built {lastBuilt.trim()}</span>
+      </div>
+      <p class="prose"><a href="/cv/">Read the CV as a web page</a></p>
+    </div>
+    <div class="cv-right rows">
+      {cvRows.map((r) => (
+        <div class="row grid12 cvrow">
+          <div class="years">{r.years}</div>
+          <div class="what">{r.text} {r.note && <span class="note">{r.note}</span>}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding-top: 88px; padding-bottom: 80px; align-items: start; }
+  .hero-text { grid-column: span 7; display: flex; flex-direction: column; gap: 28px; }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(40px, 4.6vw, 66px); line-height: 1.04; letter-spacing: -.02em; text-wrap: pretty; }
+  h1 em { font-style: italic; font-weight: 300; }
+  .hero .lede { max-width: 600px; }
+  .actions { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+  .hero-fig { grid-column: span 5; margin: 0; }
+
+  .about-grid { padding-top: 24px; }
+  .bio { grid-column: span 7; font-size: 17px; line-height: 1.65; color: var(--text); text-wrap: pretty; }
+  .facts { grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 18px; font-size: 15px; line-height: 1.5; }
+  .fact .mono { margin-bottom: 4px; }
+
+  .rrows { padding-top: 24px; display: flex; flex-direction: column; }
+  .rrows :global(.rrow:last-child) { border-bottom: 1px solid var(--rule); }
+  .more { padding-top: 24px; }
+  .pubs { padding-top: 24px; }
+  .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
+
+  .cv { padding-top: 0; align-items: start; }
+  .cv-left { grid-column: span 5; display: flex; flex-direction: column; gap: 20px; }
+  .cv-left :global(.section-head) { padding-bottom: 0; }
+  .cv-right { grid-column: span 7; margin-top: 78px; }
+  .cvrow { gap: 24px; }
+  .cvrow .years { grid-column: span 3; }
+  .cvrow .what { grid-column: span 9; }
+
+  @media (max-width: 900px) {
+    .hero { padding-top: 40px; padding-bottom: 40px; }
+    .hero-text { gap: 20px; }
+    .about-grid, .rrows, .pubs { padding-top: 12px; }
+    .facts { gap: 12px; }
+    .cv-right { margin-top: 12px; }
+    .cvrow { gap: 4px; }
+  }
+</style>

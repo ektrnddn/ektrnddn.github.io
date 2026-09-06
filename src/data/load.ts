@@ -15,6 +15,8 @@ function load<T>(raw: string): T {
 export interface Profile {
   name: string; short_name: string; title: string; affiliation: string; location: string;
   email: string; tagline: string; bio: string; advisors: string[];
+  hero: { start: string; emphasis: string; end: string; lede: string; figure: string; figure_alt: string; figure_caption: string };
+  research_lede: string;
   collaborations: { name: string; role: string; since: number }[];
   links: Record<string, string>; skills: string[]; hobbies: string[];
 }
@@ -25,7 +27,7 @@ export interface Publication {
 }
 export interface Talk { year: number; kind: string; event: string; place: string }
 export interface Education { degree: string; institution: string; place: string; start: number; end: number | string; note?: string }
-export interface Grant { name: string; body: string; years: string; note?: string }
+export interface Grant { name: string; body: string; years: string | number; note?: string }
 export interface Experience { role: string; org: string; place: string; start: string | number; end: string | number; bullets?: string[] }
 export interface Award { year: number | string; title: string; place?: string }
 

@@ -4,8 +4,26 @@
     {
       "name": "site",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "4321"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "4321"
+      ],
       "port": 4321
+    },
+    {
+      "name": "dist-preview",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8792",
+        "--directory",
+        "dist"
+      ],
+      "port": 8792
     }
   ]
 }

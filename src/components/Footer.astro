@@ -1,0 +1,31 @@
+---
+import { profile } from '../data/load';
+const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 'Google Scholar', linkedin: 'LinkedIn', orcid: 'ORCID' };
+const external = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
+---
+<footer id="contact" class="footer">
+  <div class="wrap top">
+    <div class="who">
+      <div class="name">{profile.name}</div>
+      <div class="aff">{profile.affiliation}, {profile.location}</div>
+    </div>
+    <div class="links">
+      <a href={`mailto:${profile.email}`} class="mail">{profile.email}</a>
+      {external.map(([k, v]) => <a href={v} rel="me noopener" target="_blank">{labels[k] ?? k}</a>)}
+    </div>
+  </div>
+  <div class="wrap copy">© {new Date().getFullYear()} {profile.name}. Built from plain files, <a href="https://github.com/ektrnddn/ektrnddn.github.io">source on GitHub</a>.</div>
+</footer>
+<style>
+  .footer { margin-top: 80px; border-top: 1px solid var(--rule); }
+  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; padding-top: 40px; padding-bottom: 28px; }
+  .name { font-family: var(--serif); font-size: 20px; font-weight: 500; }
+  .aff { font-size: 14px; line-height: 1.5; color: var(--muted); margin-top: 6px; }
+  .links { display: flex; gap: 24px; flex-wrap: wrap; font-size: 14px; }
+  .links a { color: var(--muted); }
+  .links a.mail { color: var(--ink); }
+  .links a:hover { color: var(--accent); }
+  .copy { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-bottom: 40px; }
+  .copy a { color: var(--muted); text-decoration: underline; }
+  @media (max-width: 900px) { .footer { margin-top: 56px; } .links { gap: 16px; } }
+</style>

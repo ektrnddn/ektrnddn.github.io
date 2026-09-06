@@ -8,7 +8,7 @@ summary: >-
   More than 7,000 dual AGN from DESI DR1: one to two orders of magnitude beyond
   earlier samples at z = 0.2–0.4, about fifty dwarf dual AGN, and a tripled census
   above z = 2.
-figure: /figures/dr_z_bigmac_duals.png
+figure: /figures/dr_z_bigmac_duals.jpg
 figure_caption: >-
   Redshift versus projected separation for 6,953 DESI DR1 dual AGN, against every
   literature candidate to date.

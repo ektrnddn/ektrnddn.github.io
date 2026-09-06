@@ -8,7 +8,7 @@ summary: >-
   Kinematic decomposition of about 1,000 dual AGN hosts at z = 2 in the ASTRID
   simulation: 61% are disk-dominated rather than the disturbed remnants merger
   theory expects.
-figure: /figures/disky_sfr_figure.png
+figure: /figures/disky_sfr_figure.jpg
 figure_caption: >-
   Mock images and stellar circularity–energy diagrams for dual AGN hosts of each
   morphological pairing.

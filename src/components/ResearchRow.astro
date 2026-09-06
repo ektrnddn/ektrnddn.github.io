@@ -1,0 +1,44 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { publications, pubLink } from '../data/load';
+import Arrow from './Arrow.astro';
+interface Props { entry: CollectionEntry<'research'>; index: number }
+const { entry, index } = Astro.props;
+const d = entry.data;
+const papers = d.publications.map((id) => publications.find((p) => p.id === id)).filter(Boolean);
+const label = (p: NonNullable<(typeof papers)[number]>) => (p.arxiv ? `arXiv:${p.arxiv}` : `${p.venue.split(',')[0]}, ${p.year}`);
+const href = `/research/${entry.id}/`;
+---
+<article class="rrow grid12">
+  <div class="meta mono">
+    <div><b>{String(index).padStart(2, '0')} · {d.scale}</b></div>
+    <div>{d.status}</div>
+  </div>
+  <div class="main">
+    <h3><a href={href}>{d.title}</a></h3>
+    <p>{d.summary}</p>
+  </div>
+  <div class="links">
+    {papers.map((p) => { const l = pubLink(p!); return l && <a href={l.url} target="_blank" rel="noopener">{label(p!)}</a>; })}
+    {d.explorer && <a href={d.explorer} target="_blank" rel="noopener">Interactive z–separation explorer</a>}
+    {d.internal_results && <a href={d.internal_results} target="_blank" rel="noopener">Results page (DESI members)</a>}
+    <a href={href} class="proj">Project page <Arrow /></a>
+  </div>
+</article>
+<style>
+  .rrow { padding: 40px 0; border-top: 1px solid var(--rule); }
+  .meta { grid-column: span 2; display: flex; flex-direction: column; gap: 6px; }
+  .main { grid-column: span 7; display: flex; flex-direction: column; gap: 14px; }
+  h3 { font-family: var(--serif); font-size: clamp(24px, 2.3vw, 30px); line-height: 1.15; letter-spacing: -.01em; }
+  h3 a { color: var(--ink); }
+  h3 a:hover { color: var(--accent); text-decoration: none; }
+  .main p { font-size: 16px; line-height: 1.6; color: var(--text); text-wrap: pretty; }
+  .links { grid-column: span 3; display: flex; flex-direction: column; gap: 10px; font-size: 14px; padding-top: 8px; }
+  .links .proj { color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+  .links .proj:hover { color: var(--accent); }
+  @media (max-width: 900px) {
+    .rrow { padding: 28px 0; }
+    .meta { flex-direction: row; gap: 14px; }
+    .links { flex-direction: row; flex-wrap: wrap; gap: 8px 20px; padding-top: 0; }
+  }
+</style>
