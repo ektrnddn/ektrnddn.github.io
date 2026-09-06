@@ -1,0 +1,12 @@
+- name: NASA LISA Preparatory Science Grant
+  body: NASA
+  years: 2023–2026
+  note: "PI: Antonella Palmese and Tiziana Di Matteo. 'Studying LISA sources using DESI and LIGO/Virgo/KAGRA', $687k."
+- name: LSST Discovery Alliance Data Science Fellowship
+  body: LSST Discovery Alliance
+  years: 2025–2026
+  note: Two-year training in software engineering, statistics, machine learning, scalable computing and science communication.
+- name: CI Pathways, Data Science Pathway
+  body: NSF Award 2417789 (NCSA and PSC)
+  years: 2025
+  note: Ten-week training in data science, machine learning and AI on advanced cyberinfrastructure.

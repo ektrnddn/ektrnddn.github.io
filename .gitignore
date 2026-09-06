@@ -1,0 +1,13 @@
+# build output
+dist/
+.astro/
+node_modules/
+
+# local-only: old site, full-resolution figures, paper PDFs (linked from arXiv instead)
+_archive/
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.log

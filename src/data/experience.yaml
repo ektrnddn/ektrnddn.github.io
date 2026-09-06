@@ -1,0 +1,61 @@
+- role: Research Assistant
+  org: Carnegie Mellon University
+  place: Pittsburgh, PA
+  start: Jan 2024
+  end: present
+  bullets:
+    - "With Antonella Palmese: identifying massive black hole binary candidates in DESI spectra through Doppler-induced velocity shifts of broad lines, and applying autoencoders to extract binary signatures from large spectral datasets."
+    - "With Tiziana Di Matteo: morphology and stellar kinematics of dual AGN host galaxies in the ASTRID cosmological simulation."
+- role: Teaching Assistant
+  org: Carnegie Mellon University
+  place: Pittsburgh, PA
+  start: Aug 2021
+  end: Dec 2023
+  bullets:
+    - Electronics 1, Physics I and II for Engineering Students, Matter and Interactions 1 and 2.
+- role: Assistant Researcher
+  org: Centre for Theoretical Astrophysics, Ilia State University
+  place: Tbilisi, Georgia
+  start: Oct 2018
+  end: Oct 2019
+  bullets:
+    - Self-similar MHD flow solutions for coronal eruption models; new classes of solutions under revised geometric and kinematic assumptions.
+- role: Visiting Scholar
+  org: Center for Mathematical Plasma Astrophysics, KU Leuven
+  place: Leuven, Belgium
+  start: Aug 2019
+  end: Sep 2019
+  bullets:
+    - Self-similar solutions for astrophysical MHD transients, with Andria Rogava and Stefaan Poedts.
+- role: Summer Student
+  org: CERN, BE-ABP-HSC
+  place: Geneva, Switzerland
+  start: Jul 2019
+  end: Aug 2019
+  bullets:
+    - Analytical method for computing wake functions of a circular beam pipe, with Nicolas Mounet.
+- role: Undergraduate Summer Student
+  org: Perimeter Institute for Theoretical Physics
+  place: Waterloo, Canada
+  start: May 2019
+  end: Jun 2019
+  bullets:
+    - Monte Carlo algorithms and phase transitions, with Paula Mellado.
+- role: Local Jury and Local Organising Committee
+  org: International Young Physicists' Tournament (IYPT)
+  place: Tbilisi, Georgia
+  start: 2019
+  end: 2019
+- role: Physics Teacher
+  org: Experimentorium, interactive science museum
+  place: Tbilisi, Georgia
+  start: Nov 2017
+  end: Jan 2018
+- role: Co-founder and CEO (TeddyBot), CTO (Quark)
+  org: TeddyBot and Quark
+  place: Tbilisi, Georgia
+  start: 2015
+  end: 2017
+  bullets:
+    - "TeddyBot: a baby-monitor device. Top company at Seed Forum Georgia 2016, top 6 at Seed Forum Estonia."
+    - "Quark: a guide ball on Sphero hardware with waypoint navigation and route memory, funded by the Scientific Library of Georgia."

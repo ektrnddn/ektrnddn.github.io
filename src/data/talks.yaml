@@ -1,0 +1,13 @@
+# Talks, posters, schools, organising. `kind`: talk | organizer | school | workshop
+- { year: 2024, kind: talk, event: "Cosmology on the Beach", place: "Playa del Carmen, Mexico" }
+- { year: 2024, kind: talk, event: "DESI Collaboration Meeting", place: "Marseille, France" }
+- { year: 2024, kind: organizer, event: "International Conference of Physics Students (ICPS)", place: "Tbilisi, Georgia" }
+- { year: 2023, kind: talk, event: "First Pre-LISA Electromagnetic Mini-Workshop", place: "online" }
+- { year: 2023, kind: talk, event: "5th Neighborhood Workshop", place: "Penn State University" }
+- { year: 2023, kind: workshop, event: "NANOGrav Workshop", place: "Pittsburgh, PA" }
+- { year: 2023, kind: school, event: "Second Michigan Cosmology Summer School", place: "Ann Arbor, MI" }
+- { year: 2020, kind: talk, event: "TSU VIII Faculty of Exact and Natural Sciences Student Conference", place: "Tbilisi, Georgia" }
+- { year: 2018, kind: talk, event: "International Conference of Physics Students (ICPS)", place: "Helsinki, Finland" }
+- { year: 2017, kind: talk, event: "Young Physicists Conference (top prize)", place: "Tbilisi, Georgia" }
+- { year: 2017, kind: talk, event: "8th Young Researchers Meeting", place: "Cagliari, Italy" }
+- { year: 2016, kind: talk, event: "7th Young Researchers Meeting", place: "Turin, Italy" }

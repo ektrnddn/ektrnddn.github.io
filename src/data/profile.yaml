@@ -1,0 +1,40 @@
+# Who I am. Edited by hand; rendered on every page.
+name: Ekaterine Dadiani
+short_name: E. Dadiani
+title: Ph.D. candidate in Physics
+affiliation: McWilliams Center for Cosmology and Astrophysics, Carnegie Mellon University
+location: Pittsburgh, PA
+email: edadiani@andrew.cmu.edu
+tagline: Massive black hole pairs, from kiloparsecs to sub-parsec, across cosmic time.
+bio: >-
+  I study massive black hole pairs: where they are, how many exist, and which ones
+  LISA and pulsar timing arrays will eventually detect. The work spans the full
+  evolutionary chain, from kiloparsec-scale dual AGN caught mid-merger in DESI,
+  to sub-parsec binaries hiding in spectral line shifts, to the host galaxies in
+  between as seen in the ASTRID cosmological simulation.
+advisors:
+  - Antonella Palmese
+  - Tiziana Di Matteo
+collaborations:
+  - name: DESI Collaboration
+    role: Project 249, Searching for Massive Black Hole Binaries in DESI
+    since: 2023
+  - name: LISA Consortium
+    role: Astrophysics Working Group
+    since: 2023
+links:
+  github: https://github.com/ektrnddn
+  ads: "TODO: NASA ADS library or author query URL"
+  scholar: "TODO: Google Scholar profile URL"
+  linkedin: "TODO: LinkedIn URL"
+  orcid: "TODO: ORCID iD (optional)"
+skills:
+  - Python (NumPy, Pandas, scikit-learn, TensorFlow, PyTorch)
+  - SQL
+  - Cosmological and N-body simulations
+  - HPC and cluster computing
+  - Numerical methods and statistical analysis
+hobbies:
+  - Film photography
+  - Skiing
+  - Hiking

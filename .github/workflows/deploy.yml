@@ -1,0 +1,94 @@
+# Builds the site and deploys it to GitHub Pages.
+#
+# Triggers:
+#   - every push to main
+#   - "cv-updated" dispatch sent by the CV repository (see docs/cv-repo-workflow.yml)
+#   - a weekly safety-net run, so the CV PDF never drifts far from the LaTeX source
+#   - manual runs from the Actions tab
+#
+# The CV step needs one repository secret, CV_REPO_TOKEN: a fine-grained personal
+# access token with read access to ektrnddn/Ekaterine_Dadiani_CV (Contents: read).
+# Without it the build still succeeds and keeps the committed PDF in public/cv/.
+
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [cv-updated]
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CV_TOKEN: ${{ secrets.CV_REPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out CV source (private, Overleaf-synced)
+        if: env.CV_TOKEN != ''
+        uses: actions/checkout@v4
+        with:
+          repository: ektrnddn/Ekaterine_Dadiani_CV
+          token: ${{ secrets.CV_REPO_TOKEN }}
+          path: cv-src
+
+      - name: Find the CV root file
+        if: env.CV_TOKEN != ''
+        id: cvroot
+        run: |
+          root=$(grep -l '\\documentclass' cv-src/*.tex | head -n 1 | xargs -n1 basename)
+          echo "root=$root" >> "$GITHUB_OUTPUT"
+          echo "Root file: $root"
+
+      - name: Compile CV
+        if: env.CV_TOKEN != ''
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: cv-src
+          root_file: ${{ steps.cvroot.outputs.root }}
+
+      - name: Place the CV PDF in the site
+        if: env.CV_TOKEN != ''
+        run: |
+          pdf="cv-src/${{ steps.cvroot.outputs.root }}"
+          pdf="${pdf%.tex}.pdf"
+          mkdir -p public/cv
+          cp "$pdf" public/cv/Ekaterine_Dadiani_CV.pdf
+          git -C cv-src log -1 --format=%cs > public/cv/last-built.txt
+          echo "CV built from commit $(git -C cv-src rev-parse --short HEAD), dated $(cat public/cv/last-built.txt)"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

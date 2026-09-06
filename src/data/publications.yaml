@@ -1,0 +1,64 @@
+# One entry per paper. `selected: true` puts it on the home page.
+# Links are built from arxiv / doi; add `url` for anything else.
+- id: dadiani2026-cosmic-pairs
+  title: "Cosmic Pairs: A DESI Census of Dual and Offset AGN as Precursors to Massive Black Hole Binaries"
+  authors: "Dadiani E., Palmese A., Zhou Y., Chen N., Di Matteo T., Eróstegui A., Mezcua M., et al. (DESI Collaboration)"
+  year: 2026
+  venue: "Submitted"
+  arxiv: "2607.27390"
+  project: dual-agn-census
+  first_author: true
+  selected: true
+  extras:
+    - label: Interactive explorer
+      url: https://ektrnddn.github.io/dualagn-explorer/
+
+- id: chen2025-connecting
+  title: "Connecting current and future dual AGN searches to LISA and PTA gravitational wave detections"
+  authors: "Chen N., Zhou Y., Dadiani E., Di Matteo T., Wang C., Palmese A., Shen Y., Li J., Foord A., Bird S., Ni Y., Yang Y., Croft R."
+  year: 2025
+  venue: "arXiv e-print"
+  arxiv: "2512.16844"
+  project: dual-agn-census
+  first_author: false
+  selected: true
+
+- id: saralidze2025-catastrophic
+  title: "Catastrophic formation of macro-scale flow and magnetic fields in the relativistic gas of binary systems"
+  authors: "Saralidze E., Shatashvili N. L., Mahajan S. M., Dadiani E."
+  year: 2025
+  venue: "Astrophysics and Space Science, 370"
+  doi: "10.1007/s10509-025-04456-1"
+  project: mhd-transients
+  first_author: false
+  selected: false
+
+- id: dadiani2024-disky
+  title: "z ∼ 2 Dual AGN Host Galaxies are Disky: Stellar Kinematics in the ASTRID Simulation"
+  authors: "Dadiani E., Di Matteo T., Chen N., Lachance P., Shen Y., Chen Y.-C., Croft R., Ni Y., Bird S."
+  year: 2024
+  venue: "The Open Journal of Astrophysics, 7"
+  doi: "10.33232/001c.124451"
+  project: disky-hosts
+  first_author: true
+  selected: true
+
+- id: rogava2022-self-similarity
+  title: "Self-similarity for astrophysical MHD transients revisited"
+  authors: "Rogava A., Poedts S., Dadiani E."
+  year: 2022
+  venue: "Advances in Space Research, 69, 474"
+  doi: "10.1016/j.asr.2021.09.020"
+  project: mhd-transients
+  first_author: false
+  selected: true
+
+- id: mounet2022-wake
+  title: "Closed Form Formulas of the Indirect Space Charge Wake Function for Axisymmetric Structures"
+  authors: "Mounet N., Zannini C., Dadiani E., et al."
+  year: 2022
+  venue: "Proceedings of HB2021 (JACoW)"
+  url: "https://cds.cern.ch/record/2841806/files/document.pdf?version=1"
+  project: cern-wake
+  first_author: false
+  selected: false

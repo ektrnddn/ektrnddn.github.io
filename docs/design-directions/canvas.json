@@ -1,0 +1,61 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 2720,
+      "title": "A · Preprint (recommended)"
+    },
+    {
+      "file": "Observatory.dc.html",
+      "x": 1580,
+      "y": 0,
+      "w": 1440,
+      "h": 2780,
+      "title": "B · Observatory"
+    },
+    {
+      "file": "FieldNotes.dc.html",
+      "x": 3160,
+      "y": 0,
+      "w": 1440,
+      "h": 3100,
+      "title": "C · Field notes"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": -620,
+      "y": 0,
+      "w": 520,
+      "text": "Three directions for ekaterine dadiani's site, same real content in each (copy from the CV and the papers).\n\nPick one and the full site gets built in it: home, research pages with the dual AGN explorer embedded, publications and talks, CV page with the auto-built PDF, mobile layouts.\n\nLinks are placeholders here. [DATE] fills in from the CV build."
+    },
+    {
+      "id": "note-a",
+      "x": 0,
+      "y": -300,
+      "w": 640,
+      "text": "A · Preprint\nLight, warm off-white, serif display (Newsreader) with Plex Sans and Mono. One crimson accent lifted from the DESI figure.\n\nWhy: figures come out of matplotlib on white, so they sit naturally; sections read like a well-typeset paper. Ages well.\nTradeoff: the quietest of the three; the dark explorer embeds as a framed window."
+    },
+    {
+      "id": "note-b",
+      "x": 1580,
+      "y": -300,
+      "w": 640,
+      "text": "B · Observatory\nDark cool near-black, warm white type, amber accent taken from the COSMOS-Web markers. Bricolage Grotesque display, Instrument Sans body.\n\nWhy: seamless with the dual AGN explorer's dark theme; the strongest first impression.\nTradeoff: white-background figures need framing or dark re-exports; heavier to keep consistent."
+    },
+    {
+      "id": "note-c",
+      "x": 3160,
+      "y": -300,
+      "w": 640,
+      "text": "C · Field notes\nNeutral grey, wide Archivo display in caps, Space Mono labels, a single blue. Strict 12-column grid with rules.\n\nWhy: data-forward; publications as a table, projects as tiles; scales cleanly as the list grows.\nTradeoff: the least personal and the coolest in tone."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}
