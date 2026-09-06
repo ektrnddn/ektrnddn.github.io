@@ -43,16 +43,13 @@ Everything shown on the site comes from plain files, no code changes needed:
 | Grants and fellowships  | `src/data/grants.yaml`             |
 | Experience              | `src/data/experience.yaml`         |
 | Awards                  | `src/data/awards.yaml`             |
-| Thesis steps: metadata  | `src/content/research/*.md` (title, stage, status, key number, scale) |
-| Thesis steps: the pages | `src/pages/research/<slug>.astro`, one hand-built story page per step |
-| Figures                 | `public/figures/` (hero figures) and `public/figures/papers/` (paper figures) |
+| Research projects       | `src/data/projects.yaml` (title, figure, paper link, or a status line) |
+| Figures                 | `public/figures/`                  |
 
 Add a paper: append an entry to `publications.yaml` with an `arxiv` or `doi`; set
-`selected: true` to feature it on the home page. Change a step's summary, status or key
-number: edit its markdown front matter. Change a step's story: edit its `.astro` page,
-which is mostly prose plus a few components (`Numbers`, `Funnel`, `Stepper`,
-`FigureGrid`, `Explorer`, `SpectrumDemo`). Add a paper figure: drop a JPEG into
-`public/figures/papers/` and reference it from the page.
+`selected: true` to feature it on the home page. Add a research project: append an entry
+to `projects.yaml` with a title, a figure in `public/figures/` and the paper link, or
+just a `status` line while it is in progress.
 
 ## Local development
 
@@ -80,7 +77,6 @@ npm run build      # static output in dist/
 docs/                          design directions and the CV-repo workflow to copy
 public/                        static files: figures, CV PDF, favicon
 src/data/                      YAML content
-src/content/research/          one markdown file per research project
 src/layouts, components, pages, styles
 _archive/                      old site, full-resolution figures, paper PDFs (not committed)
 ```
