@@ -1,11 +1,25 @@
 # Who I am. Edited by hand; rendered on every page.
 name: Ekaterine Dadiani
-short_name: E. Dadiani
+short_name: Eka
+# Portrait shown on the home page. Drop a file in public/photos/ and set the path here.
+photo: ""
+photo_alt: Ekaterine Dadiani
 title: Ph.D. candidate in Physics
 affiliation: McWilliams Center for Cosmology and Astrophysics, Carnegie Mellon University
 location: Pittsburgh, PA
 email: edadiani@andrew.cmu.edu
 tagline: Massive black hole pairs, from kiloparsecs to sub-parsec, across cosmic time.
+# Home page intro. Words in [[double brackets]] are highlighted.
+greeting: Hello there!
+intro: >-
+  I'm Ekaterine (Eka) Dadiani, a Ph.D. candidate in [[astrophysics]] at
+  [[Carnegie Mellon University]], working with Antonella Palmese and Tiziana Di Matteo.
+  I look for [[pairs of massive black holes]] in the [[DESI]] survey and the [[ASTRID]]
+  simulation: the systems that gravitational-wave observatories like [[LISA]] and pulsar
+  timing arrays will one day hear merge.
+intro_more: >-
+  Before Pittsburgh there was Tbilisi, a physics degree, a start-up, and summers at CERN,
+  KU Leuven and the Perimeter Institute.
 hero:
   # Rendered as: {start} <em>{emphasis}</em> {end}
   start: "Massive black hole pairs,"

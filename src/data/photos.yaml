@@ -1,0 +1,4 @@
+# Film photos for the home page strip. Put files in public/photos/ and list them here.
+# The strip is hidden while this list is empty.
+# - { src: /photos/kazbegi.jpg, caption: Kazbegi, Georgia, alt: Snowy peaks above a valley }
+[]

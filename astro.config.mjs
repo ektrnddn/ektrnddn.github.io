@@ -5,4 +5,5 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://ektrnddn.github.io',
   trailingSlash: 'ignore',
+  redirects: { '/cv': '/about' },
 });

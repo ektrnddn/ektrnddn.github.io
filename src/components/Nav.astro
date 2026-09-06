@@ -4,8 +4,7 @@ const path = Astro.url.pathname;
 const items = [
   { href: '/research/', label: 'Research' },
   { href: '/publications/', label: 'Publications' },
-  { href: '/cv/', label: 'CV' },
-  { href: '/#contact', label: 'Contact' },
+  { href: '/about/', label: 'About' },
 ];
 const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
 ---

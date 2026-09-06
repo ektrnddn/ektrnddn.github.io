@@ -1,203 +1,87 @@
 ---
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import Section from '../components/Section.astro';
-import Numbers from '../components/Numbers.astro';
-import Binary from '../components/Binary.astro';
-import PubItem from '../components/PubItem.astro';
+import Icon from '../components/Icon.astro';
 import Arrow from '../components/Arrow.astro';
-import { profile, publications, path, grants } from '../data/load';
-import lastBuilt from '../../public/cv/last-built.txt?raw';
-
-const steps = (await getCollection('research')).filter((e) => e.data.step).sort((a, b) => a.data.order - b.data.order);
-const selected = publications.filter((p) => p.selected);
-const statusLabel: Record<string, string> = { published: 'Published', review: 'Under review', progress: 'In progress', planned: 'Next up' };
-const fellowships = grants.filter((g) => /fellow|pathway/i.test(g.name));
-const h = profile.hero;
+import { profile, facts, photos, highlight } from '../data/load';
+const links = [
+  { href: '/research/', label: 'Research' },
+  { href: '/publications/', label: 'Publications' },
+  { href: '/about/', label: 'About me' },
+  { href: '/cv/Ekaterine_Dadiani_CV.pdf', label: 'CV (PDF)' },
+];
 ---
 <Base>
-  <section class="hero wrap grid12">
-    <div class="hero-text">
-      <p class="eyebrow">{profile.title} · Carnegie Mellon University · DESI and LISA Consortium</p>
-      <h1>{h.start} <em>{h.emphasis}</em> {h.end}</h1>
-      <p class="lede">{h.lede}</p>
-      <div class="actions">
-        <a class="btn" href="#thesis">Follow the thesis <Arrow kind="down" /></a>
-        <a class="link-ul" href="/research/dual-agn-census/">The DESI dual AGN census</a>
-        <a class="link-ul" href="/cv/">CV</a>
+  <section class="intro wrap">
+    {profile.photo && (
+      <div class="photo">
+        <img src={profile.photo} alt={profile.photo_alt ?? profile.name} width="520" height="640" fetchpriority="high" />
       </div>
+    )}
+    <div class="text">
+      <p class="greeting">{profile.greeting}</p>
+      <h1 set:html={highlight(profile.intro)} />
+      {profile.intro_more && <p class="more">{profile.intro_more}</p>}
+      <nav class="links" aria-label="Sections">
+        {links.map((l) => <a href={l.href}>{l.label} <Arrow /></a>)}
+      </nav>
     </div>
-    <figure class="hero-fig">
-      <div class="figure"><img src={h.figure} alt={h.figure_alt} width="1600" height="1314" fetchpriority="high" /></div>
-      <figcaption class="caption"><b>Figure 1.</b> {h.figure_caption}</figcaption>
-    </figure>
   </section>
 
-  <section class="thesis wrap" id="thesis">
-    <div class="section-head">
-      <span class="num">§ 1</span>
-      <h2>One thesis, four steps</h2>
-      <p class="lede-sm">Pairs of massive black holes shrink from tens of kiloparsecs to a fraction of a parsec before they merge. Each step follows them one stage closer, and each narrows the forecast of what LISA and pulsar timing arrays will hear.</p>
-    </div>
-    <div class="thesis-grid">
-      <div class="sticky">
-        <Binary sep={steps[0].data.sep} label={steps[0].data.sep_label ?? ''} height={440} />
-        <div class="legend mono">Two black holes, drawn to scale with the step you are reading. Scroll.</div>
-      </div>
-      <ol class="steps">
-        {steps.map((e) => (
-          <li class="step" data-sep={e.data.sep} data-label={e.data.sep_label}>
-            <div class="s-top">
-              <span class="eyebrow">Step {e.data.step} · {e.data.stage}</span>
-              <span class:list={['chip', e.data.status_kind]}>{statusLabel[e.data.status_kind]}</span>
-            </div>
-            <h3><a href={`/research/${e.id}/`}>{e.data.title}</a></h3>
-            {e.data.hook && <p class="hook">{e.data.hook}</p>}
-            <p class="sum">{e.data.summary}</p>
-            <div class="s-bottom">
-              {e.data.key && <div class="key"><span class="kv">{e.data.key.value}</span><span class="kl">{e.data.key.label}</span></div>}
-              <a class="link-ul" href={`/research/${e.id}/`}>Read the full story</a>
-            </div>
-          </li>
+  <section class="facts wrap">
+    <div class="mono head"><b>A few things about me</b></div>
+    <ul>
+      {facts.map((f) => (
+        <li>
+          <span class="ico"><Icon name={f.icon} /></span>
+          <span>{f.text} {f.link && <a href={f.link} target="_blank" rel="noopener">{f.link_label ?? f.link}</a>}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {photos.length > 0 && (
+    <section class="film wrap">
+      <div class="mono head"><b>On film</b></div>
+      <div class="strip">
+        {photos.map((p) => (
+          <figure>
+            <img src={p.src} alt={p.alt ?? p.caption ?? ''} loading="lazy" />
+            {p.caption && <figcaption class="mono">{p.caption}</figcaption>}
+          </figure>
         ))}
-      </ol>
-    </div>
-  </section>
-
-  <Section num="2" title="By the numbers">
-    <Numbers items={[
-      { value: '6,953', label: 'dual AGN in DESI DR1, the largest uniform sample to date', sub: 'step 02' },
-      { value: '~1,000', label: 'simulated dual AGN hosts kinematically decomposed', sub: 'step 01' },
-      { value: '826', label: 'DESI spectra with broad lines shifted by more than 2,000 km/s', sub: 'step 03' },
-      { value: '76%', label: 'of DESI-like pairs merge by today in ASTRID; 37% inside the LISA band', sub: 'Chen, Zhou, Dadiani et al. 2025' },
-    ]} />
-  </Section>
-
-  <Section num="3" title="About">
-    <div class="split about">
-      <div class="about-text">
-        <p class="prose big">{profile.bio}</p>
-        <div class="facts">
-          <div><div class="mono"><b>Advisors</b></div><div>{profile.advisors.join(' and ')}</div></div>
-          <div><div class="mono"><b>Collaborations</b></div><div>{profile.collaborations.map((c) => c.name).join(' · ')}</div></div>
-          <div><div class="mono"><b>Fellowships</b></div><div>{fellowships.map((g) => `${g.name.replace(' Data Science Fellowship', ' Fellow')} (${g.years})`).join(' · ')}</div></div>
-          <div><div class="mono"><b>Off duty</b></div><div>{profile.hobbies.join(', ')}</div></div>
-        </div>
       </div>
-      <div class="path">
-        <div class="mono"><b>The path so far</b></div>
-        <div class="rows">
-          {path.map((p) => (
-            <div class="row prow">
-              <div class="years">{p.when}</div>
-              <div class="what">{p.what}{p.where && <span class="note"> · {p.where}</span>}</div>
-            </div>
-          ))}
-        </div>
-        <a class="link-ul" href="/cv/">Full CV</a>
-      </div>
-    </div>
-  </Section>
-
-  <Section num="4" title="Selected publications">
-    <div class="pubs">{selected.map((p, i) => <PubItem pub={p} n={i + 1} />)}</div>
-    <p class="more"><a class="link-ul" href="/publications/">All publications and talks</a></p>
-  </Section>
-
-  <section class="wrap cv grid12">
-    <div class="cv-left">
-      <div class="section-head"><span class="num">§ 5</span><h2>Curriculum vitae</h2></div>
-      <p class="prose">Built automatically from the LaTeX source, so the PDF here is always the current one.</p>
-      <div class="actions">
-        <a class="btn" href="/cv/Ekaterine_Dadiani_CV.pdf">Download PDF <Arrow kind="down" /></a>
-        <span class="mono">Last built {lastBuilt.trim()}</span>
-      </div>
-      <p class="prose"><a href="/cv/">Read the CV as a web page</a></p>
-    </div>
-    <div class="cv-right">
-      <p class="lede">Open to collaborations on dual AGN, black hole binaries, DESI, and the electromagnetic side of gravitational-wave astronomy.</p>
-      <a class="link-ul" href={`mailto:${profile.email}`}>{profile.email}</a>
-    </div>
-  </section>
+    </section>
+  )}
 </Base>
 
 <style>
-  .hero { padding-top: 88px; padding-bottom: 72px; align-items: start; }
-  .hero-text { grid-column: span 7; display: flex; flex-direction: column; gap: 28px; }
-  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(40px, 4.6vw, 66px); line-height: 1.04; letter-spacing: -.02em; text-wrap: pretty; }
-  h1 em { font-style: italic; font-weight: 300; }
-  .hero .lede { max-width: 600px; }
-  .actions { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
-  .hero-fig { grid-column: span 5; margin: 0; }
+  .intro { padding-top: 96px; padding-bottom: 64px; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 56px; align-items: center; }
+  .intro:not(:has(.photo)) { grid-template-columns: minmax(0, 1fr); }
+  .photo { justify-self: end; width: min(100%, 360px); }
+  .photo img { width: 100%; height: auto; border: 1px solid var(--rule); background: var(--paper); padding: 10px; }
+  .text { display: flex; flex-direction: column; gap: 22px; max-width: 760px; }
+  .greeting { font-family: var(--serif); font-style: italic; font-size: 24px; color: var(--accent); }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.38; letter-spacing: -.01em; text-wrap: pretty; }
+  h1 :global(.hl) { font-weight: 500; color: var(--ink); border-bottom: 1px solid #e6c9cc; }
+  .more { font-size: 17px; line-height: 1.6; color: var(--text); text-wrap: pretty; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 6px; }
+  .links a { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+  .links a:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
 
-  .thesis .section-head { padding-top: 56px; }
-  .thesis-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: start; padding-top: 24px; }
-  .sticky { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 10px; }
-  .legend { color: var(--muted); }
-  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-  .step { padding: 36px 0 40px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 14px; min-height: min(60vh, 560px); justify-content: center; transition: opacity .4s; }
-  .thesis-grid.js .step { opacity: .45; }
-  .thesis-grid.js .step.on { opacity: 1; }
-  .steps .step:last-child { border-bottom: 1px solid var(--rule); }
-  .s-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-  .step h3 { font-family: var(--serif); font-size: clamp(26px, 2.6vw, 34px); line-height: 1.12; letter-spacing: -.015em; max-width: 22ch; text-wrap: pretty; }
-  .step h3 a { color: var(--ink); }
-  .step h3 a:hover { color: var(--accent); text-decoration: none; }
-  .hook { font-family: var(--serif); font-style: italic; font-size: 19px; color: var(--accent); }
-  .sum { font-size: 16px; line-height: 1.6; color: var(--text); text-wrap: pretty; max-width: 60ch; }
-  .s-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-top: 6px; }
-  .key { display: flex; flex-direction: column; gap: 2px; }
-  .kv { font-family: var(--serif); font-size: 40px; line-height: 1; letter-spacing: -.03em; }
-  .kl { font-size: 13px; color: var(--muted); }
+  .facts { padding-top: 32px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .facts ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 40px; }
+  .facts li { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 16px; line-height: 1.5; color: var(--text); }
+  .ico { flex: none; color: var(--accent); margin-top: 3px; }
 
-  .about .big { font-size: 17px; }
-  .about-text { display: flex; flex-direction: column; gap: 28px; }
-  .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 32px; font-size: 15px; line-height: 1.5; }
-  .facts .mono { margin-bottom: 4px; }
-  .path { display: flex; flex-direction: column; gap: 14px; }
-  .prow { gap: 16px; }
-  .prow .years { grid-column: span 3; }
-  .prow .what { grid-column: span 9; font-size: 14px; }
-  .path .rows .row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); padding: 10px 0; }
-
-  .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
-  .more { padding-top: 24px; }
-
-  .cv { align-items: end; padding-top: 0; }
-  .cv-left { grid-column: span 6; display: flex; flex-direction: column; gap: 20px; }
-  .cv-left .section-head { padding-bottom: 0; }
-  .cv-right { grid-column: 8 / span 5; display: flex; flex-direction: column; gap: 16px; padding-bottom: 6px; }
-  .cv-right .lede { font-size: 19px; }
+  .film { padding-top: 40px; display: flex; flex-direction: column; gap: 14px; }
+  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .strip figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .strip img { width: 100%; height: auto; border: 1px solid var(--rule); background: var(--paper); padding: 8px; }
 
   @media (max-width: 900px) {
-    .hero { padding-top: 40px; padding-bottom: 40px; }
-    .hero-text { gap: 20px; }
-    .thesis-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-top: 12px; }
-    .sticky { position: static; }
-    .step { min-height: 0; padding: 28px 0; }
-    .thesis-grid.js .step { opacity: 1; }
-    .facts { grid-template-columns: minmax(0, 1fr); }
-    .prow .years { grid-column: span 4; }
-    .prow .what { grid-column: span 8; }
+    .intro { grid-template-columns: minmax(0, 1fr); padding-top: 40px; padding-bottom: 32px; gap: 28px; }
+    .photo { justify-self: start; width: min(100%, 260px); }
+    .greeting { font-size: 21px; }
+    .facts ul { grid-template-columns: minmax(0, 1fr); gap: 0; }
   }
 </style>
-
-<script>
-  // As each step scrolls into view, the binary on the left shrinks to that step's scale.
-  const bin = document.querySelector<HTMLElement>('[data-binary]');
-  const label = document.querySelector<HTMLElement>('[data-binary-label]');
-  const steps = document.querySelectorAll<HTMLElement>('.step[data-sep]');
-  if (bin && steps.length) {
-    document.querySelector('.thesis-grid')?.classList.add('js');
-    steps[0].classList.add('on');
-    const io = new IntersectionObserver((entries) => {
-      const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (!hit) return;
-      const el = hit.target as HTMLElement;
-      bin.dataset.sep = el.dataset.sep ?? '1';
-      if (label) label.textContent = el.dataset.label ?? '';
-      steps.forEach((s) => s.classList.toggle('on', s === el));
-    }, { threshold: [0.35, 0.6], rootMargin: '-10% 0px -10% 0px' });
-    steps.forEach((s) => io.observe(s));
-  }
-</script>

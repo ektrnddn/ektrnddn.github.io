@@ -1,0 +1,13 @@
+# Short, personal lines for the home page. `icon` is one of: pin, mountain, camera, icecream, mic, star.
+- icon: pin
+  text: From Tbilisi (თბილისი), Georgia. Now in Pittsburgh.
+- icon: mountain
+  text: Skiing in winter, hiking the rest of the year. Any mountain will do.
+- icon: camera
+  text: I shoot film.
+- icon: icecream
+  text: Ice cream is a food group.
+- icon: mic
+  text: Host of Astronomy on Tap Pittsburgh, where astronomy meets a pub.
+  link: https://astronomyontap.org/
+  link_label: Astronomy on Tap

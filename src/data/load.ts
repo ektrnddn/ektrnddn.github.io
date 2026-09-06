@@ -8,6 +8,8 @@ import grantsRaw from './grants.yaml?raw';
 import experienceRaw from './experience.yaml?raw';
 import awardsRaw from './awards.yaml?raw';
 import pathRaw from './path.yaml?raw';
+import factsRaw from './facts.yaml?raw';
+import photosRaw from './photos.yaml?raw';
 
 function load<T>(raw: string): T {
   return yaml.load(raw) as T;
@@ -16,6 +18,7 @@ function load<T>(raw: string): T {
 export interface Profile {
   name: string; short_name: string; title: string; affiliation: string; location: string;
   email: string; tagline: string; bio: string; advisors: string[];
+  photo?: string; photo_alt?: string; greeting: string; intro: string; intro_more?: string;
   hero: { start: string; emphasis: string; end: string; lede: string; figure: string; figure_alt: string; figure_caption: string };
   research_lede: string;
   collaborations: { name: string; role: string; since: number }[];
@@ -32,6 +35,8 @@ export interface Grant { name: string; body: string; years: string | number; not
 export interface Experience { role: string; org: string; place: string; start: string | number; end: string | number; bullets?: string[] }
 export interface Award { year: number | string; title: string; place?: string }
 export interface PathItem { when: string; what: string; where?: string }
+export interface Fact { icon: string; text: string; link?: string; link_label?: string }
+export interface Photo { src: string; caption?: string; alt?: string }
 
 export const profile = load<Profile>(profileRaw);
 export const publications = load<Publication[]>(publicationsRaw);
@@ -41,6 +46,11 @@ export const grants = load<Grant[]>(grantsRaw);
 export const experience = load<Experience[]>(experienceRaw);
 export const awards = load<Award[]>(awardsRaw);
 export const path = load<PathItem[]>(pathRaw);
+export const facts = load<Fact[]>(factsRaw);
+export const photos = (load<Photo[] | null>(photosRaw) ?? []);
+
+// [[text]] → highlighted span. Content comes from our own YAML, so set:html is safe.
+export const highlight = (s: string) => s.replace(/\[\[(.+?)\]\]/g, '<strong class="hl">$1</strong>');
 
 export function pubLink(p: Publication): { label: string; url: string } | null {
   if (p.arxiv) return { label: `arXiv:${p.arxiv}`, url: `https://arxiv.org/abs/${p.arxiv}` };

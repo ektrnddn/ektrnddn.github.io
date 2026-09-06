@@ -20,7 +20,7 @@ Overleaf  ──sync──▶  ektrnddn/Ekaterine_Dadiani_CV (private, LaTeX)
 - **CV.** The LaTeX source stays in its own private repo, kept in sync by Overleaf.
   The deploy workflow checks that repo out with a read-only token, compiles it, and
   ships the PDF at `/cv/Ekaterine_Dadiani_CV.pdf` together with the source's last commit
-  date. A committed copy of the PDF in `public/cv/` is the fallback until the token is set.
+  date. The About page ends with the download button; `/cv` redirects there. A committed copy of the PDF in `public/cv/` is the fallback until the token is set.
   Setup: see "One-time setup" below.
 - **Dual AGN explorer.** Stays in `ektrnddn/dualagn-explorer` so its URL keeps working in
   the paper. The research page for the DESI census embeds it in an iframe and links to
@@ -34,7 +34,9 @@ Everything shown on the site comes from plain files, no code changes needed:
 
 | What                    | Where                              |
 | ----------------------- | ---------------------------------- |
-| Name, bio, links, skills | `src/data/profile.yaml`           |
+| Name, bio, links, skills, home intro | `src/data/profile.yaml` |
+| Home page facts         | `src/data/facts.yaml`              |
+| Film photos on the home page | `src/data/photos.yaml` + files in `public/photos/` |
 | Publications            | `src/data/publications.yaml`       |
 | Talks and schools       | `src/data/talks.yaml`              |
 | Education               | `src/data/education.yaml`          |

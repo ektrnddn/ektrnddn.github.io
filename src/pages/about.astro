@@ -1,0 +1,156 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Arrow from '../components/Arrow.astro';
+import { profile, education, grants, experience, awards, talks } from '../data/load';
+import lastBuilt from '../../public/cv/last-built.txt?raw';
+const pdf = '/cv/Ekaterine_Dadiani_CV.pdf';
+const kinds: Record<string, string> = { talk: 'Talk', organizer: 'Organiser', school: 'School', workshop: 'Workshop' };
+const talksSorted = [...talks].sort((a, b) => b.year - a.year);
+const outreach = [
+  { when: 'ongoing', what: 'Host, Astronomy on Tap Pittsburgh', where: 'Public astronomy talks in a pub' },
+  { when: '2024', what: 'Organiser, International Conference of Physics Students (ICPS)', where: 'Tbilisi, Georgia' },
+  { when: '2019', what: 'Local jury and organising committee, International Young Physicists’ Tournament', where: 'Tbilisi, Georgia' },
+  { when: '2017 – 2018', what: 'Physics teacher, Experimentorium science museum', where: 'Tbilisi, Georgia' },
+];
+---
+<Base title="About me" description={`About ${profile.name}: education, research experience, fellowships, talks and awards.`}>
+  <section class="wrap top">
+    <h1>About me</h1>
+    <p class="lede">{profile.bio}</p>
+    <div class="quick">
+      <div><div class="mono"><b>Advisors</b></div><div>{profile.advisors.join(' and ')}</div></div>
+      <div><div class="mono"><b>Collaborations</b></div><div>{profile.collaborations.map((c) => c.name).join(' · ')}</div></div>
+      <div><div class="mono"><b>Based in</b></div><div>{profile.location}</div></div>
+      <div><div class="mono"><b>Email</b></div><a href={`mailto:${profile.email}`}>{profile.email}</a></div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Education" />
+    <div class="rows">
+      {education.map((e) => (
+        <div class="row grid12 r">
+          <div class="years">{e.start} – {e.end}</div>
+          <div class="what"><b>{e.degree}</b>, {e.institution}, {e.place}. {e.note && <span class="note">{e.note}</span>}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Research and work" />
+    <div class="rows">
+      {experience.filter((x) => !/Teacher|Jury/.test(x.role)).map((x) => (
+        <div class="row grid12 r">
+          <div class="years">{x.start}{x.end !== x.start && ` – ${x.end}`}</div>
+          <div class="what">
+            <b>{x.role}</b>, {x.org}, {x.place}.
+            {x.bullets && <ul>{x.bullets.map((b) => <li>{b}</li>)}</ul>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Grants and fellowships" />
+    <div class="rows">
+      {grants.map((g) => (
+        <div class="row grid12 r">
+          <div class="years">{g.years}</div>
+          <div class="what"><b>{g.name}</b>, {g.body}. {g.note && <span class="note">{g.note}</span>}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Collaborations" />
+    <div class="rows">
+      {profile.collaborations.map((c) => (
+        <div class="row grid12 r">
+          <div class="years">since {c.since}</div>
+          <div class="what"><b>{c.name}</b>. <span class="note">{c.role}.</span></div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Talks and schools" />
+    <div class="rows">
+      {talksSorted.map((t) => (
+        <div class="row grid12 r">
+          <div class="years">{t.year}</div>
+          <div class="what"><span class="mono kind">{kinds[t.kind] ?? t.kind}</span> {t.event} <span class="note">· {t.place}</span></div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Outreach and service" />
+    <div class="rows">
+      {outreach.map((o) => (
+        <div class="row grid12 r">
+          <div class="years">{o.when}</div>
+          <div class="what"><b>{o.what}</b> <span class="note">· {o.where}</span></div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Awards" />
+    <div class="rows">
+      {awards.map((a) => (
+        <div class="row grid12 r">
+          <div class="years">{a.year}</div>
+          <div class="what">{a.title}{a.place && <span class="note">, {a.place}</span>}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Skills and interests" />
+    <div class="rows">
+      <div class="row grid12 r"><div class="years">Technical</div><div class="what">{profile.skills.join(' · ')}</div></div>
+      <div class="row grid12 r"><div class="years">Outside work</div><div class="what">{profile.hobbies.join(' · ')}</div></div>
+    </div>
+  </section>
+
+  <section class="wrap cvbox">
+    <div>
+      <h2>Curriculum vitae</h2>
+      <p class="prose">The PDF is compiled from the LaTeX source on every change, so it is always the current version.</p>
+    </div>
+    <div class="actions">
+      <a class="btn" href={pdf}>Download CV (PDF) <Arrow kind="down" /></a>
+      <span class="mono">Last built {lastBuilt.trim()}</span>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .top { padding-top: 72px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 22px; }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(36px, 4.4vw, 60px); line-height: 1.04; letter-spacing: -.02em; }
+  .top .lede { max-width: 760px; font-size: 20px; }
+  .quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 14px; line-height: 1.5; }
+  .quick .mono { margin-bottom: 4px; }
+  .r { gap: 24px; }
+  .r .years { grid-column: span 2; }
+  .r .what { grid-column: span 10; }
+  .r .what b { font-weight: 500; }
+  .kind { margin-right: 6px; }
+  .cvbox { margin-top: 72px; padding-top: 32px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 32px; flex-wrap: wrap; }
+  .cvbox h2 { font-family: var(--serif); font-size: 32px; letter-spacing: -.015em; margin-bottom: 8px; }
+  .actions { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  @media (max-width: 900px) {
+    .top { padding-top: 32px; }
+    .quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .r { gap: 2px; }
+    .cvbox { margin-top: 48px; }
+  }
+</style>
