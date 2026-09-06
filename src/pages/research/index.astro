@@ -1,148 +1,74 @@
 ---
-import { getCollection, getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import Section from '../../components/Section.astro';
 import PubItem from '../../components/PubItem.astro';
-import FigureGrid from '../../components/FigureGrid.astro';
 import Arrow from '../../components/Arrow.astro';
-import { profile, publications } from '../../data/load';
-
-const all = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
-const steps = all.filter((e) => e.data.step);
-const earlier = await getEntry('research', 'earlier-work');
-const { Content: Earlier } = earlier ? await render(earlier) : { Content: null };
-const earlierPubs = (earlier?.data.publications ?? []).map((id) => publications.find((p) => p.id === id)!).filter(Boolean);
-const connecting = publications.find((p) => p.id === 'chen2025-connecting')!;
-const statusLabel: Record<string, string> = { published: 'Published', review: 'Under review', progress: 'In progress', planned: 'Next up' };
-
-// Separation ladder: log10 of separation in parsecs, from 100 kpc (5) down to 0.001 pc (-3).
-const L = 5, R = -3, X0 = 40, X1 = 1160;
-const x = (logpc: number) => X0 + ((L - logpc) / (L - R)) * (X1 - X0);
-const ticks = [[5, '100 kpc'], [4, '10 kpc'], [3, '1 kpc'], [2, '100 pc'], [1, '10 pc'], [0, '1 pc'], [-1, '0.1 pc'], [-2, '0.01 pc'], [-3, '1 mpc']] as const;
-const bands = [
-  { step: '01', a: 4.5, b: 3.4, y: 62, label: 'hosts of pairs within 30 kpc' },
-  { step: '02', a: 4.7, b: 2.9, y: 92, label: 'DESI dual AGN, 1.6″ to 50 kpc' },
-  { step: '03', a: -1, b: -3, y: 62, label: 'binaries seen through line shifts' },
-  { step: '04', a: 5, b: -3, y: 122, label: 'every spectrum, scored by a VAE', dashed: true },
-];
+import { projects, publications } from '../../data/load';
+const earlierPubs = projects.earlier.map((id) => publications.find((p) => p.id === id)!).filter(Boolean);
+// [n] in the earlier-work text becomes a link to the n-th reference below.
+const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" href="#ref-$1">[$1]</a>');
 ---
-<Base title="Research" description={profile.research_lede}>
+<Base title="Research" description="Research by Ekaterine Dadiani on massive black hole pairs, from kiloparsecs to sub-parsec scales.">
   <header class="wrap top">
-    <p class="eyebrow">The thesis</p>
-    <h1>{profile.hero.start} <em>{profile.hero.emphasis}</em> {profile.hero.end}</h1>
-    <p class="lede">A multi-messenger, multi-scale census of massive black hole pairs. Simulations set the expectations, DESI provides the pairs at kiloparsec scales, spectroscopy reaches the bound binaries, and machine learning takes the search to the whole survey. Every step feeds the same question: what will LISA and pulsar timing arrays detect, and when?</p>
+    <h1>From Kiloparsecs to Sub-Parsec Scales:<br />A Multi-Messenger, Multi-Scale Census of<br /><em>Massive Black Hole Pairs</em><br />Across Cosmic Time</h1>
   </header>
 
-  <section class="wrap ladder-wrap">
-    <div class="mono"><b>Separation ladder</b> · where each step lives, from galaxy pairs to bound binaries</div>
-    <svg viewBox="0 0 1200 160" class="ladder" role="img" aria-label="Separation scales covered by the four thesis steps">
-      <line x1={X0} y1="36" x2={X1} y2="36" stroke="#1a1714" stroke-width="1.2" />
-      {ticks.map(([v, t]) => (
-        <g>
-          <line x1={x(v)} y1="30" x2={x(v)} y2="42" stroke="#1a1714" />
-          <text x={x(v)} y="20" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#6b645c">{t}</text>
-        </g>
-      ))}
-      {bands.map((b) => (
-        <g>
-          <line x1={x(b.a)} y1={b.y} x2={x(b.b)} y2={b.y} stroke="#8b1e2a" stroke-width={b.dashed ? 1.2 : 6} stroke-dasharray={b.dashed ? '4 6' : undefined} stroke-linecap="round" />
-          <text x={x(b.a) + 2} y={b.y + 18} font-family="IBM Plex Mono, monospace" font-size="11" fill="#1a1714">{b.step} · {b.label}</text>
-        </g>
-      ))}
-    </svg>
-  </section>
-
-  <section class="wrap steps">
-    {steps.map((e) => (
-      <article class="stepcard grid12">
-        <div class="meta">
-          <span class="eyebrow">Step {e.data.step}</span>
-          <div class="stage">{e.data.stage}</div>
-          <span class:list={['chip', e.data.status_kind]}>{statusLabel[e.data.status_kind]}</span>
+  <section class="wrap list">
+    {projects.thesis.map((p) => (
+      <article class="project grid12">
+        <div class="fig">
+          {p.figure ? (
+            <a href={p.link} target="_blank" rel="noopener" class="figure"><img src={p.figure} alt={p.figure_alt ?? p.title} loading="lazy" /></a>
+          ) : (
+            <div class="placeholder"><span class="mono">{p.status}</span></div>
+          )}
         </div>
-        <div class="main">
-          <h2><a href={`/research/${e.id}/`}>{e.data.title}</a></h2>
-          <p class="sum">{e.data.summary}</p>
-          <dl class="facts">
-            <div><dt class="mono">Scale</dt><dd>{e.data.scale}</dd></div>
-            {e.data.data && <div><dt class="mono">Data</dt><dd>{e.data.data}</dd></div>}
-            <div><dt class="mono">Status</dt><dd>{e.data.status}</dd></div>
-          </dl>
-          <a href={`/research/${e.id}/`} class="go">Read the full story <Arrow /></a>
-        </div>
-        <div class="thumb">
-          {e.data.figure ? <div class="figure"><img src={e.data.figure} alt="" loading="lazy" /></div> : <div class="planned-box"><span class="mono">planned</span></div>}
-          {e.data.key && <div class="key"><span class="kv">{e.data.key.value}</span><span class="kl">{e.data.key.label}</span></div>}
+        <div class="text">
+          <h2>{p.title}</h2>
+          {p.description && <p class="desc">{p.description}</p>}
+          <div class="links">
+            {p.link && <a href={p.link} target="_blank" rel="noopener" class="go">Read the full story <Arrow /></a>}
+            {p.extra_link && <a href={p.extra_link.url} target="_blank" rel="noopener" class="go alt">{p.extra_link.label} <Arrow kind="ext" /></a>}
+          </div>
         </div>
       </article>
     ))}
   </section>
 
-  <Section title="The gravitational-wave connection" lede="Every pair counted above is a future gravitational-wave source. With the ASTRID simulation we fast-forward the DESI-selected pairs to their mergers.">
-    <div class="split">
-      <div class="prose">
-        <p>In Chen, Zhou, Dadiani et al. (2025) we built mock dual AGN catalogues in ASTRID matched to the selection functions of current and future searches: COSMOS-Web, DESI, AXIS and Roman. The mocks reproduce the observed dual fractions, which lets us trust what happens next in the simulation: 76% of DESI-like pairs merge by z = 0, and 37% of the low-redshift mergers fall inside LISA's sensitivity band. The same machinery gives full-sky merger rates and the fraction of the nanohertz gravitational-wave background that descends from pairs we can already see.</p>
-      </div>
-      <div class="side">
-        <div><div class="mono"><b>Paper</b></div><a href={`https://arxiv.org/abs/${connecting.arxiv}`} target="_blank" rel="noopener">{connecting.title}</a></div>
-        <div><div class="mono"><b>Feeds into</b></div><a href="/research/dual-agn-census/">Step 02, the DESI census</a></div>
-      </div>
+  <section class="wrap earlier">
+    <div class="section-head"><h2>Earlier work</h2></div>
+    <p class="prose" set:html={earlierHtml} />
+    <div class="pubs">
+      {earlierPubs.map((p, i) => <div id={`ref-${i + 1}`}><PubItem pub={p} n={i + 1} /></div>)}
     </div>
-    <div class="gap"></div>
-    <FigureGrid cols={3} figures={[
-      { src: '/figures/papers/gw-merged-fraction.jpg', label: 'Merged by today.', caption: 'Fraction of mock dual AGN that merge by z = 0 in each survey-matched sample, with the LISA-detectable share.' },
-      { src: '/figures/papers/gw-merger-rates.jpg', label: 'Rates.', caption: 'Expected full-sky merger rates for the COSMOS, DESI, AXIS and Roman mock samples versus redshift.' },
-      { src: '/figures/papers/gw-background.jpg', label: 'Background.', caption: 'Share of the nanohertz gravitational-wave background produced by binaries descended from each mock dual AGN sample.' },
-    ]} />
-  </Section>
-
-  {earlier && (
-    <Section title="Earlier work" lede={earlier.data.summary}>
-      <div class="split">
-        <div class="prose">{Earlier && <Earlier />}</div>
-        <div class="side"><div class="mono"><b>Years</b></div><div>{earlier.data.status}</div></div>
-      </div>
-      <div class="gap"></div>
-      <div class="pubs">{earlierPubs.map((p, i) => <PubItem pub={p} n={i + 1} />)}</div>
-    </Section>
-  )}
+  </section>
 </Base>
 
 <style>
-  .top { padding-top: 64px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 22px; }
-  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(36px, 4.6vw, 64px); line-height: 1.04; letter-spacing: -.02em; max-width: 20ch; text-wrap: pretty; }
-  h1 em { font-style: italic; }
-  .top .lede { max-width: 800px; }
-  .ladder-wrap { padding-top: 16px; padding-bottom: 8px; display: flex; flex-direction: column; gap: 8px; }
-  .ladder { width: 100%; height: auto; display: block; }
-  .steps { display: flex; flex-direction: column; padding-top: 24px; }
-  .stepcard { padding: 44px 0; border-top: 1px solid var(--rule); align-items: start; }
-  .steps .stepcard:last-child { border-bottom: 1px solid var(--rule); }
-  .meta { grid-column: span 2; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-  .stage { font-family: var(--serif); font-size: 22px; line-height: 1.15; }
-  .main { grid-column: span 6; display: flex; flex-direction: column; gap: 16px; }
-  .main h2 { font-family: var(--serif); font-size: clamp(26px, 2.6vw, 34px); line-height: 1.12; letter-spacing: -.015em; text-wrap: pretty; }
-  .main h2 a { color: var(--ink); }
-  .main h2 a:hover { color: var(--accent); text-decoration: none; }
-  .sum { font-size: 16px; line-height: 1.6; color: var(--text); text-wrap: pretty; }
-  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 6px 0 0; padding-top: 14px; border-top: 1px solid var(--rule); }
-  dt { margin-bottom: 3px; } dd { margin: 0; font-size: 14px; line-height: 1.45; }
-  .go { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-size: 14px; font-weight: 500; }
-  .go:hover { color: var(--accent); text-decoration: none; }
-  .thumb { grid-column: span 4; display: flex; flex-direction: column; gap: 14px; }
-  .planned-box { border: 1px dashed var(--rule); height: 200px; display: flex; align-items: center; justify-content: center; }
-  @media (max-width: 900px) { .planned-box { height: 100px; } }
-  .key { display: flex; flex-direction: column; gap: 2px; }
-  .kv { font-family: var(--serif); font-size: 40px; line-height: 1; letter-spacing: -.03em; }
-  .kl { font-size: 13px; color: var(--muted); }
-  .gap { height: 28px; }
+  .top { padding-top: 72px; padding-bottom: 24px; }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); line-height: 1.18; letter-spacing: -.015em; }
+  h1 em { font-style: italic; color: var(--accent); }
+  .list { display: flex; flex-direction: column; padding-top: 24px; }
+  .project { padding: 40px 0; border-top: 1px solid var(--rule); align-items: center; }
+  .list .project:last-child { border-bottom: 1px solid var(--rule); }
+  .fig { grid-column: span 5; }
+  .figure { display: block; padding: 12px; }
+  .figure:hover { border-color: var(--ink); }
+  .placeholder { border: 1px dashed var(--rule); min-height: 200px; display: flex; align-items: center; justify-content: center; }
+  .text { grid-column: span 7; display: flex; flex-direction: column; gap: 18px; }
+  h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.18; letter-spacing: -.01em; text-wrap: pretty; }
+  .desc { font-size: 16px; line-height: 1.6; color: var(--text); text-wrap: pretty; max-width: 56ch; }
+  .links { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+  .go { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+  .go:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+  .go.alt { color: var(--muted); border-color: var(--muted); font-weight: 400; }
+  .status { color: var(--muted); }
+  .earlier { padding-top: 16px; }
+  .earlier .prose { max-width: 800px; padding-top: 20px; padding-bottom: 28px; font-size: 17px; }
+  .earlier :global(.ref) { color: var(--accent); font-family: var(--mono); font-size: 13px; }
   .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
   @media (max-width: 900px) {
     .top { padding-top: 32px; }
-    .ladder-wrap { overflow-x: auto; }
-    .ladder { min-width: 760px; }
-    .stepcard { padding: 28px 0; }
-    .meta { flex-direction: row; align-items: center; flex-wrap: wrap; }
-    .facts { grid-template-columns: minmax(0, 1fr); }
+    .project { padding: 28px 0; }
+    .placeholder { min-height: 120px; }
   }
 </style>

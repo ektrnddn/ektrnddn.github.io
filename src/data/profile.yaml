@@ -17,9 +17,6 @@ intro: >-
   I look for [[pairs of massive black holes]] in the [[DESI]] survey and the [[ASTRID]]
   simulation: the systems that gravitational-wave observatories like [[LISA]] and pulsar
   timing arrays will one day hear merge.
-intro_more: >-
-  Before Pittsburgh there was Tbilisi, a physics degree, a start-up, and summers at CERN,
-  KU Leuven and the Perimeter Institute.
 hero:
   # Rendered as: {start} <em>{emphasis}</em> {end}
   start: "Massive black hole pairs,"

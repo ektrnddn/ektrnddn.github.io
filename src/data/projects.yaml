@@ -1,0 +1,40 @@
+# Research page. Thesis projects in order; each needs a title, and either a paper link
+# with a figure or a status line for work not yet published.
+thesis:
+  - title: "z ∼ 2 dual AGN host galaxies are disky: stellar kinematics in the ASTRID Simulation"
+    figure: /figures/disky_sfr_figure.jpg
+    figure_alt: Stellar density maps and energy–circularity diagrams of dual AGN hosts in ASTRID
+    link: https://doi.org/10.33232/001c.124451
+  - title: "Cosmic Pairs: a DESI census of dual and offset AGN as precursors to massive black hole binaries"
+    figure: /figures/dr_z_bigmac_duals.jpg
+    figure_alt: Redshift versus projected separation for DESI DR1 dual AGN and literature candidates
+    link: https://arxiv.org/abs/2607.27390
+    extra_link: { label: Interactive figure, url: https://ektrnddn.github.io/dualagn-explorer/ }
+  - title: "Connecting current and future dual AGN searches to LISA and PTA gravitational wave detections"
+    figure: /figures/papers/gw-merger-rates.jpg
+    figure_alt: Expected full-sky massive black hole merger rates from survey-matched mock samples
+    link: https://arxiv.org/abs/2512.16844
+  - title: "Cosmic Pairs: a DESI census of massive black hole binaries"
+    status: In preparation
+  - title: "Scaling up: variational autoencoders on DESI DR3"
+    status: Coming soon
+    description: >-
+      Teaching a variational autoencoder what an ordinary DESI spectrum looks like, so that
+      the unusual ones, including binary black hole signatures, fall out on their own across
+      the whole survey.
+
+# Earlier work. [n] in the text points at the n-th entry of `earlier`.
+earlier_text: >-
+  Before moving to black holes I worked on magnetohydrodynamics. At Ilia State University
+  and KU Leuven, with Andria Rogava and Stefaan Poedts, I revisited self-similar solutions
+  for astrophysical MHD transients and found new classes of solutions under revised
+  geometric and kinematic assumptions [1]. My B.Sc. thesis with Nana Shatashvili,
+  “Transient Flow and Magnetic Field Generation in 2-Temperature Degenerate Electron-Ion
+  Gas due to Catastrophic Relaxation of Equilibrium”, extended this to the relativistic
+  gas of binary systems [2]. As a CERN summer student with Nicolas Mounet I derived
+  closed-form expressions for the indirect space-charge wake function of axisymmetric
+  beam pipes [3].
+earlier:
+  - rogava2022-self-similarity
+  - saralidze2025-catastrophic
+  - mounet2022-wake
