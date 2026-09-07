@@ -1,12 +1,12 @@
-# Short, personal lines for the home page. `icon` is one of: pin, mountain, camera, icecream, mic, star.
+# Short, personal lines for the home page. `icon` is one of pin, mountain, camera, icecream, cheese, mic, star, or a list of them.
 - icon: pin
   text: From Tbilisi (თბილისი), Georgia. Now in Pittsburgh.
 - icon: mountain
   text: Skiing in winter, hiking the rest of the year. Any mountain will do.
 - icon: camera
   text: I shoot film.
-- icon: icecream
-  text: Cheese and ice cream are food groups. 🧀🍦
+- icon: [cheese, icecream]
+  text: Cheese and ice cream are food groups.
 - icon: mic
   text: Host of Astronomy on Tap Pittsburgh, where astronomy meets a pub.
   link: https://astronomyontap.org/

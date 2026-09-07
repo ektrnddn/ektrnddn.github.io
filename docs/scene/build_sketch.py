@@ -5,7 +5,7 @@ html = open(f"{S}/scene.html").read()
 svg_inner = re.search(r'<svg[^>]*>(.*)</svg>', html, re.S).group(1)
 svg_inner = re.sub(r'\s*<!--.*?-->', '', svg_inner)
 # group layers for parallax: wrap each top-level <g class="..."> with a data-layer factor
-factors = {'range': '0.18', 'foothill': '0.45', 'meadow': '1'}
+factors = {'range': '0.2', 'foothill': '0.45', 'meadow': '1'}
 def add_layer(m):
     cls = m.group(1).split()[0]
     return f'<g data-layer="{factors.get(cls, "1")}" class="l {m.group(1)}">'
@@ -19,12 +19,12 @@ component = '''---
 ---
 <div class="sketch" data-sketch aria-hidden="true">
   <canvas data-stars></canvas>
-  <svg viewBox="0 -40 1440 680" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <svg viewBox="0 0 1440 660" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
 ''' + svg_inner.strip('\n') + '''
   </svg>
 </div>
 <style>
-  .sketch { position: relative; width: 100%; height: clamp(300px, 47vw, 680px); overflow: hidden; }
+  .sketch { position: relative; width: 100%; height: clamp(300px, 45.8vw, 660px); overflow: hidden; }
   canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   svg { position: relative; width: 100%; height: 100%; display: block; }
   .l { will-change: transform; }
@@ -33,10 +33,12 @@ component = '''---
   .h { fill: none; stroke-width: 1; opacity: .8; }
   .farfar .s { stroke: #d6d6d6; }
   .range .s { stroke: #3a3a3a; stroke-width: 1.3; }
-  .foothill .s { stroke: #5a5a5a; stroke-width: 1.1; }
-  .foothill .trees { stroke: #5a5a5a; }
+  .foothill .s { stroke: #7a7a7a; stroke-width: 1.1; }
+  .foothill .trees { stroke: #7a7a7a; }
+  .near .s { stroke: #2a2a2a; stroke-width: 1.2; }
+  .near .trees { stroke: #2a2a2a; }
   .range .h { stroke: #8a8a8a; }
-  .snow { fill: none; stroke: #6a6a6a; stroke-width: .9; opacity: .85; }
+  .snow { fill: none; stroke: #8a8a8a; stroke-width: .9; opacity: .85; }
   .snowline { fill: none; stroke: #c9c9c9; stroke-width: .9; opacity: .9; }
   .near .s { stroke: #2a2a2a; }
   .trees { fill: none; stroke: #2a2a2a; stroke-width: 1; opacity: .75; }
@@ -48,7 +50,7 @@ component = '''---
   .figure .ink { fill: #191919; stroke: #191919; stroke-width: 1; stroke-linejoin: round; }
   .figure .limb { fill: none; stroke: #191919; stroke-width: 5; stroke-linecap: round; }
   .figure .leg { fill: none; stroke: #191919; stroke-width: 4.5; stroke-linecap: round; }
-  @media (max-width: 900px) { .sketch { height: clamp(260px, 80vw, 380px); } }
+  @media (max-width: 900px) { .sketch { height: clamp(240px, 70vw, 340px); } }
 </style>
 <script>
   const root = document.querySelector<HTMLElement>('[data-sketch]');
@@ -69,7 +71,13 @@ component = '''---
     const skyline = (fx: number) => { const i = fx * (SKY.length - 1), j = Math.floor(i), t = i - j; return (SKY[j] ?? 1) * (1 - t) + (SKY[Math.min(SKY.length - 1, j + 1)] ?? 1) * t; };
     // Keep stars out of the intro text (with a soft edge), wherever it sits over the drawing.
     let tb = { x0: -1, y0: -1, x1: -1, y1: -1 };
-    const measureText = () => { const t = document.querySelector('.hero .text'); if (!t) return; const tr = t.getBoundingClientRect(), rr = root.getBoundingClientRect(); tb = { x0: tr.left - rr.left, y0: tr.top - rr.top, x1: tr.right - rr.left, y1: tr.bottom - rr.top }; };
+    const measureText = () => {
+      const kids = [...document.querySelectorAll<HTMLElement>('.hero .text > *')]; if (!kids.length) return;
+      const rr = root.getBoundingClientRect();
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (const k of kids) { const r = k.getBoundingClientRect(); if (!r.width) continue; x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); }
+      tb = { x0: x0 - rr.left, y0: y0 - rr.top, x1: x1 - rr.left, y1: y1 - rr.top };
+    };
     const keep = (fx: number, fy: number, _wide: boolean) => {
       const x = fx * W, y = fy * H;
       const dx = Math.max(tb.x0 - x, 0, x - tb.x1), dy = Math.max(tb.y0 - y, 0, y - tb.y1);
@@ -94,8 +102,8 @@ component = '''---
       while (stars.length < n && guard++ < n * 40) push(Math.random(), Math.random() * 0.9, rnd(0.55, 1.15), rnd(0.28, 0.65));
       // The Milky Way: a wide diagonal band of faint dots, a dark dust lane through it,
       // and a brighter core low on the right, above the peaks.
-      const band = Math.round(W / 3.2); guard = 0; let made = 0;
-      const cxAt = (t: number) => 0.62 - t * 0.34, cyAt = (t: number) => -0.02 + t * 0.5;
+      const band = Math.round(W / 2.4); guard = 0; let made = 0;
+      const cxAt = (t: number) => 0.96 - t * 0.42, cyAt = (t: number) => -0.02 + t * 0.56;
       while (made < band && guard++ < band * 40) {
         const t = Math.random();
         const off = gauss() * (0.075 + 0.05 * t);
@@ -108,7 +116,8 @@ component = '''---
       // Bright stars with a small sparkle, and one planet.
       guard = 0; made = 0;
       while (made < 9 && guard++ < 400) if (push(Math.random(), Math.random() * 0.7, rnd(1.7, 2.3), rnd(0.75, 0.95), true)) made++;
-      push(0.8, 0.14, 3, 0.95, true);
+      push(0.56, 0.1, 3, 0.95, true);
+      for (const [dx, dy] of [[0, 0], [0.9, -0.4], [1.7, 0.3], [0.5, 1.1], [-0.8, 0.9], [1.3, 1.4], [-0.3, -1.1]]) push(0.78 + dx * 0.006, 0.07 + dy * 0.012, 1.1, 0.85);
     };
     seed(); new ResizeObserver(seed).observe(root);
     let px = -9999, py = -9999, tx = 0, ty = 0, cx = 0, cy = 0, burst = 0;

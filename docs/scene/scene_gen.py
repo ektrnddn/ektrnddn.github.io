@@ -7,9 +7,13 @@ from scipy.ndimage import median_filter, gaussian_filter1d
 S = sys.argv[1]
 T = json.load(open(f"{S}/kazbek-trace.json"))
 W, H = T["W"], T["H"]
-sc = 1440 / W                       # photo → viewBox, uniform
-yoff = 130 - min(T["skyline"]) * sc # summit lands at y = 130
-X = lambda x: x * sc
+VH, MEADOW = 660, 598
+sc = 0.9 * 1440 / W                 # photo → frame, uniform, 90% of the width
+xoff = (1440 - W * sc) / 2
+sky0 = T["skyline"]
+cx0 = min(range(150, 230), key=lambda i: sky0[i])
+yoff = 315 - sky0[cx0] * sc         # the church hill top lands at y = 315
+X = lambda x: x * sc + xoff
 Y = lambda y: y * sc + yoff
 
 def rdp(pts, eps):
@@ -26,8 +30,9 @@ def rdp(pts, eps):
 
 sky = np.array(T["skyline"], float)
 skyline = rdp([(X(x), Y(sky[x])) for x in range(0, W, 2)], 1.1)
+skyline = [(0, skyline[0][1] + 6)] + skyline + [(1440, skyline[-1][1] + 4)]
 sky_d = 'M' + ' L'.join(f'{x:.0f} {y:.0f}' for x, y in skyline)
-sky_fill = sky_d + ' L1440 640 L0 640 Z'
+sky_fill = sky_d + f' L1440 {VH} L0 {VH} Z'
 
 # Snow cap: smoothed bottom of the contiguous snow, main cap only
 sb = np.array(T["snowbot"], float)
@@ -62,17 +67,19 @@ w = np.clip((xs - 560) / 140, 0, 1)
 hs = (sky + 3) * (1 - w) + hs * w
 hs = np.maximum(hs, sky + 3)
 hs = np.where(xs > 1240, np.minimum(hs, np.interp(xs, [1240, W - 1], [hs[1240], hs[1240] + 40])), hs)
-hs = np.minimum(hs, (556 - yoff) / sc - 6)
+hs = np.minimum(hs, (MEADOW - yoff) / sc - 6)
 hill_pts = rdp([(X(x), Y(hs[x])) for x in range(0, W, 2)], 1.4)
 hill_d = 'M' + ' L'.join(f'{x:.0f} {y:.0f}' for x, y in hill_pts)
-hill_fill = hill_d + ' L1440 640 L0 640 Z'
+hill_pts = hill_pts + [(1440, hill_pts[-1][1] + 2)]
+hill_d = 'M' + ' L'.join(f'{x:.0f} {y:.0f}' for x, y in hill_pts)
+hill_fill = hill_d + f' L1440 {VH} L0 {VH} Z'
 trees = ' '.join(f'M{x:.0f} {y:.0f} l3 -7 3 7' for x, y in hill_pts[::9] if 40 < x < 1400 and y < 470)
 
 # Gergeti Trinity on its hill: the traced bump between photo columns 150–230
 cx = 150 + int(np.argmin(sky[150:230]))
 church_x, church_y = X(cx), Y(sky[cx]) + 2
 
-svg = f'''<svg viewBox="0 -40 1440 680" fill="none" stroke-linecap="round" stroke-linejoin="round">
+svg = f'''<svg viewBox="0 0 1440 660" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <g class="range">
     <path class="f" d="{sky_fill}"/>
     <path class="s" d="{sky_d}"/>
@@ -89,14 +96,14 @@ svg = f'''<svg viewBox="0 -40 1440 680" fill="none" stroke-linecap="round" strok
     <path class="trees" d="{trees}"/>
   </g>
   <g class="meadow">
-    <path class="f" d="M0 560 C 240 550, 480 568, 720 556 S 1120 546, 1440 560 L1440 640 L0 640 Z"/>
-    <path class="s" d="M0 560 C 240 550, 480 568, 720 556 S 1120 546, 1440 560"/>
-    <path class="grass" d="M96 558 l-2 -12 M118 556 l3 -10 M300 562 l-1 -11 M330 563 l4 -9 M760 556 l-3 -12 M790 555 l2 -9 M902 552 l-2 -11 M930 551 l3 -10 M1180 554 l-2 -12 M1204 554 l3 -9 M1340 558 l-2 -11"/>
+    <path class="f" d="M0 598 C 240 590, 480 606, 720 596 S 1120 588, 1440 598 L1440 660 L0 660 Z"/>
+    <path class="s" d="M0 598 C 240 590, 480 606, 720 596 S 1120 588, 1440 598"/>
+    <path class="grass" d="M96 596 l-2 -11 M118 594 l3 -9 M300 600 l-1 -10 M330 601 l4 -8 M760 594 l-3 -11 M790 593 l2 -8 M902 590 l-2 -10 M930 589 l3 -9 M1180 592 l-2 -11 M1204 592 l3 -8 M1340 596 l-2 -10"/>
     <g class="flowers">
-      <path class="stem" d="M212 555 v-16 M405 561 v-13 M700 556 v-18 M818 552 v-14 M1048 548 v-16 M1275 554 v-13"/>
-      <circle cx="212" cy="537" r="2.6"/><circle cx="405" cy="546" r="2.2"/><circle cx="700" cy="536" r="2.8"/><circle cx="818" cy="536" r="2.3"/><circle cx="1048" cy="530" r="2.6"/><circle cx="1275" cy="539" r="2.2"/>
+      <path class="stem" d="M212 594 v-15 M405 599 v-12 M700 594 v-16 M818 590 v-13 M1048 586 v-15 M1275 592 v-12"/>
+      <circle cx="212" cy="577" r="2.5"/><circle cx="405" cy="585" r="2.1"/><circle cx="700" cy="576" r="2.7"/><circle cx="818" cy="575" r="2.2"/><circle cx="1048" cy="569" r="2.5"/><circle cx="1275" cy="578" r="2.1"/>
     </g>
-    <g class="figure" transform="translate(600 558)">
+    <g class="figure" transform="translate(600 597) scale(0.9)">
       <path class="ink" d="M 7 -96 C 4 -101, -3 -103, -8 -100 C -12 -104, -18 -101, -17 -96 C -22 -96, -24 -90, -20 -87 C -25 -85, -25 -79, -20 -77 C -24 -73, -21 -67, -16 -68 C -18 -63, -13 -60, -9 -63 C -8 -66, -7 -68, -6 -70 C -3 -72, 1 -74, 4 -78 C 8 -81, 10 -86, 9 -90 C 10 -93, 9 -95, 7 -96 Z"/>
       <path class="ink" d="M -10 -74 L 5 -74 C 10 -65, 10 -56, 8 -46 L -9 -46 C -12 -56, -12 -65, -10 -74 Z"/>
       <path class="ink" d="M -8 -46 L 7 -46 C 12 -34, 16 -18, 17 -6 L -18 -6 C -16 -18, -12 -34, -8 -46 Z"/>
@@ -107,7 +114,7 @@ svg = f'''<svg viewBox="0 -40 1440 680" fill="none" stroke-linecap="round" strok
     </g>
   </g>
 </svg>'''
-html = '''<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#fff}svg{width:1440px;height:680px;display:block}
+html = '''<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#fff}svg{width:1440px;height:660px;display:block}
 .f{fill:#fff;stroke:none}.s{fill:none;stroke-width:1.2}.h{fill:none;stroke-width:1;opacity:.8}
 .range .s{stroke:#3a3a3a;stroke-width:1.3}.range .h{stroke:#8a8a8a}.snow{fill:none;stroke:#6a6a6a;stroke-width:.9;opacity:.85}.snowline{fill:none;stroke:#bdbdbd;stroke-width:.9;opacity:.9}
 .foothill .s{stroke:#5a5a5a;stroke-width:1.1}.foothill .trees{fill:none;stroke:#5a5a5a;stroke-width:1;opacity:.8}
@@ -117,6 +124,6 @@ html = '''<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;
 </style></head><body>''' + svg + '</body></html>'
 open(f'{S}/scene.html', 'w').write(html)
 # 48 skyline samples (fraction of box height, y from box top) for the star field
-samples = [round((Y(sky[min(W - 1, int(i * W / 47))]) + 40) / 680, 3) for i in range(48)]
+samples = [round(min(Y(sky[min(W - 1, max(0, int((i * 1440 / 47 - xoff) / sc)))]), MEADOW) / VH, 3) for i in range(48)]
 json.dump(samples, open(f'{S}/skyline-samples.json', 'w'))
 print('scene.html written;', len(skyline), 'skyline pts,', len(hill_pts), 'hill pts,', len(snow_pts), 'snow pts; church at', round(church_x), round(church_y))
