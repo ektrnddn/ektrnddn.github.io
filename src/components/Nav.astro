@@ -8,8 +8,6 @@ const items = [
   { href: '#contact', label: 'Contact' },
 ];
 const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
-const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 'Scholar', linkedin: 'LinkedIn', orcid: 'ORCID' };
-const social = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
 ---
 <header class="nav">
   <div class="wrap bar">
@@ -20,9 +18,9 @@ const social = Object.entries(profile.links).filter(([, v]) => typeof v === 'str
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="1.6" fill="currentColor" stroke="none"/><path d="M2 7h2M10 7h2M7 2v2M7 10v2"/></svg>
         </button>
         <div class="pill" data-orb-pill>
-          <a href={`mailto:${profile.email}`} style="--i:0">Email</a>
-          {social.map(([k, v], i) => <a href={v} target="_blank" rel="me noopener" style={`--i:${i + 1}`}>{labels[k] ?? k}</a>)}
-          <a href="/cv/Ekaterine_Dadiani_CV.pdf" style={`--i:${social.length + 1}`}>CV</a>
+          <button type="button" data-copy={profile.email} style="--i:0" title="Copy email address">Email</button>
+          <a href={profile.links.github} target="_blank" rel="me noopener" style="--i:1">GitHub</a>
+          <a href={profile.links.linkedin} target="_blank" rel="me noopener" style="--i:2">LinkedIn</a>
         </div>
       </div>
     </div>
@@ -48,9 +46,9 @@ const social = Object.entries(profile.links).filter(([, v]) => typeof v === 'str
   .orb.open .dot svg { transform: rotate(45deg); }
   .pill { position: absolute; left: 0; top: 0; height: 28px; display: flex; align-items: center; gap: 0; padding: 0 0 0 34px; border-radius: 14px; background: var(--ink); color: var(--bg); overflow: hidden; width: 28px; opacity: 0; transition: width .4s cubic-bezier(.2,.7,.2,1), opacity .2s; white-space: nowrap; }
   .orb.open .pill { width: var(--pw, 300px); opacity: 1; }
-  .pill a { color: var(--bg); font-size: 12.5px; letter-spacing: .01em; padding: 0 10px; height: 28px; display: inline-flex; align-items: center; opacity: 0; transform: translateX(-6px); transition: opacity .25s ease calc(.12s + var(--i) * .05s), transform .3s ease calc(.12s + var(--i) * .05s); }
-  .pill a:hover { text-decoration: underline; color: var(--bg); }
-  .orb.open .pill a { opacity: 1; transform: none; }
+  .pill a, .pill button { appearance: none; border: 0; background: none; font: inherit; cursor: pointer; color: var(--bg); font-size: 12.5px; letter-spacing: .01em; padding: 0 10px; height: 28px; display: inline-flex; align-items: center; opacity: 0; transform: translateX(-6px); transition: opacity .25s ease calc(.12s + var(--i) * .05s), transform .3s ease calc(.12s + var(--i) * .05s); }
+  .pill a:hover, .pill button:hover { text-decoration: underline; color: var(--bg); }
+  .orb.open .pill a, .orb.open .pill button { opacity: 1; transform: none; }
   ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 32px; }
   li a { font-size: 14px; letter-spacing: -.01em; color: var(--muted); }
   li a:hover, li a.active { color: var(--ink); text-decoration: none; }
@@ -67,7 +65,14 @@ const social = Object.entries(profile.links).filter(([, v]) => typeof v === 'str
   if (orb) {
     const btn = orb.querySelector<HTMLButtonElement>('[data-orb-btn]')!;
     const pill = orb.querySelector<HTMLElement>('[data-orb-pill]')!;
-    const measure = () => { const links = [...pill.querySelectorAll<HTMLElement>('a')]; let w = 34 + 8; for (const a of links) w += a.offsetWidth; orb.style.setProperty('--pw', `${w}px`); };
+    const measure = () => { const links = [...pill.querySelectorAll<HTMLElement>('a, button')]; let w = 34 + 8; for (const a of links) w += a.offsetWidth; orb.style.setProperty('--pw', `${w}px`); };
+    // Email copies the address; a mail link is the fallback if the clipboard is unavailable.
+    const copyBtn = pill.querySelector<HTMLButtonElement>('[data-copy]');
+    copyBtn?.addEventListener('click', async () => {
+      const addr = copyBtn.dataset.copy ?? '';
+      try { await navigator.clipboard.writeText(addr); copyBtn.textContent = 'Copied'; setTimeout(() => { copyBtn.textContent = 'Email'; measure(); }, 1400); measure(); }
+      catch { location.href = `mailto:${addr}`; }
+    });
     const open = () => { measure(); orb.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); };
     const close = () => { orb.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
     let hoverable = matchMedia('(hover: hover)').matches, t = 0;
