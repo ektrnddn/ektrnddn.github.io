@@ -6,7 +6,7 @@ import { profile, education, grants, experience, awards, talks } from '../data/l
 import lastBuilt from '../../public/cv/last-built.txt?raw';
 const pdf = '/cv/Ekaterine_Dadiani_CV.pdf';
 const kinds: Record<string, string> = { talk: 'Talk', organizer: 'Organiser', school: 'School', workshop: 'Workshop' };
-const talksSorted = [...talks].sort((a, b) => b.year - a.year);
+const talksSorted = talks.filter((t) => t.kind !== 'organizer').sort((a, b) => b.year - a.year);
 const outreach = [
   { when: 'ongoing', what: 'Host, Astronomy on Tap Pittsburgh', where: 'Public astronomy talks in a pub' },
   { when: '2024', what: 'Organiser, International Conference of Physics Students (ICPS)', where: 'Tbilisi, Georgia' },
@@ -135,7 +135,7 @@ const outreach = [
 
 <style>
   .top { padding-top: 72px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 22px; }
-  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(36px, 4.4vw, 60px); line-height: 1.04; letter-spacing: -.02em; }
+  h1 { font-weight: 400; font-size: clamp(34px, 4vw, 52px); line-height: 1.05; letter-spacing: -.035em; }
   .top .lede { max-width: 760px; font-size: 20px; }
   .quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 14px; line-height: 1.5; }
   .quick .mono { margin-bottom: 4px; }
@@ -145,7 +145,7 @@ const outreach = [
   .r .what b { font-weight: 500; }
   .kind { margin-right: 6px; }
   .cvbox { margin-top: 72px; padding-top: 32px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 32px; flex-wrap: wrap; }
-  .cvbox h2 { font-family: var(--serif); font-size: 32px; letter-spacing: -.015em; margin-bottom: 8px; }
+  .cvbox h2 { font-size: 26px; margin-bottom: 8px; }
   .actions { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
   @media (max-width: 900px) {
     .top { padding-top: 32px; }

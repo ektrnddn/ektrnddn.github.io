@@ -2,15 +2,15 @@
 :root {
   --bg: #ffffff;
   --paper: #ffffff;
-  --ink: #141414;
-  --text: #3a3a3a;
-  --muted: #6e6e6e;
-  --rule: #e6e6e6;
-  --accent: #141414;
+  --ink: #191919;
+  --text: #444444;
+  --muted: #737373;
+  --rule: #ececec;
+  --accent: #191919;
   --accent-dark: #000000;
-  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  --mono: 'IBM Plex Mono', Menlo, Consolas, monospace;
+  --serif: 'Geist', 'Helvetica Neue', Arial, sans-serif;
+  --sans: 'Geist', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'Geist Mono', Menlo, Consolas, monospace;
   --max: 1312px;
   --pad: 64px;
 }
@@ -27,14 +27,14 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-dark); text-decoration: underline; }
 img { max-width: 100%; height: auto; display: block; }
 p { margin: 0; }
-h1, h2, h3 { margin: 0; font-weight: 400; }
+h1, h2, h3 { margin: 0; font-weight: 400; letter-spacing: -.03em; }
 
 .wrap { max-width: var(--max); margin: 0 auto; padding-left: var(--pad); padding-right: var(--pad); }
 
-.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .mono { font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted); }
 .mono b { color: var(--ink); font-weight: 500; }
-.lede { font-family: var(--serif); font-size: 21px; line-height: 1.5; color: var(--text); text-wrap: pretty; }
+.lede { font-size: 19px; line-height: 1.5; letter-spacing: -.01em; color: var(--text); text-wrap: pretty; }
 .prose { font-size: 16px; line-height: 1.65; color: var(--text); text-wrap: pretty; }
 .prose p + p { margin-top: 1em; }
 .prose a { color: var(--accent); }
@@ -46,8 +46,8 @@ h1, h2, h3 { margin: 0; font-weight: 400; }
 }
 
 .section-head { display: flex; align-items: baseline; gap: 20px; padding: 56px 0 8px; }
-.section-head .num { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; color: var(--accent); }
-.section-head h2 { font-family: var(--serif); font-size: clamp(30px, 3.2vw, 40px); letter-spacing: -.015em; line-height: 1.1; }
+.section-head .num { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+.section-head h2 { font-size: clamp(24px, 2.4vw, 30px); letter-spacing: -.03em; line-height: 1.1; font-weight: 500; }
 .section-head .lede-sm { margin-left: auto; max-width: 520px; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty; }
 .section-head .aside-link { margin-left: auto; }
 @media (max-width: 900px) {

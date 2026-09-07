@@ -12,23 +12,19 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
     <h1>From Kiloparsecs to Sub-Parsec Scales:<br />A Multi-Messenger, Multi-Scale Census of<br /><em>Massive Black Hole Pairs</em><br />Across Cosmic Time</h1>
   </header>
 
-  <section class="wrap list">
+  <section class="wrap grid">
     {projects.thesis.map((p) => (
-      <article class="project grid12">
-        <div class="fig">
-          {p.figure ? (
-            <a href={p.link} target="_blank" rel="noopener" class="figure"><img src={p.figure} alt={p.figure_alt ?? p.title} loading="lazy" /></a>
-          ) : (
-            <div class="placeholder"><span class="mono">{p.status}</span></div>
-          )}
-        </div>
-        <div class="text">
-          <h2>{p.title}</h2>
-          {p.description && <p class="desc">{p.description}</p>}
-          <div class="links">
-            {p.link && <a href={p.link} target="_blank" rel="noopener" class="go">Read the full story <Arrow /></a>}
-            {p.extra_link && <a href={p.extra_link.url} target="_blank" rel="noopener" class="go alt">{p.extra_link.label} <Arrow kind="ext" /></a>}
-          </div>
+      <article class="card">
+        {p.figure ? (
+          <a href={p.link} target="_blank" rel="noopener" class="fig"><img src={p.figure} alt={p.figure_alt ?? p.title} loading="lazy" /></a>
+        ) : (
+          <div class="fig placeholder"><span class="mono">{p.status}</span></div>
+        )}
+        <h2>{p.title}</h2>
+        {p.description && <p class="desc">{p.description}</p>}
+        <div class="links">
+          {p.link && <a href={p.link} target="_blank" rel="noopener" class="go">Read the full story <Arrow /></a>}
+          {p.extra_link && <a href={p.extra_link.url} target="_blank" rel="noopener" class="go alt">{p.extra_link.label} <Arrow kind="ext" /></a>}
         </div>
       </article>
     ))}
@@ -45,17 +41,15 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
 
 <style>
   .top { padding-top: 72px; padding-bottom: 24px; }
-  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(28px, 3.4vw, 46px); line-height: 1.18; letter-spacing: -.015em; }
-  h1 em { font-style: italic; color: var(--accent); }
-  .list { display: flex; flex-direction: column; padding-top: 24px; }
-  .project { padding: 40px 0; border-top: 1px solid var(--rule); align-items: center; }
-  .list .project:last-child { border-bottom: 1px solid var(--rule); }
-  .fig { grid-column: span 5; }
-  .figure { display: block; padding: 12px; }
-  .figure:hover { border-color: var(--ink); }
-  .placeholder { border: 1px dashed var(--rule); min-height: 200px; display: flex; align-items: center; justify-content: center; }
-  .text { grid-column: span 7; display: flex; flex-direction: column; gap: 18px; }
-  h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.18; letter-spacing: -.01em; text-wrap: pretty; }
+  h1 { font-weight: 400; font-size: clamp(26px, 3vw, 40px); line-height: 1.16; letter-spacing: -.03em; }
+  h1 em { font-style: normal; font-weight: 500; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 40px; padding-top: 32px; }
+  .card { display: flex; flex-direction: column; gap: 16px; }
+  .fig { display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; border: 1px solid var(--rule); background: var(--paper); padding: 16px; overflow: hidden; }
+  .fig img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+  a.fig:hover { border-color: var(--ink); }
+  .placeholder { border-style: dashed; }
+  h2 { font-weight: 500; font-size: clamp(20px, 1.8vw, 24px); line-height: 1.25; letter-spacing: -.02em; text-wrap: pretty; }
   .desc { font-size: 16px; line-height: 1.6; color: var(--text); text-wrap: pretty; max-width: 56ch; }
   .links { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
   .go { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
@@ -68,7 +62,6 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
   .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
   @media (max-width: 900px) {
     .top { padding-top: 32px; }
-    .project { padding: 28px 0; }
-    .placeholder { min-height: 120px; }
+    .grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
   }
 </style>

@@ -23,10 +23,10 @@ const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
 <style>
   .nav { border-bottom: 1px solid var(--rule); }
   .bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 22px; padding-bottom: 22px; }
-  .name { font-family: var(--serif); font-size: 22px; font-weight: 500; letter-spacing: -.01em; color: var(--ink); }
+  .name { font-size: 18px; font-weight: 500; letter-spacing: -.02em; color: var(--ink); }
   .name:hover { color: var(--accent); text-decoration: none; }
   ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 32px; }
-  li a { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  li a { font-size: 14px; letter-spacing: -.01em; color: var(--muted); }
   li a:hover, li a.active { color: var(--ink); text-decoration: none; }
   @media (max-width: 900px) {
     .bar { padding-top: 16px; padding-bottom: 16px; }

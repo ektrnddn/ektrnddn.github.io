@@ -9,7 +9,7 @@ const years = [...new Set(sorted.map((p) => p.year))];
 let n = 0;
 const byYear = years.map((y) => ({ year: y, items: sorted.filter((p) => p.year === y).map((p) => ({ p, n: ++n })) }));
 const kinds: Record<string, string> = { talk: 'Talk', organizer: 'Organiser', school: 'School', workshop: 'Workshop' };
-const talksSorted = [...talks].sort((a, b) => b.year - a.year);
+const talksSorted = talks.filter((t) => t.kind !== 'organizer').sort((a, b) => b.year - a.year);
 ---
 <Base title="Publications" description="Papers and talks by Ekaterine Dadiani.">
   <section class="wrap">

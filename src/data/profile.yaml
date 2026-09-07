@@ -35,11 +35,10 @@ research_lede: >-
   One question at three separation scales: where are the massive black hole pairs,
   how many are there, and which ones will gravitational-wave detectors hear?
 bio: >-
-  I study massive black hole pairs: where they are, how many exist, and which ones
-  LISA and pulsar timing arrays will eventually detect. The work spans the full
-  evolutionary chain, from kiloparsec-scale dual AGN caught mid-merger in DESI,
-  to sub-parsec binaries hiding in spectral line shifts, to the host galaxies in
-  between as seen in the ASTRID cosmological simulation.
+  I study massive black hole pairs: where they are, how many there are, and which ones
+  LISA will eventually detect. The work follows the whole evolutionary chain, from
+  kiloparsec-scale dual AGN to sub-parsec binaries, and the galaxies that host them
+  along the way.
 advisors:
   - Antonella Palmese
   - Tiziana Di Matteo

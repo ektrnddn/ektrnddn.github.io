@@ -36,7 +36,7 @@ Everything shown on the site comes from plain files, no code changes needed:
 | ----------------------- | ---------------------------------- |
 | Name, bio, links, skills, home intro | `src/data/profile.yaml` |
 | Home page facts         | `src/data/facts.yaml`              |
-| Mountain drawing        | `src/components/Sketch.astro` (ridge paths, meadow, figure; moves with the cursor) |
+| Night-sky drawing       | `src/components/Sketch.astro`, generated from `docs/scene/scene.html` by `docs/scene/build_sketch.py` (mountains, meadow, figure, star canvas) |
 | Film photos on the home page | `src/data/photos.yaml` + files in `public/photos/` |
 | Publications            | `src/data/publications.yaml`       |
 | Talks and schools       | `src/data/talks.yaml`              |

@@ -1,4 +1,16 @@
----
+# Generates src/components/Sketch.astro from scene.html (the SVG) plus the star canvas.
+import re, sys
+S, out = sys.argv[1], sys.argv[2]
+html = open(f"{S}/scene.html").read()
+svg_inner = re.search(r'<svg[^>]*>(.*)</svg>', html, re.S).group(1)
+svg_inner = re.sub(r'\s*<!--.*?-->', '', svg_inner)
+# group layers for parallax: wrap each top-level <g class="..."> with a data-layer factor
+factors = {'farfar': '0.12', 'range': '0.22', 'near': '0.5', 'meadow': '1'}
+def add_layer(m):
+    cls = m.group(1).split()[0]
+    return f'<g data-layer="{factors.get(cls, "1")}" class="l {m.group(1)}">'
+svg_inner = re.sub(r'<g class="(farfar|range|near|meadow)">', add_layer, svg_inner)
+component = '''---
 // A night in the Georgian mountains, drawn in ink: a snow-capped range, forested
 // ridges with a hilltop church, a meadow, and a small figure walking through it.
 // Behind the drawing, a field of stars that scatters around the cursor and drifts
@@ -8,47 +20,7 @@
 <div class="sketch" data-sketch aria-hidden="true">
   <canvas data-stars></canvas>
   <svg viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <g data-layer="0.12" class="l farfar">
-    <path class="f" d="M1040 330 L1090 300 L1130 318 L1180 284 L1230 302 L1290 272 L1340 296 L1400 278 L1440 292 L1440 620 L1040 620 Z"/>
-    <path class="s" d="M1040 330 L1090 300 L1130 318 L1180 284 L1230 302 L1290 272 L1340 296 L1400 278 L1440 292"/>
-  </g>
-  <g data-layer="0.22" class="l range">
-    <path class="f" d="M420 400 L470 372 L500 380 L540 340 L575 352 L600 318 L625 335 L660 290 L690 300 L720 262 L745 285 L770 270 L800 236 L820 252 L850 244 L880 214 L905 240 L930 228 L960 258 L990 246 L1020 272 L1050 254 L1080 286 L1110 270 L1140 296 L1175 282 L1210 304 L1240 292 L1280 316 L1320 300 L1360 322 L1400 312 L1440 326 L1440 620 L420 620 Z"/>
-    <path class="s" d="M420 400 L470 372 L500 380 L540 340 L575 352 L600 318 L625 335 L660 290 L690 300 L720 262 L745 285 L770 270 L800 236 L820 252 L850 244 L880 214 L905 240 L930 228 L960 258 L990 246 L1020 272 L1050 254 L1080 286 L1110 270 L1140 296 L1175 282 L1210 304 L1240 292 L1280 316 L1320 300 L1360 322 L1400 312 L1440 326"/>
-    <path class="h" d="M720 262 L700 312 M800 236 L786 290 M880 214 L866 268 M880 214 L898 264 M1050 254 L1036 306 M1210 304 L1196 348"/>
-    <path class="snow" d="M652 300 l-8 6 M664 302 l-10 8 M712 274 l-8 5 M726 276 l-9 8 M738 286 l-7 6 M792 248 l-8 6 M806 250 l-9 7 M816 262 l-7 6 M868 226 l-9 6 M892 228 l-10 8 M880 240 l-8 6 M898 252 l-8 7 M924 240 l-8 6 M940 244 l-9 7 M1044 266 l-8 6 M1058 268 l-9 7 M1170 292 l-8 6 M1184 294 l-8 7"/>
-  </g>
-  <g data-layer="0.5" class="l near">
-    <path class="f" d="M0 384 C 90 372, 160 392, 250 418 S 400 470, 520 522 S 600 548, 640 552 L640 620 L0 620 Z"/>
-    <path class="s" d="M0 384 C 90 372, 160 392, 250 418 S 400 470, 520 522 S 600 548, 640 552"/>
-        <path class="trees" d="M62 384 l3 -7 3 7 M110 386 l3 -8 3 8 M170 400 l3 -7 3 7 M330 452 l3 -7 3 7 M372 468 l3 -8 3 8 M430 494 l3 -7 3 7 M492 516 l3 -7 3 7"/>
-    <g class="church" transform="translate(236 418)">
-      <path d="M-9 0 v-9 h18 v9 z M-4 -9 v-5 h8 v5 z M-4 -14 a4 4 0 0 1 8 0 z M-0.6 -18 v-5 h1.2 v5 z M-2.2 -21.5 h4.4 v1 h-4.4 z M10 0 v-14 h4 v14 z M10 -14 l2 -3 2 3 z"/>
-    </g>
-  </g>
-  <g data-layer="0.5" class="l near">
-    <path class="f" d="M900 556 C 1000 540, 1080 500, 1180 468 S 1330 428, 1440 418 L1440 620 L900 620 Z"/>
-    <path class="s" d="M900 556 C 1000 540, 1080 500, 1180 468 S 1330 428, 1440 418"/>
-        <path class="trees" d="M1120 486 l3 -7 3 7 M1200 462 l3 -8 3 8 M1300 438 l3 -7 3 7 M1380 426 l3 -7 3 7"/>
-  </g>
-  <g data-layer="1" class="l meadow">
-    <path class="f" d="M0 560 C 240 550, 480 568, 720 556 S 1120 546, 1440 560 L1440 620 L0 620 Z"/>
-    <path class="s" d="M0 560 C 240 550, 480 568, 720 556 S 1120 546, 1440 560"/>
-    <path class="grass" d="M96 558 l-2 -12 M118 556 l3 -10 M300 562 l-1 -11 M330 563 l4 -9 M760 556 l-3 -12 M790 555 l2 -9 M902 552 l-2 -11 M930 551 l3 -10 M1180 554 l-2 -12 M1204 554 l3 -9 M1340 558 l-2 -11"/>
-    <g class="flowers">
-      <path class="stem" d="M212 555 v-16 M405 561 v-13 M700 556 v-18 M818 552 v-14 M1048 548 v-16 M1275 554 v-13"/>
-      <circle cx="212" cy="537" r="2.6"/><circle cx="405" cy="546" r="2.2"/><circle cx="700" cy="536" r="2.8"/><circle cx="818" cy="536" r="2.3"/><circle cx="1048" cy="530" r="2.6"/><circle cx="1275" cy="539" r="2.2"/>
-    </g>
-    <g class="figure" transform="translate(600 558)">
-      <path class="ink" d="M 7 -96 C 4 -101, -3 -103, -8 -100 C -12 -104, -18 -101, -17 -96 C -22 -96, -24 -90, -20 -87 C -25 -85, -25 -79, -20 -77 C -24 -73, -21 -67, -16 -68 C -18 -63, -13 -60, -9 -63 C -8 -66, -7 -68, -6 -70 C -3 -72, 1 -74, 4 -78 C 8 -81, 10 -86, 9 -90 C 10 -93, 9 -95, 7 -96 Z"/>
-      <path class="ink" d="M -10 -74 L 5 -74 C 10 -65, 10 -56, 8 -46 L -9 -46 C -12 -56, -12 -65, -10 -74 Z"/>
-      <path class="ink" d="M -8 -46 L 7 -46 C 12 -34, 16 -18, 17 -6 L -18 -6 C -16 -18, -12 -34, -8 -46 Z"/>
-      <path class="limb" d="M 4 -70 C 10 -62, 13 -54, 11 -44"/>
-      <path class="limb" d="M -8 -70 C -13 -62, -14 -54, -11 -44"/>
-      <path class="leg" d="M 5 -6 L 10 0 M -6 -6 L -12 0"/>
-      <ellipse cx="12" cy="0.5" rx="5" ry="1.8" class="ink"/><ellipse cx="-14" cy="0.5" rx="5" ry="1.8" class="ink"/>
-    </g>
-  </g>
+''' + svg_inner.strip('\n') + '''
   </svg>
 </div>
 <style>
@@ -185,3 +157,6 @@
     requestAnimationFrame(draw);
   }
 </script>
+'''
+open(out, 'w').write(component)
+print("Sketch.astro written,", len(component), "bytes")
