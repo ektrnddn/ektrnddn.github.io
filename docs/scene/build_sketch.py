@@ -5,11 +5,11 @@ html = open(f"{S}/scene.html").read()
 svg_inner = re.search(r'<svg[^>]*>(.*)</svg>', html, re.S).group(1)
 svg_inner = re.sub(r'\s*<!--.*?-->', '', svg_inner)
 # group layers for parallax: wrap each top-level <g class="..."> with a data-layer factor
-factors = {'farfar': '0.12', 'range': '0.22', 'near': '0.5', 'meadow': '1'}
+factors = {'farfar': '0.1', 'range': '0.2', 'foothill': '0.35', 'near': '0.55', 'meadow': '1'}
 def add_layer(m):
     cls = m.group(1).split()[0]
     return f'<g data-layer="{factors.get(cls, "1")}" class="l {m.group(1)}">'
-svg_inner = re.sub(r'<g class="(farfar|range|near|meadow)">', add_layer, svg_inner)
+svg_inner = re.sub(r'<g class="(farfar|range|foothill|near|meadow)">', add_layer, svg_inner)
 component = '''---
 // A night in the Georgian mountains, drawn in ink: a snow-capped range, forested
 // ridges with a hilltop church, a meadow, and a small figure walking through it.
@@ -19,12 +19,12 @@ component = '''---
 ---
 <div class="sketch" data-sketch aria-hidden="true">
   <canvas data-stars></canvas>
-  <svg viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <svg viewBox="0 -40 1440 680" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
 ''' + svg_inner.strip('\n') + '''
   </svg>
 </div>
 <style>
-  .sketch { position: relative; width: 100%; height: clamp(260px, 42vw, 560px); overflow: hidden; }
+  .sketch { position: relative; width: 100%; height: clamp(300px, 47vw, 680px); overflow: hidden; }
   canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   svg { position: relative; width: 100%; height: 100%; display: block; }
   .l { will-change: transform; }
@@ -32,9 +32,12 @@ component = '''---
   .s { fill: none; stroke-width: 1.2; }
   .h { fill: none; stroke-width: 1; opacity: .8; }
   .farfar .s { stroke: #d6d6d6; }
-  .range .s { stroke: #5a5a5a; stroke-width: 1.3; }
+  .range .s { stroke: #4a4a4a; stroke-width: 1.3; }
+  .foothill .s { stroke: #8f8f8f; stroke-width: 1.1; }
+  .foothill .trees { stroke: #8f8f8f; }
   .range .h { stroke: #8a8a8a; }
-  .snow { fill: none; stroke: #7a7a7a; stroke-width: .9; opacity: .9; }
+  .snow { fill: none; stroke: #6a6a6a; stroke-width: .9; opacity: .85; }
+  .snowline { fill: none; stroke: #c9c9c9; stroke-width: .9; opacity: .9; }
   .near .s { stroke: #2a2a2a; }
   .trees { fill: none; stroke: #2a2a2a; stroke-width: 1; opacity: .75; }
   .church { fill: #2a2a2a; stroke: none; }
@@ -45,7 +48,7 @@ component = '''---
   .figure .ink { fill: #191919; stroke: #191919; stroke-width: 1; stroke-linejoin: round; }
   .figure .limb { fill: none; stroke: #191919; stroke-width: 5; stroke-linecap: round; }
   .figure .leg { fill: none; stroke: #191919; stroke-width: 4.5; stroke-linecap: round; }
-  @media (max-width: 900px) { .sketch { height: clamp(240px, 72vw, 340px); } }
+  @media (max-width: 900px) { .sketch { height: clamp(260px, 80vw, 380px); } }
 </style>
 <script>
   const root = document.querySelector<HTMLElement>('[data-sketch]');
@@ -57,49 +60,56 @@ component = '''---
     const cv = root.querySelector<HTMLCanvasElement>('[data-stars]')!;
     const ctx = cv.getContext('2d')!;
     let W = 0, H = 0, dpr = 1;
-    type Star = { x: number; y: number; ox: number; oy: number; vx: number; vy: number; r: number; a: number; ph: number };
+    type Star = { x: number; y: number; ox: number; oy: number; vx: number; vy: number; r: number; a: number; ph: number; sp: boolean };
     let stars: Star[] = [];
     const rnd = (a: number, b: number) => a + Math.random() * (b - a);
     // A rough skyline in fractions of the box: stars only above it, and away from the intro text on wide screens.
-    const skyline = (fx: number) => fx < 0.3 ? 0.62 : fx < 0.45 ? 0.62 - (fx - 0.3) * 0.5 : fx < 0.62 ? 0.45 - (fx - 0.45) * 0.6 : 0.36 + (fx - 0.62) * 0.35;
-    // Keep stars away from the intro text: a hard zone on wide screens with a soft, fading
-    // edge, and off the top strip on narrow screens where the links sit.
+    // Rough skyline in fractions of the box (stars only above it).
+    const skyline = (fx: number) => fx < 0.26 ? 0.62 : fx < 0.44 ? 0.62 - (fx - 0.26) * 0.9 : fx < 0.6 ? 0.46 - (fx - 0.44) * 1.1 : 0.28 + (fx - 0.6) * 0.3;
+    // Keep stars away from the intro text: a hard zone on wide screens with a soft edge,
+    // and off the top strip on narrow screens where the links sit.
     const keep = (fx: number, fy: number, wide: boolean) => {
       if (!wide) return fy * H > 90;
-      if (fx >= 0.55 || fy >= 0.62) {
-        const dx = Math.max(0, (fx - 0.55) * W), dy = Math.max(0, (fy - 0.62) * H);
-        const d = fx >= 0.55 && fy >= 0.62 ? Math.min(dx, dy) : Math.max(dx, dy);
+      if (fx >= 0.55 || fy >= 0.6) {
+        const dx = Math.max(0, (fx - 0.55) * W), dy = Math.max(0, (fy - 0.6) * H);
+        const d = fx >= 0.55 && fy >= 0.6 ? Math.min(dx, dy) : Math.max(dx, dy);
         return Math.random() < Math.min(1, d / 140);
       }
       return false;
     };
+    const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
     const seed = () => {
       dpr = Math.min(2, window.devicePixelRatio || 1);
       W = root.clientWidth; H = root.clientHeight;
       cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       stars = [];
       const wide = window.innerWidth > 900;
-      const n = Math.round(W / 6);
-      let guard = 0;
-      while (stars.length < n && guard++ < n * 30) {
-        const fx = Math.random(), fy = Math.random() * 0.9;
-        if (fy > skyline(fx) - 0.03) continue;
-        if (!keep(fx, fy, wide)) continue;
-        const big = Math.random() < 0.12;
+      const push = (fx: number, fy: number, r: number, a: number, spark = false) => {
+        if (fy < 0 || fy > skyline(fx) - 0.02 || !keep(fx, fy, wide)) return false;
         const x = fx * W, y = fy * H;
-        stars.push({ x, y, ox: x, oy: y, vx: 0, vy: 0, r: big ? rnd(1.5, 2.2) : rnd(0.6, 1.2), a: big ? rnd(0.7, 0.95) : rnd(0.3, 0.7), ph: rnd(0, 6.28) });
-      }
-      // The band of the Milky Way: a denser stripe of faint dots, top centre-right down toward the peaks.
-      const band = Math.round(W / 5);
-      guard = 0;
-      while (stars.length < n + band && guard++ < band * 30) {
+        stars.push({ x, y, ox: x, oy: y, vx: 0, vy: 0, r, a, ph: rnd(0, 6.28), sp: spark });
+        return true;
+      };
+      // Scattered field.
+      const n = Math.round(W / 5); let guard = 0;
+      while (stars.length < n && guard++ < n * 40) push(Math.random(), Math.random() * 0.9, rnd(0.55, 1.15), rnd(0.28, 0.65));
+      // The Milky Way: a wide diagonal band of faint dots, a dark dust lane through it,
+      // and a brighter core low on the right, above the peaks.
+      const band = Math.round(W / 1.05); guard = 0; let made = 0;
+      const cxAt = (t: number) => (wide ? 0.6 : 0.42) + t * 0.28, cyAt = (t: number) => -0.02 + t * 0.6;
+      while (made < band && guard++ < band * 40) {
         const t = Math.random();
-        const fx = 0.78 - t * 0.2 + rnd(-0.05, 0.05), fy = t * 0.42 + rnd(-0.03, 0.03);
-        if (fy < 0 || fy > skyline(fx) - 0.03) continue;
-        if (!keep(fx, fy, wide)) continue;
-        const x = fx * W, y = fy * H;
-        stars.push({ x, y, ox: x, oy: y, vx: 0, vy: 0, r: rnd(0.4, 0.9), a: rnd(0.15, 0.4), ph: rnd(0, 6.28) });
+        const off = gauss() * (0.075 + 0.05 * t);
+        const lane = Math.abs(off - 0.02) < 0.012;
+        if (lane && Math.random() < 0.8) continue;
+        const core = t > 0.6 ? (t - 0.6) / 0.4 : 0;
+        const fx = cxAt(t) + off + rnd(-0.01, 0.01), fy = cyAt(t) - off * 0.35 + rnd(-0.01, 0.01);
+        if (push(fx, fy, rnd(0.4, 0.9) + core * 0.35, rnd(0.16, 0.4) + core * 0.3)) made++;
       }
+      // Bright stars with a small sparkle, and one planet.
+      guard = 0; made = 0;
+      while (made < 9 && guard++ < 400) if (push(Math.random(), Math.random() * 0.7, rnd(1.7, 2.3), rnd(0.75, 0.95), true)) made++;
+      push(wide ? 0.6 : 0.2, 0.22, 3, 0.95, true);
     };
     seed(); new ResizeObserver(seed).observe(root);
     let px = -9999, py = -9999, tx = 0, ty = 0, cx = 0, cy = 0, burst = 0;
@@ -136,6 +146,7 @@ component = '''---
         ctx.globalAlpha = s.a * tw;
         ctx.fillStyle = '#191919';
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        if (s.sp) { const L = s.r * 3.2; ctx.globalAlpha = s.a * tw * 0.35; ctx.lineWidth = 0.6; ctx.strokeStyle = '#191919'; ctx.beginPath(); ctx.moveTo(s.x - L, s.y); ctx.lineTo(s.x + L, s.y); ctx.moveTo(s.x, s.y - L); ctx.lineTo(s.x, s.y + L); ctx.stroke(); }
       }
       burst = 0;
       // Constellations: faint lines between stars that are close to each other and to the cursor.
