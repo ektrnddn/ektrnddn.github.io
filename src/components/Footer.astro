@@ -1,11 +1,16 @@
 ---
 import { profile } from '../data/load';
 import PixelWord from './PixelWord.astro';
+import Doodle from './Doodle.astro';
 const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 'Google Scholar', linkedin: 'LinkedIn', orcid: 'ORCID' };
 const external = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
 ---
 <footer id="contact" class="footer">
   <div class="wrap word"><PixelWord lines={['EKATERINE', 'DADIANI']} /></div>
+  <div class="wrap rise" data-rise>
+    <span class="mono cap">as drawn by a friend</span>
+    <div class="riser"><Doodle /></div>
+  </div>
   <div class="wrap bottom">
     <div class="left">
       <span class="mono">© {new Date().getFullYear()}</span>
@@ -20,6 +25,13 @@ const external = Object.entries(profile.links).filter(([, v]) => typeof v === 's
 <style>
   .footer { margin-top: 96px; border-top: 1px solid var(--rule); }
   .word { padding-top: 56px; padding-bottom: 40px; }
+  .rise { position: relative; height: 170px; overflow: hidden; display: flex; justify-content: flex-end; align-items: flex-end; gap: 16px; }
+  .rise .cap { color: var(--muted); align-self: flex-end; padding-bottom: 6px; opacity: 0; transition: opacity .6s ease 2.6s; }
+  .rise.up .cap { opacity: 1; }
+  .riser { transform: translateY(104%); transition: transform 1.3s cubic-bezier(.2,.7,.2,1); margin-right: 8px; }
+  .rise.up .riser { transform: none; }
+  .riser :global(.doodle svg) { max-width: 124px; }
+  .riser :global(.doodle figcaption) { display: none; }
   .bottom { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 40px; border-top: 1px solid var(--rule); }
   .left { display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap; }
   .aff { font-size: 13px; color: var(--muted); }
@@ -29,3 +41,7 @@ const external = Object.entries(profile.links).filter(([, v]) => typeof v === 's
   .links a:hover { color: var(--accent); }
   @media (max-width: 900px) { .footer { margin-top: 64px; } .word { padding-top: 36px; padding-bottom: 28px; } .links { gap: 14px; } }
 </style>
+<script>
+  const rise = document.querySelector<HTMLElement>('[data-rise]');
+  if (rise) { const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { rise.classList.add('up'); io.disconnect(); } }), { threshold: 0.6 }); io.observe(rise); }
+</script>

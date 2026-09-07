@@ -1,9 +1,13 @@
-# Short, personal lines for the home page, shown as "label ....... value".
-# `icon` is one of pin, mountain, camera, icecream, cheese, mic, star, or a list of them.
-- { icon: pin, label: Home, text: "Tbilisi (თბილისი), Georgia" }
-- { icon: pin, label: Now, text: "Pittsburgh, PA" }
-- { icon: mountain, label: Winter, text: "Skiing" }
-- { icon: mountain, label: The rest of the year, text: "Hiking. Any mountain will do." }
-- { icon: camera, label: Camera, text: "Film" }
-- { icon: [cheese, icecream], label: Food groups, text: "Cheese and ice cream" }
-- { icon: mic, label: Outreach, text: "Host of", link: https://astronomyontap.org/, link_label: "Astronomy on Tap Pittsburgh" }
+# Short, personal lines for the home page. `icon` is one of pin, mountain, camera, icecream, cheese, mic, star, or a list of them.
+- icon: pin
+  text: From Tbilisi (თბილისი), Georgia. Now in Pittsburgh.
+- icon: mountain
+  text: Skiing in winter, hiking the rest of the year. Any mountain will do.
+- icon: camera
+  text: I shoot film.
+- icon: [cheese, icecream]
+  text: Cheese and ice cream are food groups.
+- icon: mic
+  text: Host of Astronomy on Tap Pittsburgh, where astronomy meets a pub.
+  link: https://astronomyontap.org/
+  link_label: Astronomy on Tap

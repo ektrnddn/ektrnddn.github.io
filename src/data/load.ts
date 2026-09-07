@@ -34,7 +34,7 @@ export interface Education { degree: string; institution: string; place: string;
 export interface Grant { name: string; body: string; years: string | number; note?: string }
 export interface Experience { role: string; org: string; place: string; start: string | number; end: string | number; bullets?: string[] }
 export interface Award { year: number | string; title: string; place?: string }
-export interface Fact { icon: string | string[]; label: string; text: string; link?: string; link_label?: string }
+export interface Fact { icon: string | string[]; text: string; link?: string; link_label?: string }
 export interface Photo { src: string; caption?: string; alt?: string }
 export interface Project { title: string; figure?: string; figure_alt?: string; link?: string; extra_link?: { label: string; url: string }; status?: string; description?: string }
 export interface Projects { thesis: Project[]; earlier_text: string; earlier: string[] }
