@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro';
 import { profile } from '../data/load';
 
 interface Props { title?: string; description?: string; image?: string }
-const { title, description = profile.tagline, image = '/figures/dr_z_bigmac_duals.jpg' } = Astro.props;
+const { title, description = profile.tagline, image = '/og.png' } = Astro.props;
 const fullTitle = title ? `${title} · ${profile.name}` : `${profile.name} · Astrophysicist`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(image, Astro.site);

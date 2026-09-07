@@ -19,12 +19,12 @@ component = '''---
 ---
 <div class="sketch" data-sketch aria-hidden="true">
   <canvas data-stars></canvas>
-  <svg viewBox="0 -20 1440 660" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <svg viewBox="0 -20 1440 660" preserveAspectRatio="xMidYMax meet" fill="none" stroke-linecap="round" stroke-linejoin="round">
 ''' + svg_inner.strip('\n') + '''
   </svg>
 </div>
 <style>
-  .sketch { position: relative; width: 100%; height: clamp(300px, 45.8vw, 660px); overflow: hidden; }
+  .sketch { position: relative; width: 100%; height: max(45.8vw, calc(100vh - 180px)); max-height: 1100px; overflow: hidden; }
   canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   svg { position: relative; width: 100%; height: 100%; display: block; }
   .l { will-change: transform; }
@@ -50,7 +50,7 @@ component = '''---
   .figure .ink { fill: #191919; stroke: #191919; stroke-width: 1; stroke-linejoin: round; }
   .figure .limb { fill: none; stroke: #191919; stroke-width: 5; stroke-linecap: round; }
   .figure .leg { fill: none; stroke: #191919; stroke-width: 4.5; stroke-linecap: round; }
-  @media (max-width: 900px) { .sketch { height: clamp(240px, 70vw, 340px); } }
+  @media (max-width: 900px) { .sketch { height: clamp(240px, 70vw, 340px); max-height: none; } }
 </style>
 <script>
   const root = document.querySelector<HTMLElement>('[data-sketch]');
@@ -68,7 +68,8 @@ component = '''---
     // A rough skyline in fractions of the box: stars only above it, and away from the intro text on wide screens.
     // The traced skyline, as fractions of the box height, sampled across the width.
     const SKY = [0.479, 0.458, 0.45, 0.458, 0.456, 0.439, 0.418, 0.441, 0.464, 0.484, 0.497, 0.498, 0.496, 0.496, 0.505, 0.515, 0.521, 0.537, 0.549, 0.551, 0.537, 0.521, 0.492, 0.463, 0.418, 0.377, 0.333, 0.284, 0.26, 0.25, 0.261, 0.285, 0.318, 0.336, 0.372, 0.408, 0.438, 0.436, 0.439, 0.439, 0.461, 0.439, 0.452, 0.446, 0.472, 0.492, 0.514, 0.537];
-    const skyline = (fx: number) => { const i = fx * (SKY.length - 1), j = Math.floor(i), t = i - j; return (SKY[j] ?? 1) * (1 - t) + (SKY[Math.min(SKY.length - 1, j + 1)] ?? 1) * t; };
+    const drawn = () => Math.min(1, (W * 660 / 1440) / H);   // share of the box the drawing occupies (bottom-aligned)
+    const skyline = (fx: number) => { const i = fx * (SKY.length - 1), j = Math.floor(i), t = i - j; const f = (SKY[j] ?? 1) * (1 - t) + (SKY[Math.min(SKY.length - 1, j + 1)] ?? 1) * t; return 1 - (1 - f) * drawn(); };
     // Keep stars out of the intro text (with a soft edge), wherever it sits over the drawing.
     let tb = { x0: -1, y0: -1, x1: -1, y1: -1 };
     const measureText = () => {
@@ -103,7 +104,7 @@ component = '''---
       // The Milky Way: a wide diagonal band of faint dots, a dark dust lane through it,
       // and a brighter core low on the right, above the peaks.
       const band = Math.round(W / 2.4); guard = 0; let made = 0;
-      const cxAt = (t: number) => 0.96 - t * 0.42, cyAt = (t: number) => -0.02 + t * 0.56;
+      const peak = 1 - 0.71 * drawn(); const cxAt = (t: number) => 0.96 - t * 0.42, cyAt = (t: number) => -0.02 + t * (peak + 0.04);
       while (made < band && guard++ < band * 40) {
         const t = Math.random();
         const off = gauss() * (0.075 + 0.05 * t);
