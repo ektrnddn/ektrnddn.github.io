@@ -9,9 +9,10 @@ const steps = [
   { name: 'Merger', text: 'The binary spirals in and merges, sending out the gravitational waves that LISA and pulsar timing arrays will hear.' },
 ];
 ---
-<section class="merger wrap" data-merger aria-label="The thesis in one scroll">
-  <div class="panel">
+<section class="merger wrap" data-merger aria-label="The pair spirals in">
+  <div class="left">
     <div class="sticky">
+      <a href="/research/" class="big">See the research <Arrow /></a>
       <svg viewBox="0 0 600 600" class="scene" aria-hidden="true">
         <g data-ripples class="ripples">
           <circle cx="300" cy="300" r="20" /><circle cx="300" cy="300" r="20" /><circle cx="300" cy="300" r="20" />
@@ -36,21 +37,28 @@ const steps = [
       </svg>
     </div>
   </div>
-  <ol class="steps">
+  <ol class="notes">
     {steps.map((st, i) => (
-      <li class="step" data-step={i}>
+      <li class="note" data-step={i}>
         <div class="mono stage">{String(i + 1).padStart(2, '0')} · {st.name}</div>
         <p>{st.text}</p>
-        <a href="/research/" class="more">See the research <Arrow /></a>
       </li>
     ))}
   </ol>
 </section>
 <style>
-  .merger { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 40px; padding-top: 8px; padding-bottom: 40px; align-items: start; }
-  .panel { position: relative; }
-  .sticky { position: sticky; top: 80px; height: calc(100vh - 100px); display: flex; align-items: center; justify-content: center; }
-  .scene { height: 100%; width: auto; max-width: 100%; display: block; }
+  .merger { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 40px; align-items: stretch; padding-top: 24px; }
+  .left { position: relative; }
+  .sticky { position: sticky; top: 72px; height: calc(100vh - 72px); display: flex; flex-direction: column; gap: 8px; padding-top: 32px; }
+  .big { display: inline-flex; align-items: center; gap: 12px; font-size: clamp(22px, 2.4vw, 32px); font-weight: 500; letter-spacing: -.03em; color: var(--ink); border-bottom: 1px solid var(--ink); padding-bottom: 2px; width: fit-content; }
+  .big:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
+  .big :global(svg) { width: 22px; height: 22px; }
+  .scene { flex: 1 1 auto; min-height: 0; width: auto; max-width: 100%; display: block; align-self: center; }
+  .notes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; padding-top: calc(50vh - 120px); padding-bottom: 20vh; }
+  .note { min-height: 62vh; display: flex; flex-direction: column; justify-content: center; gap: 10px; opacity: .3; transition: opacity .4s; }
+  .note.on { opacity: 1; }
+  .note p { font-size: 14.5px; line-height: 1.6; color: var(--text); max-width: 34ch; text-wrap: pretty; }
+  .stage { color: var(--muted); }
   .galaxy ellipse, .galaxy path { fill: none; stroke: #9a9a9a; stroke-width: 1.1; }
   .galaxy .bh { fill: #191919; }
   .galaxy .agn circle { fill: none; stroke: #191919; stroke-width: .9; stroke-dasharray: 2 4; opacity: 0; transition: opacity .4s; }
@@ -62,24 +70,18 @@ const steps = [
   .merger.merging .ripples circle:nth-child(2) { animation-delay: .8s; }
   .merger.merging .ripples circle:nth-child(3) { animation-delay: 1.6s; }
   @keyframes ripple { 0% { r: 12; opacity: .6; } 100% { r: 240; opacity: 0; } }
-  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-  .step { min-height: 90vh; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 24px 0; opacity: .3; transition: opacity .4s; }
-  .step.on { opacity: 1; }
-  .step p { font-size: 14.5px; line-height: 1.6; color: var(--text); max-width: 34ch; text-wrap: pretty; }
-  .stage { color: var(--muted); }
-  .more { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-size: 13.5px; font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; width: fit-content; margin-top: 4px; }
-  .more:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
   @media (max-width: 900px) {
-    .merger { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-    .sticky { top: 64px; height: 52vh; background: var(--bg); }
-    .step { min-height: 40vh; padding: 16px 0; }
+    .merger { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .sticky { top: 56px; height: 54vh; padding-top: 16px; background: var(--bg); }
+    .scene { max-height: 40vh; }
+    .notes { padding-top: 8vh; padding-bottom: 10vh; }
+    .note { min-height: 44vh; }
   }
 </style>
 <script>
   const root = document.querySelector<HTMLElement>('[data-merger]');
   if (root) {
     const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
-    const list = root.querySelector<HTMLElement>('.steps')!;
     const ga = root.querySelector<SVGGElement>('[data-gal="a"]')!, gb = root.querySelector<SVGGElement>('[data-gal="b"]')!;
     const orbit = root.querySelector<SVGEllipseElement>('[data-orbit]')!;
     const remnant = root.querySelector<SVGGElement>('[data-remnant]')!;
@@ -88,10 +90,10 @@ const steps = [
     let theta = 0, last = performance.now(), t = 0, cur = 0;
     const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
     const ease = (v: number) => v * v * (3 - 2 * v);
+    const list = root.querySelector<HTMLElement>('.notes')!;
     const progress = () => {
       const r = list.getBoundingClientRect();
-      const mid = innerHeight * 0.5;
-      return clamp((mid - r.top) / Math.max(1, r.height - innerHeight * 0.4));
+      return clamp((innerHeight * 0.5 - r.top) / Math.max(1, r.height - innerHeight * 0.55));
     };
     const draw = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
