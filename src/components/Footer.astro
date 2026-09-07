@@ -1,40 +1,31 @@
 ---
 import { profile } from '../data/load';
 import PixelWord from './PixelWord.astro';
-import Doodle from './Doodle.astro';
 const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 'Google Scholar', linkedin: 'LinkedIn', orcid: 'ORCID' };
 const external = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
 ---
 <footer id="contact" class="footer">
-  <div class="wrap backdrop"><PixelWord lines={['EKATERINE', 'DADIANI']} /></div>
-  <div class="wrap top">
-    <div class="doodle-slot"><Doodle /></div>
-    <div class="who">
-      <div class="aff">{profile.affiliation}, {profile.location}</div>
+  <div class="wrap word"><PixelWord lines={['EKATERINE', 'DADIANI']} /></div>
+  <div class="wrap bottom">
+    <div class="left">
+      <span class="mono">© {new Date().getFullYear()}</span>
+      <span class="aff">{profile.affiliation}, {profile.location}</span>
     </div>
     <div class="links">
       <a href={`mailto:${profile.email}`} class="mail">{profile.email}</a>
       {external.map(([k, v]) => <a href={v} rel="me noopener" target="_blank">{labels[k] ?? k}</a>)}
     </div>
   </div>
-  <div class="wrap copy">© {new Date().getFullYear()}</div>
 </footer>
 <style>
-  .footer { position: relative; margin-top: 80px; border-top: 1px solid var(--rule); overflow: hidden; min-height: 700px; display: flex; flex-direction: column; }
-  .footer > .wrap { width: 100%; }
-  .backdrop { position: absolute; left: 0; right: 0; top: 244px; z-index: 0; pointer-events: none; }
-  .top, .copy { position: relative; z-index: 1; }
-  .top { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; padding-top: 36px; padding-bottom: 20px; }
-  .doodle-slot { flex: none; width: 118px; margin-right: 4px; }
-  .who { padding-bottom: 6px; }
-  .who { flex: 1 1 320px; }
-  .links { margin-left: auto; }
-  .aff { font-size: 14px; line-height: 1.5; color: var(--muted); }
-  .links { display: flex; gap: 24px; flex-wrap: wrap; font-size: 14px; }
+  .footer { margin-top: 96px; border-top: 1px solid var(--rule); }
+  .word { padding-top: 56px; padding-bottom: 40px; }
+  .bottom { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 40px; border-top: 1px solid var(--rule); }
+  .left { display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap; }
+  .aff { font-size: 13px; color: var(--muted); }
+  .links { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; }
   .links a { color: var(--muted); }
   .links a.mail { color: var(--ink); }
   .links a:hover { color: var(--accent); }
-  .copy { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-bottom: 32px; margin-top: auto; }
-  .copy a { color: var(--muted); text-decoration: underline; }
-  @media (max-width: 900px) { .footer { margin-top: 56px; min-height: 400px; } .links { gap: 16px; } .backdrop { top: 210px; } }
+  @media (max-width: 900px) { .footer { margin-top: 64px; } .word { padding-top: 36px; padding-bottom: 28px; } .links { gap: 14px; } }
 </style>
