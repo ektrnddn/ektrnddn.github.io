@@ -22,8 +22,8 @@ def skyline(x0, x1, base, massif, seed_phase, spires, step=11, jitter=1.6):
     return [(round(px), round(py, 1)) for px, py in pts]
 
 spires = [(760, 40, 16), (812, 26, 12), (858, 56, 18), (884, 36, 13), (930, 24, 11), (1010, 40, 15), (1052, 20, 10), (1140, 32, 13), (1195, 16, 9), (1290, 26, 12), (1350, 14, 9), (640, 22, 12), (690, 16, 10), (560, 12, 9)]
-range_pts = skyline(380, 1440, 336, [(860, 118, 250), (1130, 48, 130), (600, 30, 120)], 3, spires)
-farfar = skyline(940, 1440, 292, [(1150, 42, 160), (1330, 26, 90)], 11, [(1120, 22, 12), (1230, 16, 10), (1330, 20, 11)], step=14, jitter=1)
+range_pts = skyline(0, 1440, 378, [(860, 118, 250), (1130, 48, 130), (600, 30, 120), (200, 18, 160)], 3, spires)
+farfar = skyline(0, 1440, 336, [(1150, 42, 160), (1330, 26, 90), (120, 22, 140)], 11, [(1120, 22, 12), (1230, 16, 10), (1330, 20, 11), (90, 12, 10)], step=14, jitter=1)
 
 def poly(pts): return 'M' + ' L'.join(f'{x} {y}' for x, y in pts)
 def closed(pts, x0, x1, bottom=640): return poly(pts) + f' L{x1} {bottom} L{x0} {bottom} Z'
@@ -60,7 +60,7 @@ def snowline(pts, depth):
         d = depth + 10 * math.sin(x / 37) + rng.uniform(-3, 3)
         out.append((x, y + d))
     return out
-snow_pts = [(x, y) for x, y in snowline(range_pts, 34) if 620 <= x <= 1250]
+snow_pts = [(x, y) for x, y in snowline(range_pts, 34) if 640 <= x <= 1120]
 snow_d = 'M' + ' '.join((f'{x} {y:.0f}' if i == 0 else f'Q{x - 5} {y - 6:.0f} {x} {y:.0f}') for i, (x, y) in enumerate(snow_pts))
 
 # Foothill in front of the range: rounded, forested
@@ -69,11 +69,11 @@ trees_fh = ' '.join(f'M{x} {y} l3 -7 3 7' for x, y in [(360,458),(410,455),(560,
 
 svg = f'''<svg viewBox="0 -20 1440 660" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <g class="farfar">
-    <path class="f" d="{closed(farfar, 980, 1440)}"/>
+    <path class="f" d="{closed(farfar, 0, 1440)}"/>
     <path class="s" d="{poly(farfar)}"/>
   </g>
   <g class="range">
-    <path class="f" d="{closed(range_pts, 380, 1440)}"/>
+    <path class="f" d="{closed(range_pts, 0, 1440)}"/>
     <path class="s" d="{poly(range_pts)}"/>
     <path class="h" d="{' '.join(rock)}"/>
     <path class="snowline" d="{snow_d}"/>
@@ -88,9 +88,6 @@ svg = f'''<svg viewBox="0 -20 1440 660" fill="none" stroke-linecap="round" strok
     <path class="f" d="M0 384 C 90 372, 160 392, 250 418 S 400 470, 520 522 S 600 548, 640 552 L640 640 L0 640 Z"/>
     <path class="s" d="M0 384 C 90 372, 160 392, 250 418 S 400 470, 520 522 S 600 548, 640 552"/>
     <path class="trees" d="M62 384 l3 -7 3 7 M110 386 l3 -8 3 8 M170 400 l3 -7 3 7 M330 452 l3 -7 3 7 M372 468 l3 -8 3 8 M430 494 l3 -7 3 7 M492 516 l3 -7 3 7"/>
-    <g class="church" transform="translate(236 418)">
-      <path d="M-9 0 v-9 h18 v9 z M-4 -9 v-5 h8 v5 z M-4 -14 a4 4 0 0 1 8 0 z M-0.6 -18 v-5 h1.2 v5 z M-2.2 -21.5 h4.4 v1 h-4.4 z M10 0 v-14 h4 v14 z M10 -14 l2 -3 2 3 z"/>
-    </g>
   </g>
   <g class="near">
     <path class="f" d="M900 556 C 1000 540, 1080 500, 1180 468 S 1330 428, 1440 418 L1440 640 L900 640 Z"/>
