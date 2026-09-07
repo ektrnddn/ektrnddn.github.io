@@ -8,10 +8,24 @@ const items = [
   { href: '#contact', label: 'Contact' },
 ];
 const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
+const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 'Scholar', linkedin: 'LinkedIn', orcid: 'ORCID' };
+const social = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
 ---
 <header class="nav">
   <div class="wrap bar">
-    <a href="/" class="name">{profile.name}</a>
+    <div class="brand">
+      <a href="/" class="name">{profile.name}</a>
+      <div class="orb" data-orb>
+        <button type="button" class="dot" aria-label="Contact and links" aria-expanded="false" data-orb-btn>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="1.6" fill="currentColor" stroke="none"/><path d="M2 7h2M10 7h2M7 2v2M7 10v2"/></svg>
+        </button>
+        <div class="pill" data-orb-pill>
+          <a href={`mailto:${profile.email}`} style="--i:0">Email</a>
+          {social.map(([k, v], i) => <a href={v} target="_blank" rel="me noopener" style={`--i:${i + 1}`}>{labels[k] ?? k}</a>)}
+          <a href="/cv/Ekaterine_Dadiani_CV.pdf" style={`--i:${social.length + 1}`}>CV</a>
+        </div>
+      </div>
+    </div>
     <nav aria-label="Main">
       <ul>
         {items.map((i) => (
@@ -26,6 +40,17 @@ const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
   .bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 22px; padding-bottom: 22px; }
   .name { font-size: 18px; font-weight: 500; letter-spacing: -.02em; color: var(--ink); }
   .name:hover { color: var(--accent); text-decoration: none; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .orb { position: relative; display: flex; align-items: center; height: 28px; }
+  .dot { appearance: none; border: 1px solid var(--ink); background: var(--bg); color: var(--ink); width: 28px; height: 28px; border-radius: 50%; padding: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: transform .35s cubic-bezier(.2,.7,.2,1), background .2s, color .2s; position: relative; z-index: 2; }
+  .dot svg { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+  .orb.open .dot { background: var(--ink); color: var(--bg); }
+  .orb.open .dot svg { transform: rotate(45deg); }
+  .pill { position: absolute; left: 0; top: 0; height: 28px; display: flex; align-items: center; gap: 0; padding: 0 0 0 34px; border-radius: 14px; background: var(--ink); color: var(--bg); overflow: hidden; width: 28px; opacity: 0; transition: width .4s cubic-bezier(.2,.7,.2,1), opacity .2s; white-space: nowrap; }
+  .orb.open .pill { width: var(--pw, 300px); opacity: 1; }
+  .pill a { color: var(--bg); font-size: 12.5px; letter-spacing: .01em; padding: 0 10px; height: 28px; display: inline-flex; align-items: center; opacity: 0; transform: translateX(-6px); transition: opacity .25s ease calc(.12s + var(--i) * .05s), transform .3s ease calc(.12s + var(--i) * .05s); }
+  .pill a:hover { text-decoration: underline; color: var(--bg); }
+  .orb.open .pill a { opacity: 1; transform: none; }
   ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 32px; }
   li a { font-size: 14px; letter-spacing: -.01em; color: var(--muted); }
   li a:hover, li a.active { color: var(--ink); text-decoration: none; }
@@ -35,3 +60,23 @@ const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
     li a { font-size: 11px; letter-spacing: .1em; }
   }
 </style>
+
+<script>
+  // The little orb beside the name unfolds into a pill of contact links.
+  const orb = document.querySelector<HTMLElement>('[data-orb]');
+  if (orb) {
+    const btn = orb.querySelector<HTMLButtonElement>('[data-orb-btn]')!;
+    const pill = orb.querySelector<HTMLElement>('[data-orb-pill]')!;
+    const measure = () => { const links = [...pill.querySelectorAll<HTMLElement>('a')]; let w = 34 + 8; for (const a of links) w += a.offsetWidth; orb.style.setProperty('--pw', `${w}px`); };
+    const open = () => { measure(); orb.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); };
+    const close = () => { orb.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
+    let hoverable = matchMedia('(hover: hover)').matches, t = 0;
+    btn.addEventListener('click', () => (orb.classList.contains('open') ? close() : open()));
+    if (hoverable) {
+      orb.addEventListener('pointerenter', () => { clearTimeout(t); open(); });
+      orb.addEventListener('pointerleave', () => { t = window.setTimeout(close, 250); });
+    }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    document.addEventListener('pointerdown', (e) => { if (!orb.contains(e.target as Node)) close(); });
+  }
+</script>

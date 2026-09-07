@@ -8,27 +8,31 @@ const earlierPubs = projects.earlier.map((id) => publications.find((p) => p.id =
 const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" href="#ref-$1">[$1]</a>');
 ---
 <Base title="Research" description="Research by Ekaterine Dadiani on massive black hole pairs, from kiloparsecs to sub-parsec scales.">
-  <header class="wrap top">
-    <h1>From Kiloparsecs to Sub-Parsec Scales:<br />A Multi-Messenger, Multi-Scale Census of<br /><em>Massive Black Hole Pairs</em><br />Across Cosmic Time</h1>
-  </header>
-
-  <section class="strip" data-strip>
-    <div class="track" data-track>
-      {[0, 1, 2].map((set) => projects.thesis.map((p) => (
-        <article class="card" data-card aria-hidden={set === 1 ? undefined : 'true'}>
-          {p.figure ? (
-            <a href={p.link} target="_blank" rel="noopener" class="fig" tabindex={set === 1 ? undefined : -1} draggable="false"><img src={p.figure} alt={p.figure_alt ?? p.title} loading="lazy" draggable="false" /></a>
-          ) : (
-            <div class="fig placeholder"><span class="mono">{p.status}</span></div>
-          )}
-          <h2>{p.title}</h2>
-          {p.description && <p class="desc">{p.description}</p>}
-          <div class="links">
-            {p.link && <a href={p.link} target="_blank" rel="noopener" class="go" tabindex={set === 1 ? undefined : -1} draggable="false">Read the full story <Arrow /></a>}
-            {p.extra_link && <a href={p.extra_link.url} target="_blank" rel="noopener" class="go alt" tabindex={set === 1 ? undefined : -1} draggable="false">{p.extra_link.label} <Arrow kind="ext" /></a>}
+  <section class="wrap stage">
+    <div class="left">
+      <h1>From Kiloparsecs to Sub-Parsec Scales:<br />A Multi-Messenger, Multi-Scale Census of<br /><em>Massive Black Hole Pairs</em><br />Across Cosmic Time</h1>
+      <div class="info" data-info>
+        {projects.thesis.map((p, i) => (
+          <div class="entry" data-entry={i} aria-hidden={i === 0 ? undefined : 'true'}>
+            <div class="mono idx">{String(i + 1).padStart(2, '0')} / {String(projects.thesis.length).padStart(2, '0')}</div>
+            <h2>{p.title}</h2>
+            <div class="links">
+              {p.link && <a href={p.link} target="_blank" rel="noopener" class="go">Read the full story <Arrow /></a>}
+              {p.extra_link && <a href={p.extra_link.url} target="_blank" rel="noopener" class="go alt">{p.extra_link.label} <Arrow kind="ext" /></a>}
+              {!p.link && p.status && <span class="mono status">{p.status}</span>}
+            </div>
           </div>
-        </article>
-      )))}
+        ))}
+      </div>
+      <div class="hint mono">Scroll or drag the stack · arrow keys work too</div>
+    </div>
+    <div class="deck" data-deck tabindex="0" aria-label="Research projects, one at a time">
+      {projects.thesis.map((p, i) => (
+        <div class="card" data-card={i} data-placeholder={p.figure ? undefined : 'true'}>
+          {p.figure ? <img src={p.figure} alt={p.figure_alt ?? p.title} draggable="false" loading={i < 2 ? 'eager' : 'lazy'} /> : <span class="mono">{p.status}</span>}
+          <div class="tag">{p.title}</div>
+        </div>
+      ))}
     </div>
   </section>
 
@@ -42,26 +46,37 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
 </Base>
 
 <style>
-  .top { padding-top: 72px; padding-bottom: 24px; }
-  h1 { font-weight: 400; font-size: clamp(26px, 3vw, 40px); line-height: 1.16; letter-spacing: -.03em; }
+  .stage { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 48px; align-items: center; padding-top: 48px; padding-bottom: 24px; min-height: 640px; }
+  .left { display: flex; flex-direction: column; gap: 28px; }
+  h1 { font-weight: 400; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.16; letter-spacing: -.03em; }
   h1 em { font-style: normal; font-weight: 500; }
-  .strip { position: relative; overflow: hidden; padding: 32px 0 40px; margin-top: 8px; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-  .strip.dragging { cursor: grabbing; }
-  .track { display: flex; align-items: flex-start; gap: 28px; width: max-content; will-change: transform; }
-  .card { flex: 0 0 auto; width: var(--w, 300px); display: flex; flex-direction: column; gap: 14px; transition: width .14s cubic-bezier(.2,.7,.2,1); }
-  .fig { display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; border: 1px solid var(--rule); background: var(--paper); padding: 14px; overflow: hidden; }
-  .fig img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
-  a.fig:hover { border-color: var(--ink); }
-  .placeholder { border-style: dashed; }
-  .card h2 { font-size: 17px; line-height: 1.3; }
-  .card .desc { font-size: 14px; }
-  h2 { font-weight: 500; font-size: clamp(20px, 1.8vw, 24px); line-height: 1.25; letter-spacing: -.02em; text-wrap: pretty; }
-  .desc { font-size: 16px; line-height: 1.6; color: var(--text); text-wrap: pretty; max-width: 56ch; }
-  .links { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+  .info { position: relative; min-height: 150px; }
+  .entry { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 10px; opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease; pointer-events: none; }
+  .entry.on { opacity: 1; transform: none; pointer-events: auto; }
+  .idx { color: var(--muted); }
+  h2 { font-weight: 500; font-size: clamp(18px, 1.7vw, 22px); line-height: 1.3; letter-spacing: -.02em; text-wrap: pretty; max-width: 30ch; }
+  .links { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
   .go { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
   .go:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
   .go.alt { color: var(--muted); border-color: var(--muted); font-weight: 400; }
   .status { color: var(--muted); }
+  .hint { color: var(--muted); }
+  .deck { position: relative; height: 560px; perspective: 1200px; cursor: grab; touch-action: pan-x; user-select: none; -webkit-user-select: none; outline: none; }
+  .deck:focus-visible { outline: 1px solid var(--ink); outline-offset: 8px; }
+  .deck.dragging { cursor: grabbing; }
+  .card { position: absolute; left: 50%; top: 50%; width: min(100%, 460px); aspect-ratio: 4 / 3; margin-left: min(-50%, -230px); margin-top: -172px; border-radius: 18px; background: #efefef; overflow: hidden; display: flex; align-items: center; justify-content: center; will-change: transform, opacity; transition: box-shadow .3s; }
+  .card img { width: 100%; height: 100%; object-fit: contain; background: var(--paper); padding: 18px; transition: opacity .3s; }
+  .card[data-placeholder] { border: 1px dashed var(--rule); background: var(--paper); }
+  .card .tag { position: absolute; left: 18px; bottom: 14px; font-size: 13px; color: var(--muted); background: rgba(255,255,255,.85); padding: 4px 8px; border-radius: 6px; max-width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity .3s; }
+  .card.slab img, .card.slab .tag, .card.slab > span { opacity: 0; }
+  .card.active { box-shadow: 0 30px 60px -30px rgba(0,0,0,.25); }
+  @media (max-width: 900px) {
+    .stage { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-top: 24px; min-height: 0; }
+    .deck { height: 380px; }
+    .card { width: min(100%, 320px); margin-left: min(-50%, -160px); margin-top: -120px; }
+    .info { min-height: 120px; }
+    .hint { display: none; }
+  }
   .earlier { padding-top: 16px; }
   .earlier .prose { max-width: 800px; padding-top: 20px; padding-bottom: 28px; font-size: 17px; }
   .earlier :global(.ref) { color: var(--accent); font-family: var(--mono); font-size: 13px; }
@@ -75,62 +90,53 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
 </style>
 
 <script>
-  // A looping belt of cards. It drifts slowly on its own, can be dragged or scrolled
-  // sideways, wraps around forever, and the card nearest the cursor swells over the others.
-  const strip = document.querySelector<HTMLElement>('[data-strip]');
-  const track = document.querySelector<HTMLElement>('[data-track]');
-  if (strip && track) {
-    const cards = [...track.querySelectorAll<HTMLElement>('[data-card]')];
-    const per = cards.length / 3;
-    const hover = matchMedia('(hover: hover)').matches;
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let setW = 0, x = 0, vx = 0, px = -1e9, py = -1e9, dragging = false, lastX = 0, lastT = 0, paused = false, moved = 0;
-    const measure = () => {
-      const gap = parseFloat(getComputedStyle(track).gap) || 0;
-      setW = cards.slice(0, per).reduce((w, c) => w + c.offsetWidth + gap, 0);
-      const pad = Math.max(64, (window.innerWidth - 1312) / 2 + 64);
-      if (!x) x = setW - pad;
-    };
-    measure(); window.addEventListener('resize', measure);
-    const wrap = () => { if (x < setW * 0.5) x += setW; else if (x >= setW * 1.5) x -= setW; };
-    strip.addEventListener('pointermove', (e) => {
-      px = e.clientX; py = e.clientY;
-      if (dragging) { const now = performance.now(); const dx = e.clientX - lastX; x -= dx; moved += Math.abs(dx); vx = -dx / Math.max(1, now - lastT) * 16; lastX = e.clientX; lastT = now; }
-    });
-    strip.addEventListener('pointerenter', () => { paused = true; });
-    strip.addEventListener('pointerleave', () => { px = py = -1e9; paused = false; dragging = false; strip.classList.remove('dragging'); });
-    strip.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; dragging = true; moved = 0; vx = 0; lastX = e.clientX; lastT = performance.now(); strip.classList.add('dragging'); strip.setPointerCapture(e.pointerId); });
-    const end = () => { dragging = false; strip.classList.remove('dragging'); };
-    strip.addEventListener('pointerup', end); strip.addEventListener('pointercancel', end);
-    // A drag should not also count as a click on a link.
-    strip.addEventListener('click', (e) => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);
-    // Sideways wheel or trackpad scrolls the belt; vertical wheel leaves the page alone.
-    strip.addEventListener('wheel', (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { x += e.deltaX; e.preventDefault(); } }, { passive: false });
-    const base = 300, grow = 200, reach = 380;
-    const tick = () => {
-      if (!dragging) {
-        if (!paused && !reduce) vx += (0.35 - vx) * 0.02; else vx *= 0.92;
-        x += vx;
+  // A vertical stack of cards: the current one sits full size, the others flatten into
+  // slabs above and below. Wheel, drag, arrow keys or a click on a slab move the stack.
+  const deck = document.querySelector<HTMLElement>('[data-deck]');
+  if (deck) {
+    const cards = [...deck.querySelectorAll<HTMLElement>('[data-card]')];
+    const entries = [...document.querySelectorAll<HTMLElement>('[data-entry]')];
+    const n = cards.length;
+    let target = 0, pos = 0, dragging = false, startY = 0, startPos = 0, moved = 0, wheelAcc = 0, wheelT = 0;
+    const clamp = (v: number) => Math.max(0, Math.min(n - 1, v));
+    const show = (i: number) => entries.forEach((e, k) => { e.classList.toggle('on', k === i); e.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
+    const layout = () => {
+      const H = deck.clientHeight;
+      for (let k = 0; k < n; k++) {
+        const d = k - pos, a = Math.abs(d), s = Math.sign(d);
+        const w = Math.max(0, 1 - a);                 // 1 at the active slot
+        const y = s * (Math.min(a, 1) * H * 0.42 + Math.max(0, a - 1) * 26);
+        const sy = 0.1 + 0.9 * w, sx = 1 - 0.06 * Math.min(a, 3);
+        const rot = -s * Math.min(a, 1) * 18;
+        cards[k].style.transform = `translate3d(0, ${y.toFixed(1)}px, ${(-a * 40).toFixed(0)}px) rotateX(${rot.toFixed(1)}deg) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+        cards[k].style.opacity = a > 2.6 ? '0' : String(Math.max(0.35, 1 - a * 0.22));
+        cards[k].style.zIndex = String(100 - Math.round(a * 10));
+        cards[k].classList.toggle('slab', w < 0.35);
+        cards[k].classList.toggle('active', a < 0.5);
       }
-      wrap();
-      // Dock magnification: the card nearest the cursor widens, neighbours a little; the
-      // track shifts by half the growth on the cursor's left so the hovered card stays put.
-      let shift = 0;
-      if (hover) {
-        const inside = py > strip.getBoundingClientRect().top && py < strip.getBoundingClientRect().bottom;
-        for (const c of cards) {
-          const r = c.getBoundingClientRect();
-          const d = Math.abs(px - (r.left + r.width / 2));
-          const t = inside ? Math.max(0, 1 - d / reach) : 0;
-          const e = t * t * (3 - 2 * t);
-          const w = base + grow * e;
-          c.style.setProperty('--w', `${w.toFixed(1)}px`);
-          if (r.left + r.width / 2 < px) shift += (w - base) * 0.5;
-        }
-      }
-      track.style.transform = `translate3d(${(-(x + shift)).toFixed(2)}px, 0, 0)`;
-      requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+    const tick = () => { if (!dragging) pos += (target - pos) * 0.12; if (Math.abs(target - pos) < 0.001) pos = target; layout(); requestAnimationFrame(tick); };
+    show(0); layout(); requestAnimationFrame(tick);
+    const go = (i: number) => { target = clamp(Math.round(i)); show(target); };
+    deck.addEventListener('wheel', (e) => {
+      const dy = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : 0;
+      if (!dy) return;
+      const atEdge = (dy > 0 && target >= n - 1) || (dy < 0 && target <= 0);
+      if (atEdge) return;                            // let the page scroll past the ends
+      e.preventDefault();
+      wheelAcc += dy; const now = performance.now();
+      if (Math.abs(wheelAcc) > 60 && now - wheelT > 350) { go(target + Math.sign(wheelAcc)); wheelAcc = 0; wheelT = now; }
+      if (Math.abs(wheelAcc) > 400) wheelAcc = 0;
+    }, { passive: false });
+    deck.addEventListener('pointerdown', (e) => { dragging = true; startY = e.clientY; startPos = pos; moved = 0; deck.classList.add('dragging'); deck.setPointerCapture(e.pointerId); });
+    deck.addEventListener('pointermove', (e) => { if (!dragging) return; const dy = e.clientY - startY; moved = Math.max(moved, Math.abs(dy)); pos = clamp(startPos - dy / (deck.clientHeight * 0.42)); });
+    const end = (e: PointerEvent) => {
+      if (!dragging) return; dragging = false; deck.classList.remove('dragging');
+      if (moved < 6) { const c = (e.target as HTMLElement).closest<HTMLElement>('[data-card]'); if (c) { go(Number(c.dataset.card)); return; } }
+      go(pos + (pos - startPos > 0 ? 0.3 : -0.3) * Math.sign(pos - startPos));
+    };
+    deck.addEventListener('pointerup', end); deck.addEventListener('pointercancel', end);
+    deck.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); go(target + 1); } if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); go(target - 1); } });
+    window.addEventListener('resize', layout);
   }
 </script>
