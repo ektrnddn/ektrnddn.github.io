@@ -1,0 +1,135 @@
+---
+// The thesis in one scroll: two galaxies drift together on the left while the reader
+// scrolls the four stages on the right. The black holes spiral in, both switch on as
+// AGN, become a bound binary, and finally merge into ripples. Each stage links out.
+import Arrow from './Arrow.astro';
+const steps = [
+  { scale: '≳ 30 kpc', title: 'Two galaxies, still far apart', text: 'Before the pairs meet: what their hosts look like at z ≈ 2 in the ASTRID simulation. Disks, mostly.', links: [{ label: 'Paper', url: 'https://doi.org/10.33232/001c.124451' }, { label: 'Research', url: '/research/' }] },
+  { scale: '1 – 50 kpc · dual AGN', title: 'Both black holes switch on', text: 'Cosmic Pairs: the DESI census of nearly 7,000 dual and offset AGN, the largest uniform sample so far.', links: [{ label: 'Paper', url: 'https://arxiv.org/abs/2607.27390' }, { label: 'Interactive figure', url: 'https://ektrnddn.github.io/dualagn-explorer/' }] },
+  { scale: '≲ 0.01 pc · binary', title: 'Bound, unresolvable, but the lines shift', text: 'Sub-parsec binaries betray themselves through Doppler-shifted broad lines. The search across DESI spectra.', links: [{ label: 'Research', url: '/research/' }] },
+  { scale: 'merger · gravitational waves', title: 'What LISA and pulsar timing arrays will hear', text: 'The same pairs, fast-forwarded in ASTRID to their mergers: rates, fractions and the background.', links: [{ label: 'Paper', url: 'https://arxiv.org/abs/2512.16844' }] },
+];
+---
+<section class="merger wrap" data-merger aria-label="The thesis in one scroll">
+  <div class="panel">
+    <div class="sticky">
+      <svg viewBox="0 0 600 600" class="scene" aria-hidden="true">
+        <g data-ripples class="ripples">
+          <circle cx="300" cy="300" r="20" /><circle cx="300" cy="300" r="20" /><circle cx="300" cy="300" r="20" />
+        </g>
+        <ellipse data-orbit class="orbit" cx="300" cy="300" rx="200" ry="110" />
+        <g data-gal="a" class="galaxy">
+          <ellipse rx="78" ry="30" />
+          <path d="M-70 -6 C -40 -34, 10 -30, 44 -12" /><path d="M70 6 C 40 34, -10 30, -44 12" />
+          <g class="agn"><circle r="16" /><circle r="26" /></g>
+          <circle class="bh" r="6" />
+        </g>
+        <g data-gal="b" class="galaxy">
+          <ellipse rx="56" ry="22" />
+          <path d="M-50 -4 C -28 -24, 8 -22, 32 -8" /><path d="M50 4 C 28 24, -8 22, -32 8" />
+          <g class="agn"><circle r="12" /><circle r="20" /></g>
+          <circle class="bh" r="4.5" />
+        </g>
+        <g data-remnant class="remnant" transform="translate(300 300)">
+          <ellipse rx="96" ry="60" /><ellipse rx="60" ry="48" transform="rotate(38)" />
+        </g>
+        <circle data-merged class="merged" cx="300" cy="300" r="8" />
+      </svg>
+      <div class="readout mono"><span data-scale>≳ 30 kpc</span></div>
+    </div>
+  </div>
+  <ol class="steps">
+    {steps.map((s, i) => (
+      <li class="step" data-step={i}>
+        <div class="mono scale">{String(i + 1).padStart(2, '0')} · {s.scale}</div>
+        <h3>{s.title}</h3>
+        <p>{s.text}</p>
+        <div class="links">{s.links.map((l) => <a href={l.url} target={l.url.startsWith('http') ? '_blank' : undefined} rel={l.url.startsWith('http') ? 'noopener' : undefined}>{l.label} <Arrow kind={l.url.startsWith('http') ? 'ext' : 'right'} /></a>)}</div>
+      </li>
+    ))}
+  </ol>
+</section>
+<style>
+  .merger { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 56px; padding-top: 24px; padding-bottom: 40px; align-items: start; }
+  .panel { position: relative; }
+  .sticky { position: sticky; top: 96px; }
+  .scene { width: 100%; height: auto; display: block; }
+  .readout { margin-top: 8px; color: var(--muted); }
+  .galaxy ellipse, .galaxy path { fill: none; stroke: #9a9a9a; stroke-width: 1.1; }
+  .galaxy .bh { fill: #191919; }
+  .galaxy .agn circle { fill: none; stroke: #191919; stroke-width: .9; stroke-dasharray: 2 4; opacity: 0; transition: opacity .4s; }
+  .orbit { fill: none; stroke: #d0d0d0; stroke-width: 1; stroke-dasharray: 3 5; }
+  .remnant ellipse { fill: none; stroke: #b5b5b5; stroke-width: 1; opacity: 0; transition: opacity .4s; }
+  .merged { fill: #191919; opacity: 0; transition: opacity .3s; }
+  .ripples circle { fill: none; stroke: #191919; stroke-width: 1; opacity: 0; }
+  .merger.merging .ripples circle { animation: ripple 2.4s ease-out infinite; }
+  .merger.merging .ripples circle:nth-child(2) { animation-delay: .8s; }
+  .merger.merging .ripples circle:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes ripple { 0% { r: 12; opacity: .6; } 100% { r: 220; opacity: 0; } }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .step { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 24px 0; border-top: 1px solid var(--rule); opacity: .38; transition: opacity .4s; }
+  .step.on { opacity: 1; }
+  .step h3 { font-weight: 500; font-size: clamp(20px, 1.9vw, 26px); line-height: 1.25; letter-spacing: -.02em; max-width: 26ch; text-wrap: pretty; }
+  .step p { font-size: 15.5px; line-height: 1.6; color: var(--text); max-width: 48ch; text-wrap: pretty; }
+  .scale { color: var(--muted); }
+  .links { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 4px; }
+  .links a { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-size: 14px; font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+  .links a:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
+  @media (max-width: 900px) {
+    .merger { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .sticky { top: 64px; background: var(--bg); padding-bottom: 8px; }
+    .scene { max-width: 280px; margin: 0 auto; }
+    .step { min-height: 0; padding: 22px 0; }
+  }
+</style>
+<script>
+  const root = document.querySelector<HTMLElement>('[data-merger]');
+  if (root) {
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    const list = root.querySelector<HTMLElement>('.steps')!;
+    const ga = root.querySelector<SVGGElement>('[data-gal="a"]')!, gb = root.querySelector<SVGGElement>('[data-gal="b"]')!;
+    const orbit = root.querySelector<SVGEllipseElement>('[data-orbit]')!;
+    const remnant = root.querySelector<SVGGElement>('[data-remnant]')!;
+    const merged = root.querySelector<SVGCircleElement>('[data-merged]')!;
+    const scaleOut = root.querySelector<HTMLElement>('[data-scale]')!;
+    const scales = steps.map((s) => s.querySelector('.scale')?.textContent?.replace(/^\d+ · /, '') ?? '');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let theta = 0, last = performance.now(), t = 0, cur = 0;
+    const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+    const ease = (v: number) => v * v * (3 - 2 * v);
+    const progress = () => {
+      const r = list.getBoundingClientRect();
+      const mid = innerHeight * 0.5;
+      return clamp((mid - r.top) / Math.max(1, r.height - innerHeight * 0.4));
+    };
+    const draw = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      t = progress(); cur += (t - cur) * (reduce ? 1 : 0.12);
+      const sep = 230 * Math.pow(1 - cur, 1.7);            // separation shrinks as you scroll
+      const omega = 0.25 + 3.2 * Math.pow(1 - sep / 230, 2); // and the orbit speeds up
+      theta += omega * dt * (reduce ? 0.2 : 1);
+      const q = 0.62, cx = 300, cy = 300, ex = Math.cos(theta), ey = 0.55 * Math.sin(theta);
+      const ax = cx + sep * (1 - q) * ex, ay = cy + sep * (1 - q) * ey;
+      const bx = cx - sep * q * ex, by = cy - sep * q * ey;
+      const galFade = clamp(1 - (cur - 0.5) / 0.22);            // galaxies dissolve into one remnant
+      const galShrink = 0.7 + 0.3 * galFade;
+      ga.setAttribute('transform', `translate(${ax.toFixed(1)} ${ay.toFixed(1)}) rotate(${(theta * 20).toFixed(1)}) scale(${galShrink})`);
+      gb.setAttribute('transform', `translate(${bx.toFixed(1)} ${by.toFixed(1)}) rotate(${(-theta * 25).toFixed(1)}) scale(${galShrink})`);
+      for (const g of [ga, gb]) { (g.querySelector('ellipse') as SVGElement).style.opacity = String(galFade); g.querySelectorAll('path').forEach((p) => (p.style.opacity = String(galFade))); }
+      const agnOn = clamp((cur - 0.18) / 0.12) * clamp(1 - (cur - 0.62) / 0.18);
+      root.querySelectorAll<SVGCircleElement>('.agn circle').forEach((c) => (c.style.opacity = String(agnOn * 0.9)));
+      orbit.setAttribute('rx', String(Math.max(2, sep * 0.5))); orbit.setAttribute('ry', String(Math.max(1, sep * 0.5 * 0.55)));
+      orbit.setAttribute('cx', String(cx - sep * (q - 0.5) * ex * 0)); orbit.style.opacity = String(clamp((cur - 0.35) / 0.15) * clamp(1 - (cur - 0.9) / 0.08));
+      remnant.querySelectorAll('ellipse').forEach((e) => (e.style.opacity = String(clamp((cur - 0.55) / 0.2) * clamp(1 - (cur - 0.92) / 0.06) * 0.9)));
+      const mergedNow = cur > 0.93;
+      merged.style.opacity = mergedNow ? '1' : '0';
+      root.classList.toggle('merging', mergedNow);
+      for (const g of [ga, gb]) (g.querySelector('.bh') as SVGElement).style.opacity = mergedNow ? '0' : '1';
+      const idx = Math.min(steps.length - 1, Math.floor(cur * steps.length + 0.15));
+      steps.forEach((s, i) => s.classList.toggle('on', i === idx));
+      scaleOut.textContent = scales[idx];
+      requestAnimationFrame(draw);
+    };
+    requestAnimationFrame(draw);
+  }
+</script>

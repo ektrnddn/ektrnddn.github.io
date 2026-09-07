@@ -2,7 +2,11 @@
 import Base from '../layouts/Base.astro';
 import Arrow from '../components/Arrow.astro';
 import Sketch from '../components/Sketch.astro';
-import { profile, photos, highlight } from '../data/load';
+import Merger from '../components/Merger.astro';
+import PubItem from '../components/PubItem.astro';
+import SectionHead from '../components/SectionHead.astro';
+import { profile, photos, publications, highlight } from '../data/load';
+const selected = publications.filter((p) => p.selected).slice(0, 4);
 const links = [
   { href: '/research/', label: 'Research' },
   { href: '/publications/', label: 'Publications' },
@@ -20,6 +24,26 @@ const links = [
       </nav>
     </div>
     <Sketch />
+  </section>
+
+  <section class="wrap thesis-head">
+    <SectionHead title="The thesis, in one scroll" lede="From two galaxies tens of kiloparsecs apart to a single merged black hole. Scroll, and follow the pair in." />
+  </section>
+  <Merger />
+
+  <section class="wrap">
+    <SectionHead title="Selected publications">
+      <a class="link-ul aside-link" href="/publications/">See all publications</a>
+    </SectionHead>
+    <div class="pubs">{selected.map((p, i) => <PubItem pub={p} n={i + 1} />)}</div>
+  </section>
+
+  <section class="wrap about-teaser">
+    <p class="lede">From Tbilisi to Pittsburgh by way of CERN, KU Leuven and the Perimeter Institute. The whole story, and the CV, on the About page.</p>
+    <div class="links">
+      <a class="link-ul" href="/about/">About me</a>
+      <a class="link-ul" href="/cv/Ekaterine_Dadiani_CV.pdf">CV (PDF)</a>
+    </div>
   </section>
 
   {photos.length > 0 && (
@@ -49,6 +73,13 @@ const links = [
   .links a:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
   .hero :global(.sketch) { margin-top: -260px; }
 
+  .thesis-head { padding-top: 40px; }
+  .thesis-head :global(.section-head) { padding-top: 24px; }
+  .pubs { padding-top: 24px; }
+  .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
+  .about-teaser { padding-top: 64px; display: flex; flex-direction: column; gap: 18px; }
+  .about-teaser .lede { max-width: 640px; }
+  .about-teaser .links { display: flex; gap: 24px; }
   .film { padding-top: 48px; display: flex; flex-direction: column; gap: 14px; }
   .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
   .strip figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
