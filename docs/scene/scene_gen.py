@@ -1,101 +1,92 @@
-# Writes scene.html: the ink drawing of the mountains. Hatching is computed from the skyline.
-import math, sys, random
+# Writes scene.html: Mount Kazbek seen from Stepantsminda, traced from a photograph
+# (kazbek-trace.json holds the per-column skyline, snow-cap bottom and foothill rows),
+# with the Gergeti Trinity church on its hill, a meadow and a small walking figure.
+import json, math, sys
+import numpy as np
+from scipy.ndimage import median_filter, gaussian_filter1d
 S = sys.argv[1]
+T = json.load(open(f"{S}/kazbek-trace.json"))
+W, H = T["W"], T["H"]
+sc = 1440 / W                       # photo → viewBox, uniform
+yoff = 130 - min(T["skyline"]) * sc # summit lands at y = 130
+X = lambda x: x * sc
+Y = lambda y: y * sc + yoff
 
-# Main range skyline: an envelope (a broad massif with a second, lower knot), layered
-# noise for irregularity, and a handful of sharp spires. Seeded so the drawing is stable.
-rng = random.Random(7)
-def skyline(x0, x1, base, massif, seed_phase, spires, step=11, jitter=1.6):
-    r = random.Random(seed_phase)
-    phases = [r.random() * 6.283 for _ in range(4)]
-    pts = []
-    x = x0
-    while x <= x1:
-        e = base
-        for (cx, amp, wid) in massif: e -= amp * math.exp(-((x - cx) / wid) ** 2)
-        n = 16 * math.sin(x / 95 + phases[0]) + 9 * math.sin(x / 47 + phases[1]) + 5 * math.sin(x / 23 + phases[2]) + 2.5 * math.sin(x / 11 + phases[3])
-        sp = 0
-        for (sx, h, w) in spires: sp = max(sp, h * max(0, 1 - abs(x - sx) / w))
-        pts.append((x, e + n - sp + r.uniform(-jitter, jitter)))
-        x += step + r.uniform(-2, 2)
-    pts[-1] = (x1, pts[-1][1])
-    return [(round(px), round(py, 1)) for px, py in pts]
+def rdp(pts, eps):
+    if len(pts) < 3: return pts
+    (x0, y0), (x1, y1) = pts[0], pts[-1]
+    dx, dy = x1 - x0, y1 - y0; L = math.hypot(dx, dy) or 1
+    dmax, idx = 0, 0
+    for i in range(1, len(pts) - 1):
+        d = abs(dy * pts[i][0] - dx * pts[i][1] + x1 * y0 - y1 * x0) / L
+        if d > dmax: dmax, idx = d, i
+    if dmax > eps:
+        return rdp(pts[:idx + 1], eps)[:-1] + rdp(pts[idx:], eps)
+    return [pts[0], pts[-1]]
 
-spires = [(760, 46, 16), (812, 30, 12), (858, 62, 18), (884, 40, 13), (930, 28, 11), (1010, 44, 15), (1052, 22, 10), (1140, 36, 13), (1195, 18, 9), (1290, 30, 12), (1350, 16, 9), (640, 26, 12), (690, 18, 10), (560, 14, 9)]
-range_pts = skyline(380, 1440, 336, [(860, 118, 250), (1130, 48, 130), (600, 30, 120)], 3, spires)
-farfar = skyline(940, 1440, 292, [(1150, 42, 160), (1330, 26, 90)], 11, [(1120, 22, 12), (1230, 16, 10), (1330, 20, 11)], step=14, jitter=1)
+sky = np.array(T["skyline"], float)
+skyline = rdp([(X(x), Y(sky[x])) for x in range(0, W, 2)], 1.1)
+sky_d = 'M' + ' L'.join(f'{x:.0f} {y:.0f}' for x, y in skyline)
+sky_fill = sky_d + ' L1440 640 L0 640 Z'
 
-def poly(pts): return 'M' + ' L'.join(f'{x} {y}' for x, y in pts)
-def closed(pts, x0, x1, bottom=640): return poly(pts) + f' L{x1} {bottom} L{x0} {bottom} Z'
+# Snow cap: smoothed bottom of the contiguous snow, main cap only
+sb = np.array(T["snowbot"], float)
+cap = np.arange(W)[(sb > 0) & (np.arange(W) > 560) & (np.arange(W) < 1360)]
+sbs = median_filter(np.interp(np.arange(W), cap, sb[cap]), size=61)
+snow_pts = [(X(x), max(Y(sbs[x]), Y(sky[x]) + 6)) for x in range(int(cap.min()), int(cap.max()), 3)]
+snow_pts = rdp(snow_pts, 1.5)
+snow_d = 'M' + ' '.join((f'{x:.0f} {y:.0f}' if i == 0 else f'Q{x - 4:.0f} {y - 5:.0f} {x:.0f} {y:.0f}') for i, (x, y) in enumerate(snow_pts))
 
-# Summits: local minima of y with some prominence
-def summits_of(pts, min_prom):
-    out = []
-    for i in range(2, len(pts) - 2):
-        x, y = pts[i]
-        if y < pts[i-1][1] and y <= pts[i+1][1]:
-            prom = min(max(pts[j][1] for j in range(max(0, i-6), i)), max(pts[j][1] for j in range(i+1, min(len(pts), i+7)))) - y
-            if prom >= min_prom: out.append((i, prom))
-    return out
-rock, snow, hatch = [], [], []
-for i, prom in summits_of(range_pts, 14):
-    x, y = range_pts[i]
-    # the steeper face gets a rock line curving down it
-    lx, ly = range_pts[i-1]; rx, ry = range_pts[i+1]
-    steep_left = (ly - y) / max(1, x - lx) > (ry - y) / max(1, rx - x)
-    sgn = -1 if steep_left else 1
-    L = min(72, 1.7 * prom + 16)
-    rock.append(f'M{x + sgn*2} {y + 5} q{sgn*L*0.18:.0f} {L*0.45:.0f} {sgn*L*0.42:.0f} {L:.0f}')
-    if prom > 30:
-        rock.append(f'M{x - sgn*3} {y + 9} q{-sgn*L*0.1:.0f} {L*0.3:.0f} {-sgn*L*0.22:.0f} {L*0.62:.0f}')
-    # snow hatches on the shaded (right) face just under the summit
-    for k in range(3 if prom > 30 else 2):
-        t = 9 + k * 8
-        hatch.append(f'M{x + 4 + k*3} {y + t} l{7 + k*2} {3 + k}')
-# Scalloped snow line following the skyline, some way below it
-def snowline(pts, depth):
-    out = []
-    for i, (x, y) in enumerate(pts):
-        if i % 2: continue
-        d = depth + 10 * math.sin(x / 37) + rng.uniform(-3, 3)
-        out.append((x, y + d))
-    return out
-snow_pts = [(x, y) for x, y in snowline(range_pts, 34) if 620 <= x <= 1250]
-snow_d = 'M' + ' '.join((f'{x} {y:.0f}' if i == 0 else f'Q{x - 5} {y - 6:.0f} {x} {y:.0f}') for i, (x, y) in enumerate(snow_pts))
+# Rock lines: couloirs fanning down from the summit region to the snow line
+summit_x = int(np.argmin(sky))
+rock = []
+for dx in (-150, -95, -45, 35, 80, 130):
+    xs = summit_x + dx
+    if not (0 < xs < W): continue
+    x0, y0 = X(xs), Y(sky[xs]) + 8
+    x1, y1 = X(xs + dx * 0.55), Y(sbs[min(W - 1, max(0, int(xs + dx * 0.55)))]) - 4
+    y1 = min(y1, y0 + 80)
+    if y1 > y0 + 20: rock.append(f'M{x0:.0f} {y0:.0f} Q{(x0 + x1) / 2 + (6 if dx < 0 else -6):.0f} {(y0 + y1) / 2:.0f} {x1:.0f} {y1:.0f}')
+# Snow hatches: short strokes just under the snow line
+hatch = []
+for i, (x, y) in enumerate(snow_pts):
+    if i % 3 == 1: hatch.append(f'M{x:.0f} {y + 4:.0f} l7 4 M{x + 9:.0f} {y + 9:.0f} l6 4')
 
-# Foothill in front of the range: rounded, forested
-foothill = 'M300 470 C 420 452, 520 444, 640 452 S 860 474, 980 462 S 1200 430, 1320 438 S 1400 446, 1440 442'
-trees_fh = ' '.join(f'M{x} {y} l3 -7 3 7' for x, y in [(360,458),(410,455),(560,447),(700,455),(760,462),(900,468),(1000,461),(1080,449),(1160,440),(1250,436),(1360,440)])
+# Foothill: the forested hill in front. Heavily smoothed; left of the hill it follows the
+# skyline so the church hill stays part of the range layer.
+hill = np.array(T["hill"], float)
+hs = gaussian_filter1d(median_filter(hill, size=61), 22)
+xs = np.arange(W)
+# blend from the skyline into the hill over 140 columns, and flatten the village bumps on the right
+w = np.clip((xs - 560) / 140, 0, 1)
+hs = (sky + 3) * (1 - w) + hs * w
+hs = np.maximum(hs, sky + 3)
+hs = np.where(xs > 1240, np.minimum(hs, np.interp(xs, [1240, W - 1], [hs[1240], hs[1240] + 40])), hs)
+hs = np.minimum(hs, (556 - yoff) / sc - 6)
+hill_pts = rdp([(X(x), Y(hs[x])) for x in range(0, W, 2)], 1.4)
+hill_d = 'M' + ' L'.join(f'{x:.0f} {y:.0f}' for x, y in hill_pts)
+hill_fill = hill_d + ' L1440 640 L0 640 Z'
+trees = ' '.join(f'M{x:.0f} {y:.0f} l3 -7 3 7' for x, y in hill_pts[::9] if 40 < x < 1400 and y < 470)
+
+# Gergeti Trinity on its hill: the traced bump between photo columns 150–230
+cx = 150 + int(np.argmin(sky[150:230]))
+church_x, church_y = X(cx), Y(sky[cx]) + 2
 
 svg = f'''<svg viewBox="0 -40 1440 680" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <g class="farfar">
-    <path class="f" d="{closed(farfar, 980, 1440)}"/>
-    <path class="s" d="{poly(farfar)}"/>
-  </g>
   <g class="range">
-    <path class="f" d="{closed(range_pts, 380, 1440)}"/>
-    <path class="s" d="{poly(range_pts)}"/>
+    <path class="f" d="{sky_fill}"/>
+    <path class="s" d="{sky_d}"/>
     <path class="h" d="{' '.join(rock)}"/>
     <path class="snowline" d="{snow_d}"/>
     <path class="snow" d="{' '.join(hatch)}"/>
-  </g>
-  <g class="foothill">
-    <path class="f" d="{foothill} L1440 640 L300 640 Z"/>
-    <path class="s" d="{foothill}"/>
-    <path class="trees" d="{trees_fh}"/>
-  </g>
-  <g class="near">
-    <path class="f" d="M0 384 C 90 372, 160 392, 250 418 S 400 470, 520 522 S 600 548, 640 552 L640 640 L0 640 Z"/>
-    <path class="s" d="M0 384 C 90 372, 160 392, 250 418 S 400 470, 520 522 S 600 548, 640 552"/>
-    <path class="trees" d="M62 384 l3 -7 3 7 M110 386 l3 -8 3 8 M170 400 l3 -7 3 7 M330 452 l3 -7 3 7 M372 468 l3 -8 3 8 M430 494 l3 -7 3 7 M492 516 l3 -7 3 7"/>
-    <g class="church" transform="translate(236 418)">
+    <g class="church" transform="translate({church_x:.0f} {church_y:.0f}) scale(1.35)">
       <path d="M-9 0 v-9 h18 v9 z M-4 -9 v-5 h8 v5 z M-4 -14 a4 4 0 0 1 8 0 z M-0.6 -18 v-5 h1.2 v5 z M-2.2 -21.5 h4.4 v1 h-4.4 z M10 0 v-14 h4 v14 z M10 -14 l2 -3 2 3 z"/>
     </g>
   </g>
-  <g class="near">
-    <path class="f" d="M900 556 C 1000 540, 1080 500, 1180 468 S 1330 428, 1440 418 L1440 640 L900 640 Z"/>
-    <path class="s" d="M900 556 C 1000 540, 1080 500, 1180 468 S 1330 428, 1440 418"/>
-    <path class="trees" d="M1120 486 l3 -7 3 7 M1200 462 l3 -8 3 8 M1300 438 l3 -7 3 7 M1380 426 l3 -7 3 7"/>
+  <g class="foothill">
+    <path class="f" d="{hill_fill}"/>
+    <path class="s" d="{hill_d}"/>
+    <path class="trees" d="{trees}"/>
   </g>
   <g class="meadow">
     <path class="f" d="M0 560 C 240 550, 480 568, 720 556 S 1120 546, 1440 560 L1440 640 L0 640 Z"/>
@@ -118,12 +109,14 @@ svg = f'''<svg viewBox="0 -40 1440 680" fill="none" stroke-linecap="round" strok
 </svg>'''
 html = '''<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#fff}svg{width:1440px;height:680px;display:block}
 .f{fill:#fff;stroke:none}.s{fill:none;stroke-width:1.2}.h{fill:none;stroke-width:1;opacity:.8}
-.farfar .s{stroke:#d6d6d6}.range .s{stroke:#4a4a4a;stroke-width:1.3}.range .h{stroke:#8a8a8a}.snow{fill:none;stroke:#6a6a6a;stroke-width:.9;opacity:.85}.snowline{fill:none;stroke:#c9c9c9;stroke-width:.9;opacity:.9}
-.foothill .s{stroke:#8f8f8f;stroke-width:1.1}.foothill .trees{stroke:#8f8f8f}
-.near .s{stroke:#2a2a2a}.trees{fill:none;stroke:#2a2a2a;stroke-width:1;opacity:.75}
+.range .s{stroke:#3a3a3a;stroke-width:1.3}.range .h{stroke:#8a8a8a}.snow{fill:none;stroke:#6a6a6a;stroke-width:.9;opacity:.85}.snowline{fill:none;stroke:#bdbdbd;stroke-width:.9;opacity:.9}
+.foothill .s{stroke:#5a5a5a;stroke-width:1.1}.foothill .trees{fill:none;stroke:#5a5a5a;stroke-width:1;opacity:.8}
 .meadow .s{stroke:#191919;stroke-width:1.4}.grass{fill:none;stroke:#191919;stroke-width:1;opacity:.7}.flowers .stem{fill:none;stroke:#191919;stroke-width:1;opacity:.6}.flowers circle{fill:#d98aa0}
 .figure .ink{fill:#191919;stroke:#191919;stroke-width:1;stroke-linejoin:round}.figure .limb{fill:none;stroke:#191919;stroke-width:5;stroke-linecap:round}.figure .leg{fill:none;stroke:#191919;stroke-width:4.5;stroke-linecap:round}
 .church{fill:#2a2a2a;stroke:none}
 </style></head><body>''' + svg + '</body></html>'
 open(f'{S}/scene.html', 'w').write(html)
-print('scene.html written;', len(range_pts), 'skyline points,', len(rock), 'rock lines,', len(hatch), 'hatches')
+# 48 skyline samples (fraction of box height, y from box top) for the star field
+samples = [round((Y(sky[min(W - 1, int(i * W / 47))]) + 40) / 680, 3) for i in range(48)]
+json.dump(samples, open(f'{S}/skyline-samples.json', 'w'))
+print('scene.html written;', len(skyline), 'skyline pts,', len(hill_pts), 'hill pts,', len(snow_pts), 'snow pts; church at', round(church_x), round(church_y))

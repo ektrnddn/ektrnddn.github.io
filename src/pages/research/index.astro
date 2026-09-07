@@ -12,25 +12,23 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
     <h1>From Kiloparsecs to Sub-Parsec Scales:<br />A Multi-Messenger, Multi-Scale Census of<br /><em>Massive Black Hole Pairs</em><br />Across Cosmic Time</h1>
   </header>
 
-  <section class="strip-wrap">
-    <div class="wrap hint mono">Scroll sideways, or move the cursor across the cards</div>
-    <div class="strip" data-strip>
-      {projects.thesis.map((p) => (
-        <article class="card" data-card>
+  <section class="strip" data-strip>
+    <div class="track" data-track>
+      {[0, 1, 2].map((set) => projects.thesis.map((p) => (
+        <article class="card" data-card aria-hidden={set === 1 ? undefined : 'true'}>
           {p.figure ? (
-            <a href={p.link} target="_blank" rel="noopener" class="fig"><img src={p.figure} alt={p.figure_alt ?? p.title} loading="lazy" /></a>
+            <a href={p.link} target="_blank" rel="noopener" class="fig" tabindex={set === 1 ? undefined : -1} draggable="false"><img src={p.figure} alt={p.figure_alt ?? p.title} loading="lazy" draggable="false" /></a>
           ) : (
             <div class="fig placeholder"><span class="mono">{p.status}</span></div>
           )}
           <h2>{p.title}</h2>
           {p.description && <p class="desc">{p.description}</p>}
           <div class="links">
-            {p.link && <a href={p.link} target="_blank" rel="noopener" class="go">Read the full story <Arrow /></a>}
-            {p.extra_link && <a href={p.extra_link.url} target="_blank" rel="noopener" class="go alt">{p.extra_link.label} <Arrow kind="ext" /></a>}
+            {p.link && <a href={p.link} target="_blank" rel="noopener" class="go" tabindex={set === 1 ? undefined : -1} draggable="false">Read the full story <Arrow /></a>}
+            {p.extra_link && <a href={p.extra_link.url} target="_blank" rel="noopener" class="go alt" tabindex={set === 1 ? undefined : -1} draggable="false">{p.extra_link.label} <Arrow kind="ext" /></a>}
           </div>
         </article>
-      ))}
-      <div class="spacer"></div>
+      )))}
     </div>
   </section>
 
@@ -47,13 +45,10 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
   .top { padding-top: 72px; padding-bottom: 24px; }
   h1 { font-weight: 400; font-size: clamp(26px, 3vw, 40px); line-height: 1.16; letter-spacing: -.03em; }
   h1 em { font-style: normal; font-weight: 500; }
-  .strip-wrap { padding-top: 24px; }
-  .hint { padding-bottom: 14px; }
-  .strip { display: flex; align-items: flex-start; gap: 28px; overflow-x: auto; overscroll-behavior-x: contain; padding-top: 24px; padding-bottom: 28px; padding-inline-start: max(var(--pad), calc((100vw - var(--max)) / 2 + var(--pad))); scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
-  .strip::-webkit-scrollbar { height: 6px; }
-  .strip::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
-  .spacer { flex: 0 0 var(--pad); }
-  .card { flex: 0 0 auto; width: var(--w, 300px); display: flex; flex-direction: column; gap: 14px; transition: width .18s cubic-bezier(.2,.7,.2,1); }
+  .strip { position: relative; overflow: hidden; padding: 120px 0 40px; margin-top: 8px; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .strip.dragging { cursor: grabbing; }
+  .track { display: flex; align-items: flex-start; gap: 28px; width: max-content; will-change: transform; }
+  .card { flex: 0 0 auto; width: 300px; display: flex; flex-direction: column; gap: 14px; transform-origin: 50% 100%; transition: transform .16s cubic-bezier(.2,.7,.2,1); background: var(--bg); position: relative; }
   .fig { display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; border: 1px solid var(--rule); background: var(--paper); padding: 14px; overflow: hidden; }
   .fig img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
   a.fig:hover { border-color: var(--ink); }
@@ -73,32 +68,65 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
   .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
   @media (max-width: 900px) {
     .top { padding-top: 32px; }
-    .strip { gap: 18px; padding-inline-start: var(--pad); }
-    .card { width: 260px; }
+    .strip { padding-top: 60px; }
+    .track { gap: 18px; }
+    .card { width: 240px; }
   }
 </style>
 
 <script>
-  // Cards grow as the cursor comes near, like a dock; wheel over the strip scrolls it sideways.
+  // A looping belt of cards. It drifts slowly on its own, can be dragged or scrolled
+  // sideways, wraps around forever, and the card nearest the cursor swells over the others.
   const strip = document.querySelector<HTMLElement>('[data-strip]');
-  if (strip && matchMedia('(hover: hover)').matches) {
-    const cards = [...strip.querySelectorAll<HTMLElement>('[data-card]')];
-    const base = 300, grow = 90, reach = 420;
-    let px = -1e9;
-    const apply = () => {
-      for (const c of cards) {
-        const r = c.getBoundingClientRect();
-        const d = Math.abs(px - (r.left + r.width / 2));
-        const t = Math.max(0, 1 - d / reach);
-        c.style.setProperty('--w', `${base + grow * t * t * (3 - 2 * t)}px`);
-      }
+  const track = document.querySelector<HTMLElement>('[data-track]');
+  if (strip && track) {
+    const cards = [...track.querySelectorAll<HTMLElement>('[data-card]')];
+    const per = cards.length / 3;
+    const hover = matchMedia('(hover: hover)').matches;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let setW = 0, x = 0, vx = 0, px = -1e9, py = -1e9, dragging = false, lastX = 0, lastT = 0, paused = false, moved = 0;
+    const measure = () => {
+      const gap = parseFloat(getComputedStyle(track).gap) || 0;
+      setW = cards.slice(0, per).reduce((w, c) => w + c.offsetWidth + gap, 0);
+      const pad = Math.max(64, (window.innerWidth - 1312) / 2 + 64);
+      if (!x) x = setW - pad;
     };
-    strip.addEventListener('pointermove', (e) => { px = e.clientX; apply(); });
-    strip.addEventListener('pointerleave', () => { px = -1e9; apply(); });
-    strip.addEventListener('wheel', (e) => {
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-      const canScroll = e.deltaY > 0 ? strip.scrollLeft + strip.clientWidth < strip.scrollWidth - 1 : strip.scrollLeft > 0;
-      if (canScroll) { strip.scrollLeft += e.deltaY; e.preventDefault(); }
-    }, { passive: false });
+    measure(); window.addEventListener('resize', measure);
+    const wrap = () => { if (x < setW * 0.5) x += setW; else if (x >= setW * 1.5) x -= setW; };
+    strip.addEventListener('pointermove', (e) => {
+      px = e.clientX; py = e.clientY;
+      if (dragging) { const now = performance.now(); const dx = e.clientX - lastX; x -= dx; moved += Math.abs(dx); vx = -dx / Math.max(1, now - lastT) * 16; lastX = e.clientX; lastT = now; }
+    });
+    strip.addEventListener('pointerenter', () => { paused = true; });
+    strip.addEventListener('pointerleave', () => { px = py = -1e9; paused = false; dragging = false; strip.classList.remove('dragging'); });
+    strip.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; dragging = true; moved = 0; vx = 0; lastX = e.clientX; lastT = performance.now(); strip.classList.add('dragging'); strip.setPointerCapture(e.pointerId); });
+    const end = () => { dragging = false; strip.classList.remove('dragging'); };
+    strip.addEventListener('pointerup', end); strip.addEventListener('pointercancel', end);
+    // A drag should not also count as a click on a link.
+    strip.addEventListener('click', (e) => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);
+    // Sideways wheel or trackpad scrolls the belt; vertical wheel leaves the page alone.
+    strip.addEventListener('wheel', (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { x += e.deltaX; e.preventDefault(); } }, { passive: false });
+    const reach = 340, maxScale = 1.5;
+    const tick = () => {
+      if (!dragging) {
+        if (!paused && !reduce) vx += (0.35 - vx) * 0.02; else vx *= 0.92;
+        x += vx;
+      }
+      wrap();
+      track.style.transform = `translate3d(${(-x).toFixed(2)}px, 0, 0)`;
+      if (hover) {
+        for (const c of cards) {
+          const r = c.getBoundingClientRect();
+          const inside = py > r.top - 40 && py < r.bottom + 40;
+          const d = Math.abs(px - (r.left + r.width / 2));
+          const t = inside ? Math.max(0, 1 - d / reach) : 0;
+          const e = t * t * (3 - 2 * t);
+          c.style.transform = `scale(${(1 + (maxScale - 1) * e).toFixed(3)})`;
+          c.style.zIndex = String(Math.round(1 + 100 * e));
+        }
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   }
 </script>

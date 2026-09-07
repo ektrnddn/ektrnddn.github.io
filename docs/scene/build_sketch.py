@@ -5,11 +5,11 @@ html = open(f"{S}/scene.html").read()
 svg_inner = re.search(r'<svg[^>]*>(.*)</svg>', html, re.S).group(1)
 svg_inner = re.sub(r'\s*<!--.*?-->', '', svg_inner)
 # group layers for parallax: wrap each top-level <g class="..."> with a data-layer factor
-factors = {'farfar': '0.1', 'range': '0.2', 'foothill': '0.35', 'near': '0.55', 'meadow': '1'}
+factors = {'range': '0.18', 'foothill': '0.45', 'meadow': '1'}
 def add_layer(m):
     cls = m.group(1).split()[0]
     return f'<g data-layer="{factors.get(cls, "1")}" class="l {m.group(1)}">'
-svg_inner = re.sub(r'<g class="(farfar|range|foothill|near|meadow)">', add_layer, svg_inner)
+svg_inner = re.sub(r'<g class="(range|foothill|meadow)">', add_layer, svg_inner)
 component = '''---
 // A night in the Georgian mountains, drawn in ink: a snow-capped range, forested
 // ridges with a hilltop church, a meadow, and a small figure walking through it.
@@ -32,9 +32,9 @@ component = '''---
   .s { fill: none; stroke-width: 1.2; }
   .h { fill: none; stroke-width: 1; opacity: .8; }
   .farfar .s { stroke: #d6d6d6; }
-  .range .s { stroke: #4a4a4a; stroke-width: 1.3; }
-  .foothill .s { stroke: #8f8f8f; stroke-width: 1.1; }
-  .foothill .trees { stroke: #8f8f8f; }
+  .range .s { stroke: #3a3a3a; stroke-width: 1.3; }
+  .foothill .s { stroke: #5a5a5a; stroke-width: 1.1; }
+  .foothill .trees { stroke: #5a5a5a; }
   .range .h { stroke: #8a8a8a; }
   .snow { fill: none; stroke: #6a6a6a; stroke-width: .9; opacity: .85; }
   .snowline { fill: none; stroke: #c9c9c9; stroke-width: .9; opacity: .9; }
@@ -64,23 +64,22 @@ component = '''---
     let stars: Star[] = [];
     const rnd = (a: number, b: number) => a + Math.random() * (b - a);
     // A rough skyline in fractions of the box: stars only above it, and away from the intro text on wide screens.
-    // Rough skyline in fractions of the box (stars only above it).
-    const skyline = (fx: number) => fx < 0.26 ? 0.62 : fx < 0.44 ? 0.62 - (fx - 0.26) * 0.9 : fx < 0.6 ? 0.46 - (fx - 0.44) * 1.1 : 0.28 + (fx - 0.6) * 0.3;
-    // Keep stars away from the intro text: a hard zone on wide screens with a soft edge,
-    // and off the top strip on narrow screens where the links sit.
-    const keep = (fx: number, fy: number, wide: boolean) => {
-      if (!wide) return fy * H > 90;
-      if (fx >= 0.55 || fy >= 0.6) {
-        const dx = Math.max(0, (fx - 0.55) * W), dy = Math.max(0, (fy - 0.6) * H);
-        const d = fx >= 0.55 && fy >= 0.6 ? Math.min(dx, dy) : Math.max(dx, dy);
-        return Math.random() < Math.min(1, d / 140);
-      }
-      return false;
+    // The traced skyline, as fractions of the box height, sampled across the width.
+    const SKY = [0.479, 0.458, 0.45, 0.458, 0.456, 0.439, 0.418, 0.441, 0.464, 0.484, 0.497, 0.498, 0.496, 0.496, 0.505, 0.515, 0.521, 0.537, 0.549, 0.551, 0.537, 0.521, 0.492, 0.463, 0.418, 0.377, 0.333, 0.284, 0.26, 0.25, 0.261, 0.285, 0.318, 0.336, 0.372, 0.408, 0.438, 0.436, 0.439, 0.439, 0.461, 0.439, 0.452, 0.446, 0.472, 0.492, 0.514, 0.537];
+    const skyline = (fx: number) => { const i = fx * (SKY.length - 1), j = Math.floor(i), t = i - j; return (SKY[j] ?? 1) * (1 - t) + (SKY[Math.min(SKY.length - 1, j + 1)] ?? 1) * t; };
+    // Keep stars out of the intro text (with a soft edge), wherever it sits over the drawing.
+    let tb = { x0: -1, y0: -1, x1: -1, y1: -1 };
+    const measureText = () => { const t = document.querySelector('.hero .text'); if (!t) return; const tr = t.getBoundingClientRect(), rr = root.getBoundingClientRect(); tb = { x0: tr.left - rr.left, y0: tr.top - rr.top, x1: tr.right - rr.left, y1: tr.bottom - rr.top }; };
+    const keep = (fx: number, fy: number, _wide: boolean) => {
+      const x = fx * W, y = fy * H;
+      const dx = Math.max(tb.x0 - x, 0, x - tb.x1), dy = Math.max(tb.y0 - y, 0, y - tb.y1);
+      const d = Math.hypot(dx, dy);
+      return d > 24 && Math.random() < Math.min(1, (d - 24) / 120);
     };
     const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
     const seed = () => {
       dpr = Math.min(2, window.devicePixelRatio || 1);
-      W = root.clientWidth; H = root.clientHeight;
+      W = root.clientWidth; H = root.clientHeight; measureText();
       cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       stars = [];
       const wide = window.innerWidth > 900;
@@ -91,12 +90,12 @@ component = '''---
         return true;
       };
       // Scattered field.
-      const n = Math.round(W / 5); let guard = 0;
+      const n = Math.round(W / 9); let guard = 0;
       while (stars.length < n && guard++ < n * 40) push(Math.random(), Math.random() * 0.9, rnd(0.55, 1.15), rnd(0.28, 0.65));
       // The Milky Way: a wide diagonal band of faint dots, a dark dust lane through it,
       // and a brighter core low on the right, above the peaks.
-      const band = Math.round(W / 1.05); guard = 0; let made = 0;
-      const cxAt = (t: number) => (wide ? 0.6 : 0.42) + t * 0.28, cyAt = (t: number) => -0.02 + t * 0.6;
+      const band = Math.round(W / 3.2); guard = 0; let made = 0;
+      const cxAt = (t: number) => 0.62 - t * 0.34, cyAt = (t: number) => -0.02 + t * 0.5;
       while (made < band && guard++ < band * 40) {
         const t = Math.random();
         const off = gauss() * (0.075 + 0.05 * t);
@@ -104,12 +103,12 @@ component = '''---
         if (lane && Math.random() < 0.8) continue;
         const core = t > 0.6 ? (t - 0.6) / 0.4 : 0;
         const fx = cxAt(t) + off + rnd(-0.01, 0.01), fy = cyAt(t) - off * 0.35 + rnd(-0.01, 0.01);
-        if (push(fx, fy, rnd(0.4, 0.9) + core * 0.35, rnd(0.16, 0.4) + core * 0.3)) made++;
+        if (push(fx, fy, rnd(0.5, 1.0) + core * 0.35, rnd(0.2, 0.45) + core * 0.3)) made++;
       }
       // Bright stars with a small sparkle, and one planet.
       guard = 0; made = 0;
       while (made < 9 && guard++ < 400) if (push(Math.random(), Math.random() * 0.7, rnd(1.7, 2.3), rnd(0.75, 0.95), true)) made++;
-      push(wide ? 0.6 : 0.2, 0.22, 3, 0.95, true);
+      push(0.8, 0.14, 3, 0.95, true);
     };
     seed(); new ResizeObserver(seed).observe(root);
     let px = -9999, py = -9999, tx = 0, ty = 0, cx = 0, cy = 0, burst = 0;
@@ -140,7 +139,7 @@ component = '''---
           s.vx += (s.ox - s.x) * 0.015; s.vy += (s.oy - s.y) * 0.015;
           s.vx *= 0.86; s.vy *= 0.86;
           s.x += s.vx; s.y += s.vy;
-          if (d2 < 150 * 150) near.push(s);
+          if (d2 < 130 * 130 && near.length < 28) near.push(s);
         }
         const tw = reduce ? 1 : 0.85 + 0.15 * Math.sin(t / 900 + s.ph);
         ctx.globalAlpha = s.a * tw;

@@ -22,7 +22,7 @@ export interface Profile {
   hero: { start: string; emphasis: string; end: string; lede: string; figure: string; figure_alt: string; figure_caption: string };
   research_lede: string;
   collaborations: { name: string; role: string; since: number }[];
-  links: Record<string, string>; skills: string[]; hobbies: string[];
+  links: Record<string, string>; research_interests: string[]; skills: { area: string; items: string }[]; hobbies: string[];
 }
 export interface Publication {
   id: string; title: string; authors: string; year: number; venue: string;

@@ -12,7 +12,7 @@ tagline: Massive black hole pairs, from kiloparsecs to sub-parsec, across cosmic
 # Home page intro. Words in [[double brackets]] are highlighted.
 greeting: Hello there!
 intro: >-
-  I'm Ekaterine (Eka) Dadiani, a Ph.D. candidate in [[astrophysics]] at
+  I'm Ekaterine (Eka) Dadiani, a Ph.D. candidate in [[physics]] at
   [[Carnegie Mellon University]], working with Antonella Palmese and Tiziana Di Matteo.
   I look for [[pairs of massive black holes]] in the [[DESI]] survey and the [[ASTRID]]
   simulation: the systems that gravitational-wave observatories like [[LISA]] and pulsar
@@ -55,12 +55,19 @@ links:
   scholar: "TODO: Google Scholar profile URL"
   linkedin: "TODO: LinkedIn URL"
   orcid: "TODO: ORCID iD (optional)"
+research_interests:
+  - Massive black hole physics and merger dynamics
+  - Electromagnetic counterparts of gravitational-wave events
+  - Active galactic nuclei and dual AGN
+  - Galaxy morphology and evolution
+  - The Dark Energy Spectroscopic Instrument
+  - Synthetic observation pipelines and machine learning in astrophysics
+  - Cosmological simulations
 skills:
-  - Python (NumPy, Pandas, scikit-learn, TensorFlow, PyTorch)
-  - SQL
-  - Cosmological and N-body simulations
-  - HPC and cluster computing
-  - Numerical methods and statistical analysis
+  - { area: Languages, items: "Python, SQL, Bash, LaTeX" }
+  - { area: Machine learning and data, items: "PyTorch, TensorFlow, scikit-learn, NumPy, Pandas, SciPy, Astropy; autoencoders and unsupervised anomaly detection; image processing for wide-field surveys" }
+  - { area: Statistics, items: "Bayesian inference, MCMC, hierarchical models, time-series analysis, hypothesis testing on large catalogues" }
+  - { area: Simulation and computing, items: "Cosmological and N-body simulations (ASTRID), HDF5, HPC and Slurm, Git, Jupyter" }
 hobbies:
   - Film photography
   - Skiing

@@ -78,7 +78,7 @@ const outreach = [
   </section>
 
   <section class="wrap">
-    <SectionHead title="Talks and schools" />
+    <SectionHead title="Talks" />
     <div class="rows">
       {talksSorted.map((t) => (
         <div class="row grid12 r">
@@ -114,10 +114,16 @@ const outreach = [
   </section>
 
   <section class="wrap">
-    <SectionHead title="Skills and interests" />
+    <SectionHead title="Research interests" />
+    <p class="prose interests">{profile.research_interests.join(' · ')}</p>
+  </section>
+
+  <section class="wrap">
+    <SectionHead title="Technical skills" />
     <div class="rows">
-      <div class="row grid12 r"><div class="years">Technical</div><div class="what">{profile.skills.join(' · ')}</div></div>
-      <div class="row grid12 r"><div class="years">Outside work</div><div class="what">{profile.hobbies.join(' · ')}</div></div>
+      {profile.skills.map((k) => (
+        <div class="row grid12 r"><div class="years">{k.area}</div><div class="what">{k.items}</div></div>
+      ))}
     </div>
   </section>
 
@@ -143,6 +149,7 @@ const outreach = [
   .r .what { grid-column: span 10; }
   .r .what b { font-weight: 500; }
   .kind { margin-right: 6px; }
+  .interests { padding-top: 20px; max-width: 800px; }
   .cvbox { margin-top: 72px; padding-top: 32px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 32px; flex-wrap: wrap; }
   .cvbox h2 { font-size: 26px; margin-bottom: 8px; }
   .actions { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }

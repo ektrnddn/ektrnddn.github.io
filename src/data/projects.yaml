@@ -18,10 +18,6 @@ thesis:
     status: In preparation
   - title: "Scaling up: variational autoencoders on DESI DR3"
     status: Coming soon
-    description: >-
-      Teaching a variational autoencoder what an ordinary DESI spectrum looks like, so that
-      the unusual ones, including binary black hole signatures, fall out on their own across
-      the whole survey.
 
 # Earlier work. [n] in the text points at the n-th entry of `earlier`.
 earlier_text: >-
