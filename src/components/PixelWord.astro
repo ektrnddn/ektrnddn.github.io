@@ -1,0 +1,68 @@
+---
+// A word spelled in light grey blocks, 5×7 pixel letters merged into horizontal bars.
+// Blocks near the cursor darken; the word fades in row by row when it scrolls into view.
+interface Props { word?: string }
+const { word = 'EKATERINE' } = Astro.props;
+const FONT: Record<string, string[]> = {
+  E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+  K: ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
+  A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+  T: ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+  R: ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
+  I: ['11111', '00100', '00100', '00100', '00100', '00100', '11111'],
+  N: ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+  D: ['11110', '10001', '10001', '10001', '10001', '10001', '11110'],
+  ' ': ['00000', '00000', '00000', '00000', '00000', '00000', '00000'],
+};
+const rows = 7, cell = 24, gap = 5, pitch = cell + gap;
+const letters = [...word.toUpperCase()].map((c) => FONT[c] ?? FONT[' ']);
+const cols = letters.length * 6 - 1;
+const W = cols * pitch - gap, H = rows * pitch - gap;
+// merge horizontal runs of set pixels into bars
+const bars: { x: number; y: number; w: number; r: number }[] = [];
+for (let r = 0; r < rows; r++) {
+  const line = letters.map((l) => l[r]).join('0');
+  let start = -1;
+  for (let c = 0; c <= line.length; c++) {
+    const on = c < line.length && line[c] === '1';
+    if (on && start < 0) start = c;
+    if (!on && start >= 0) { bars.push({ x: start * pitch, y: r * pitch, w: (c - start) * pitch - gap, r }); start = -1; }
+  }
+}
+---
+<div class="pixelword" data-pixelword aria-hidden="true">
+  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMinYMid meet">
+    {bars.map((b) => <rect x={b.x} y={b.y} width={b.w} height={cell} rx="2" style={`--d:${b.r * 60}ms`} />)}
+  </svg>
+</div>
+<style>
+  .pixelword { width: 100%; }
+  svg { width: 100%; height: auto; display: block; overflow: visible; }
+  rect { fill: #ededed; opacity: 0; transform: translateY(6px); transition: fill .25s ease, opacity .6s ease var(--d), transform .6s cubic-bezier(.2,.7,.2,1) var(--d); }
+  .pixelword.in rect { opacity: 1; transform: none; }
+  rect.near { fill: #cfcfcf; }
+  rect.nearer { fill: #b3b3b3; }
+</style>
+<script>
+  const root = document.querySelector<HTMLElement>('[data-pixelword]');
+  if (root) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { root.classList.add('in'); io.disconnect(); } }), { threshold: 0.2 });
+    io.observe(root);
+    const rects = [...root.querySelectorAll<SVGRectElement>('rect')];
+    if (matchMedia('(hover: hover)').matches) {
+      let raf = 0, px = -1e9, py = -1e9;
+      const paint = () => {
+        raf = 0;
+        for (const r of rects) {
+          const b = r.getBoundingClientRect();
+          const dx = Math.max(b.left - px, 0, px - b.right), dy = Math.max(b.top - py, 0, py - b.bottom);
+          const d = Math.hypot(dx, dy);
+          r.classList.toggle('nearer', d < 40);
+          r.classList.toggle('near', d >= 40 && d < 120);
+        }
+      };
+      window.addEventListener('pointermove', (e) => { px = e.clientX; py = e.clientY; if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
+      document.addEventListener('pointerleave', () => { px = py = -1e9; paint(); });
+    }
+  }
+</script>
