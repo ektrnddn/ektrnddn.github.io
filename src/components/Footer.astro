@@ -29,15 +29,15 @@ const external = Object.entries(profile.links).filter(([, v]) => typeof v === 's
   </div>
 </footer>
 <style>
-  .footer { margin-top: 96px; border-top: 1px solid var(--rule); }
+  .footer { margin-top: 96px; }
   .word { padding-top: 56px; padding-bottom: 0; }
   .rise { position: relative; height: 200px; margin-top: -96px; overflow: hidden; z-index: 1; }
   .riser { position: absolute; right: 150px; bottom: 0; transform: translateY(104%); transition: transform 1.3s cubic-bezier(.2,.7,.2,1); }
   .rise.up .riser { transform: none; }
   .riser :global(.doodle svg) { max-width: 132px; }
   .riser :global(.doodle figcaption) { display: none; }
-  .note { position: absolute; right: 0; top: 14px; width: 150px; color: var(--ink); }
-  .note .cap { display: block; color: var(--ink); opacity: 0; transition: opacity .5s ease 3.2s; white-space: nowrap; }
+  .note { position: absolute; right: 0; top: 14px; width: 150px; color: #d9d9d9; }
+  .note .cap { display: block; color: #cfcfcf; opacity: 0; transition: opacity .5s ease 3.2s; white-space: nowrap; }
   .note .arrow { width: 96px; height: auto; display: block; margin: 2px 0 0 -6px; }
   .note .arrow path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .7s cubic-bezier(.4,0,.2,1) 3.4s; }
   .note .arrow .head { transition-delay: 4s; transition-duration: .3s; }
