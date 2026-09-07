@@ -1,10 +1,12 @@
 ---
 import { profile } from '../data/load';
+import Doodle from './Doodle.astro';
 const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 'Google Scholar', linkedin: 'LinkedIn', orcid: 'ORCID' };
 const external = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
 ---
 <footer id="contact" class="footer">
   <div class="wrap top">
+    <div class="doodle-slot"><Doodle /></div>
     <div class="who">
       <div class="name">{profile.name}</div>
       <div class="aff">{profile.affiliation}, {profile.location}</div>
@@ -18,7 +20,10 @@ const external = Object.entries(profile.links).filter(([, v]) => typeof v === 's
 </footer>
 <style>
   .footer { margin-top: 80px; border-top: 1px solid var(--rule); }
-  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; padding-top: 40px; padding-bottom: 28px; }
+  .top { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; padding-top: 40px; padding-bottom: 28px; }
+  .doodle-slot { flex: none; width: 84px; margin-right: 8px; }
+  .who { flex: 1 1 320px; }
+  .links { margin-left: auto; }
   .name { font-size: 17px; font-weight: 500; letter-spacing: -.02em; }
   .aff { font-size: 14px; line-height: 1.5; color: var(--muted); margin-top: 6px; }
   .links { display: flex; gap: 24px; flex-wrap: wrap; font-size: 14px; }

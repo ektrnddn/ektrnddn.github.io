@@ -12,11 +12,10 @@ tagline: Massive black hole pairs, from kiloparsecs to sub-parsec, across cosmic
 # Home page intro. Words in [[double brackets]] are highlighted.
 greeting: Hello there!
 intro: >-
-  I'm Ekaterine (Eka) Dadiani, a Ph.D. candidate in [[physics]] at
+  I'm Ekaterine (Eka) Dadiani, a Ph.D. candidate in [[Physics]] at
   [[Carnegie Mellon University]], working with Antonella Palmese and Tiziana Di Matteo.
   I look for [[pairs of massive black holes]] in the [[DESI]] survey and the [[ASTRID]]
-  simulation: the systems that gravitational-wave observatories like [[LISA]] and pulsar
-  timing arrays will one day hear merge.
+  simulation: the progenitors of mergers that [[LISA]] will detect.
 hero:
   # Rendered as: {start} <em>{emphasis}</em> {end}
   start: "Massive black hole pairs,"
@@ -37,8 +36,7 @@ research_lede: >-
 bio: >-
   I study massive black hole pairs: where they are, how many there are, and which ones
   LISA will eventually detect. The work follows the whole evolutionary chain, from
-  kiloparsec-scale dual AGN to sub-parsec binaries, and the galaxies that host them
-  along the way.
+  kiloparsec-scale dual AGN to sub-parsec binaries, and their host galaxy parameters.
 advisors:
   - Antonella Palmese
   - Tiziana Di Matteo

@@ -5,11 +5,11 @@ html = open(f"{S}/scene.html").read()
 svg_inner = re.search(r'<svg[^>]*>(.*)</svg>', html, re.S).group(1)
 svg_inner = re.sub(r'\s*<!--.*?-->', '', svg_inner)
 # group layers for parallax: wrap each top-level <g class="..."> with a data-layer factor
-factors = {'range': '0.2', 'foothill': '0.45', 'meadow': '1'}
+factors = {'farfar': '0.1', 'range': '0.2', 'foothill': '0.4', 'near': '0.6', 'meadow': '1'}
 def add_layer(m):
     cls = m.group(1).split()[0]
     return f'<g data-layer="{factors.get(cls, "1")}" class="l {m.group(1)}">'
-svg_inner = re.sub(r'<g class="(range|foothill|meadow)">', add_layer, svg_inner)
+svg_inner = re.sub(r'<g class="(farfar|range|foothill|near|meadow)">', add_layer, svg_inner)
 component = '''---
 // A night in the Georgian mountains, drawn in ink: a snow-capped range, forested
 // ridges with a hilltop church, a meadow, and a small figure walking through it.
@@ -19,7 +19,7 @@ component = '''---
 ---
 <div class="sketch" data-sketch aria-hidden="true">
   <canvas data-stars></canvas>
-  <svg viewBox="0 0 1440 660" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <svg viewBox="0 -20 1440 660" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
 ''' + svg_inner.strip('\n') + '''
   </svg>
 </div>
@@ -33,8 +33,8 @@ component = '''---
   .h { fill: none; stroke-width: 1; opacity: .8; }
   .farfar .s { stroke: #d6d6d6; }
   .range .s { stroke: #3a3a3a; stroke-width: 1.3; }
-  .foothill .s { stroke: #7a7a7a; stroke-width: 1.1; }
-  .foothill .trees { stroke: #7a7a7a; }
+  .foothill .s { stroke: #8f8f8f; stroke-width: 1.1; }
+  .foothill .trees { stroke: #8f8f8f; }
   .near .s { stroke: #2a2a2a; stroke-width: 1.2; }
   .near .trees { stroke: #2a2a2a; }
   .range .h { stroke: #8a8a8a; }

@@ -3,7 +3,6 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Arrow from '../components/Arrow.astro';
 import Sketch from '../components/Sketch.astro';
-import Doodle from '../components/Doodle.astro';
 import { profile, facts, photos, highlight } from '../data/load';
 const links = [
   { href: '/research/', label: 'Research' },
@@ -25,7 +24,6 @@ const links = [
   </section>
 
   <section class="facts wrap">
-    <div class="doodle-slot"><Doodle /></div>
     <ul>
       {facts.map((f) => (
         <li>
@@ -63,9 +61,8 @@ const links = [
   .links a:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
   .hero :global(.sketch) { margin-top: -260px; }
 
-  .facts { padding-top: 8px; padding-bottom: 24px; display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 32px 56px; align-items: center; }
-  .facts ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; order: -1; }
-  .doodle-slot { display: flex; justify-content: center; }
+  .facts { padding-top: 8px; padding-bottom: 24px; }
+  .facts ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
   .facts li { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 16px; line-height: 1.5; color: var(--text); }
   .ico { flex: none; color: var(--ink); margin-top: 3px; display: inline-flex; gap: 6px; }
 
@@ -79,7 +76,6 @@ const links = [
     .text { padding-top: 36px; gap: 16px; }
     h1 { font-size: 21px; }
     .hero :global(.sketch) { margin-top: -20px; }
-    .facts { grid-template-columns: minmax(0, 1fr); gap: 24px; }
-    .doodle-slot { justify-content: flex-start; }
+    .facts ul { grid-template-columns: minmax(0, 1fr); }
   }
 </style>

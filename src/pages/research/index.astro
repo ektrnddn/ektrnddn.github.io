@@ -45,10 +45,10 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
   .top { padding-top: 72px; padding-bottom: 24px; }
   h1 { font-weight: 400; font-size: clamp(26px, 3vw, 40px); line-height: 1.16; letter-spacing: -.03em; }
   h1 em { font-style: normal; font-weight: 500; }
-  .strip { position: relative; overflow: hidden; padding: 120px 0 40px; margin-top: 8px; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .strip { position: relative; overflow: hidden; padding: 32px 0 40px; margin-top: 8px; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
   .strip.dragging { cursor: grabbing; }
   .track { display: flex; align-items: flex-start; gap: 28px; width: max-content; will-change: transform; }
-  .card { flex: 0 0 auto; width: 300px; display: flex; flex-direction: column; gap: 14px; transform-origin: 50% 100%; transition: transform .16s cubic-bezier(.2,.7,.2,1); background: var(--bg); position: relative; }
+  .card { flex: 0 0 auto; width: var(--w, 300px); display: flex; flex-direction: column; gap: 14px; transition: width .14s cubic-bezier(.2,.7,.2,1); }
   .fig { display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; border: 1px solid var(--rule); background: var(--paper); padding: 14px; overflow: hidden; }
   .fig img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
   a.fig:hover { border-color: var(--ink); }
@@ -68,7 +68,7 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
   .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
   @media (max-width: 900px) {
     .top { padding-top: 32px; }
-    .strip { padding-top: 60px; }
+    .strip { padding-top: 16px; }
     .track { gap: 18px; }
     .card { width: 240px; }
   }
@@ -106,25 +106,29 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
     strip.addEventListener('click', (e) => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);
     // Sideways wheel or trackpad scrolls the belt; vertical wheel leaves the page alone.
     strip.addEventListener('wheel', (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { x += e.deltaX; e.preventDefault(); } }, { passive: false });
-    const reach = 340, maxScale = 1.5;
+    const base = 300, grow = 200, reach = 380;
     const tick = () => {
       if (!dragging) {
         if (!paused && !reduce) vx += (0.35 - vx) * 0.02; else vx *= 0.92;
         x += vx;
       }
       wrap();
-      track.style.transform = `translate3d(${(-x).toFixed(2)}px, 0, 0)`;
+      // Dock magnification: the card nearest the cursor widens, neighbours a little; the
+      // track shifts by half the growth on the cursor's left so the hovered card stays put.
+      let shift = 0;
       if (hover) {
+        const inside = py > strip.getBoundingClientRect().top && py < strip.getBoundingClientRect().bottom;
         for (const c of cards) {
           const r = c.getBoundingClientRect();
-          const inside = py > r.top - 40 && py < r.bottom + 40;
           const d = Math.abs(px - (r.left + r.width / 2));
           const t = inside ? Math.max(0, 1 - d / reach) : 0;
           const e = t * t * (3 - 2 * t);
-          c.style.transform = `scale(${(1 + (maxScale - 1) * e).toFixed(3)})`;
-          c.style.zIndex = String(Math.round(1 + 100 * e));
+          const w = base + grow * e;
+          c.style.setProperty('--w', `${w.toFixed(1)}px`);
+          if (r.left + r.width / 2 < px) shift += (w - base) * 0.5;
         }
       }
+      track.style.transform = `translate3d(${(-(x + shift)).toFixed(2)}px, 0, 0)`;
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
