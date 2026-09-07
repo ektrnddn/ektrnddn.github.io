@@ -12,8 +12,8 @@ def add_layer(m):
 svg_inner = re.sub(r'<g class="(farfar|range|foothill|near|meadow)">', add_layer, svg_inner)
 component = '''---
 // A night in the Georgian mountains, drawn in ink: a snow-capped range, forested
-// ridges with a hilltop church, a meadow, and a small figure walking through it.
-// Behind the drawing, a field of stars that scatters around the cursor and drifts
+// ridges, a meadow, and a small figure walking through it: hover her and she
+// raises a pair of binoculars. Behind the drawing, a field of stars that scatters around the cursor and drifts
 // back; nearby stars join into faint constellations, and a click sends them flying.
 // The drawing layers also shift gently with the cursor.
 ---
@@ -50,6 +50,9 @@ component = '''---
   .figure .ink { fill: #191919; stroke: #191919; stroke-width: 1; stroke-linejoin: round; }
   .figure .limb { fill: none; stroke: #191919; stroke-width: 5; stroke-linecap: round; }
   .figure .leg { fill: none; stroke: #191919; stroke-width: 4.5; stroke-linecap: round; }
+  .figure .binos { opacity: 0; }
+  .figure .sep { fill: none; stroke: #ffffff; stroke-width: 1; }
+  .figure .hit { fill: transparent; stroke: none; }
   @media (max-width: 900px) { .sketch { height: clamp(240px, 70vw, 340px); max-height: none; } }
 </style>
 <script>
@@ -131,8 +134,31 @@ component = '''---
     }, { passive: true });
     document.addEventListener('pointerleave', () => { px = py = -9999; tx = ty = 0; });
     root.addEventListener('pointerdown', (e) => { const [x, y] = local(e) as [number, number, DOMRect]; px = x; py = y; burst = 1; });
+    // The walker: come close (hover, or tap on touch screens) and she stops to look
+    // through binoculars; the arms rise, the head tilts up, and the glasses fade in.
+    const fig = root.querySelector<SVGGElement>('.figure');
+    const nums = (d: string) => d.match(/-?\\d+(?:\\.\\d+)?/g)!.map(Number);
+    const arms = fig ? [...fig.querySelectorAll<SVGPathElement>('.arm')].map((p) => ({ p, a: nums(p.dataset.rest ?? ''), b: nums(p.dataset.up ?? '') })) : [];
+    const head = fig?.querySelector<SVGGElement>('.head'), binos = fig?.querySelector<SVGGElement>('.binos'), hit = fig?.querySelector<SVGRectElement>('.hit');
+    let want = 0, pose = 0;
+    if (hit) {
+      hit.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'touch') want = 1; });
+      hit.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'touch') want = 0; });
+      hit.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch') want = want ? 0 : 1; });
+    }
+    const poseFigure = () => {
+      if (Math.abs(want - pose) < 0.002) { if (pose === want) return; pose = want; } else pose += (want - pose) * (reduce ? 1 : want ? 0.14 : 0.1);
+      const k = pose * pose * (3 - 2 * pose);
+      for (const { p, a, b } of arms) {
+        const v = a.map((x, i) => x + (b[i] - x) * k);
+        p.setAttribute('d', `M ${v[0]} ${v[1]} C ${v[2]} ${v[3]}, ${v[4]} ${v[5]}, ${v[6]} ${v[7]}`);
+      }
+      head?.setAttribute('transform', `rotate(${(-8 * k).toFixed(2)} -4 -72)`);
+      if (binos) { const g = Math.max(0, Math.min(1, (k - 0.5) / 0.4)); binos.style.opacity = String(g); binos.setAttribute('transform', `translate(8 -86) scale(${(0.6 + 0.4 * g).toFixed(3)}) translate(-8 86)`); }
+    };
     const draw = (t: number) => {
       ctx.clearRect(0, 0, W, H);
+      poseFigure();
       const R = 110, R2 = R * R;
       const near: Star[] = [];
       for (const s of stars) {

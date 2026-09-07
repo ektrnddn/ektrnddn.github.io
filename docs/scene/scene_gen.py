@@ -103,13 +103,21 @@ svg = f'''<svg viewBox="0 -20 1440 660" fill="none" stroke-linecap="round" strok
       <circle cx="212" cy="537" r="2.6"/><circle cx="405" cy="546" r="2.2"/><circle cx="700" cy="536" r="2.8"/><circle cx="818" cy="536" r="2.3"/><circle cx="1048" cy="530" r="2.6"/><circle cx="1275" cy="539" r="2.2"/>
     </g>
     <g class="figure" transform="translate(600 558)">
-      <path class="ink" d="M 7 -96 C 4 -101, -3 -103, -8 -100 C -12 -104, -18 -101, -17 -96 C -22 -96, -24 -90, -20 -87 C -25 -85, -25 -79, -20 -77 C -24 -73, -21 -67, -16 -68 C -18 -63, -13 -60, -9 -63 C -8 -66, -7 -68, -6 -70 C -3 -72, 1 -74, 4 -78 C 8 -81, 10 -86, 9 -90 C 10 -93, 9 -95, 7 -96 Z"/>
+      <g class="head">
+        <path class="ink" d="M 7 -96 C 4 -101, -3 -103, -8 -100 C -12 -104, -18 -101, -17 -96 C -22 -96, -24 -90, -20 -87 C -25 -85, -25 -79, -20 -77 C -24 -73, -21 -67, -16 -68 C -18 -63, -13 -60, -9 -63 C -8 -66, -7 -68, -6 -70 C -3 -72, 1 -74, 4 -78 C 8 -81, 10 -86, 9 -90 C 10 -93, 9 -95, 7 -96 Z"/>
+        <g class="binos">
+          <path class="ink" d="M 8 -90.5 L 24 -92 C 25.5 -92, 25.5 -85, 24 -85 L 8 -86 Z"/>
+          <path class="ink" d="M 9 -86 L 25 -87.5 C 26.5 -87.5, 26.5 -80.5, 25 -80.5 L 9 -81.5 Z"/>
+          <path class="sep" d="M 9.5 -86 L 25 -87.4"/>
+        </g>
+      </g>
       <path class="ink" d="M -10 -74 L 5 -74 C 10 -65, 10 -56, 8 -46 L -9 -46 C -12 -56, -12 -65, -10 -74 Z"/>
       <path class="ink" d="M -8 -46 L 7 -46 C 12 -34, 16 -18, 17 -6 L -18 -6 C -16 -18, -12 -34, -8 -46 Z"/>
-      <path class="limb" d="M 4 -70 C 10 -62, 13 -54, 11 -44"/>
-      <path class="limb" d="M -8 -70 C -13 -62, -14 -54, -11 -44"/>
+      <path class="limb arm" data-rest="M 4 -70 C 10 -62, 13 -54, 11 -44" data-up="M 4 -70 C 14 -69, 19 -75, 16 -81" d="M 4 -70 C 10 -62, 13 -54, 11 -44"/>
+      <path class="limb arm" data-rest="M -8 -70 C -13 -62, -14 -54, -11 -44" data-up="M -8 -70 C 2 -70, 10 -76, 11 -85" d="M -8 -70 C -13 -62, -14 -54, -11 -44"/>
       <path class="leg" d="M 5 -6 L 10 0 M -6 -6 L -12 0"/>
       <ellipse cx="12" cy="0.5" rx="5" ry="1.8" class="ink"/><ellipse cx="-14" cy="0.5" rx="5" ry="1.8" class="ink"/>
+      <rect class="hit" x="-36" y="-114" width="74" height="122"/>
     </g>
   </g>
 </svg>'''
@@ -119,7 +127,7 @@ html = '''<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;
 .foothill .s{stroke:#8f8f8f;stroke-width:1.1}.foothill .trees{stroke:#8f8f8f}
 .near .s{stroke:#2a2a2a}.trees{fill:none;stroke:#2a2a2a;stroke-width:1;opacity:.75}
 .meadow .s{stroke:#191919;stroke-width:1.4}.grass{fill:none;stroke:#191919;stroke-width:1;opacity:.7}.flowers .stem{fill:none;stroke:#191919;stroke-width:1;opacity:.6}.flowers circle{fill:#d98aa0}
-.figure .ink{fill:#191919;stroke:#191919;stroke-width:1;stroke-linejoin:round}.figure .limb{fill:none;stroke:#191919;stroke-width:5;stroke-linecap:round}.figure .leg{fill:none;stroke:#191919;stroke-width:4.5;stroke-linecap:round}
+.figure .ink{fill:#191919;stroke:#191919;stroke-width:1;stroke-linejoin:round}.figure .limb{fill:none;stroke:#191919;stroke-width:5;stroke-linecap:round}.figure .leg{fill:none;stroke:#191919;stroke-width:4.5;stroke-linecap:round}.figure .binos{opacity:0}.figure .sep{fill:none;stroke:#fff;stroke-width:1}.figure .hit{fill:transparent;stroke:none}
 .church{fill:#2a2a2a;stroke:none}
 </style></head><body>''' + svg + '</body></html>'
 open(f'{S}/scene.html', 'w').write(html)
