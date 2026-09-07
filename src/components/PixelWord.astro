@@ -1,8 +1,8 @@
 ---
 // A word spelled in light grey blocks, 5×7 pixel letters merged into horizontal bars.
 // Blocks near the cursor darken; the word fades in row by row when it scrolls into view.
-interface Props { word?: string }
-const { word = 'EKATERINE' } = Astro.props;
+interface Props { lines?: string[] }
+const { lines = ['EKATERINE'] } = Astro.props;
 const FONT: Record<string, string[]> = {
   E: ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
   K: ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
@@ -15,33 +15,39 @@ const FONT: Record<string, string[]> = {
   ' ': ['00000', '00000', '00000', '00000', '00000', '00000', '00000'],
 };
 const rows = 7, cell = 24, gap = 5, pitch = cell + gap;
-const letters = [...word.toUpperCase()].map((c) => FONT[c] ?? FONT[' ']);
-const cols = letters.length * 6 - 1;
-const W = cols * pitch - gap, H = rows * pitch - gap;
-// merge horizontal runs of set pixels into bars
-const bars: { x: number; y: number; w: number; r: number }[] = [];
-for (let r = 0; r < rows; r++) {
-  const line = letters.map((l) => l[r]).join('0');
-  let start = -1;
-  for (let c = 0; c <= line.length; c++) {
-    const on = c < line.length && line[c] === '1';
-    if (on && start < 0) start = c;
-    if (!on && start >= 0) { bars.push({ x: start * pitch, y: r * pitch, w: (c - start) * pitch - gap, r }); start = -1; }
+type Bar = { x: number; y: number; w: number; r: number };
+const render = (word: string) => {
+  const letters = [...word.toUpperCase()].map((c) => FONT[c] ?? FONT[' ']);
+  const cols = letters.length * 6 - 1;
+  const bars: Bar[] = [];
+  for (let r = 0; r < rows; r++) {
+    const line = letters.map((l) => l[r]).join('0');
+    let start = -1;
+    for (let c = 0; c <= line.length; c++) {
+      const on = c < line.length && line[c] === '1';
+      if (on && start < 0) start = c;
+      if (!on && start >= 0) { bars.push({ x: start * pitch, y: r * pitch, w: (c - start) * pitch - gap, r }); start = -1; }
+    }
   }
-}
+  return { cols, W: cols * pitch - gap, H: rows * pitch - gap, bars };
+};
+const rendered = lines.map(render);
+const maxCols = Math.max(...rendered.map((r) => r.cols));
 ---
 <div class="pixelword" data-pixelword aria-hidden="true">
-  <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMinYMid meet">
-    {bars.map((b) => <rect x={b.x} y={b.y} width={b.w} height={cell} rx="2" style={`--d:${b.r * 60}ms`} />)}
-  </svg>
+  {rendered.map((line, i) => (
+    <svg viewBox={`0 0 ${line.W} ${line.H}`} preserveAspectRatio="xMidYMid meet" style={`width:${(line.cols / maxCols) * 100}%`}>
+      {line.bars.map((b) => <rect x={b.x} y={b.y} width={b.w} height={cell} rx="2" style={`--d:${(i * rows + b.r) * 45}ms`} />)}
+    </svg>
+  ))}
 </div>
 <style>
-  .pixelword { width: 100%; }
-  svg { width: 100%; height: auto; display: block; overflow: visible; }
-  rect { fill: #ededed; opacity: 0; transform: translateY(6px); transition: fill .25s ease, opacity .6s ease var(--d), transform .6s cubic-bezier(.2,.7,.2,1) var(--d); }
+  .pixelword { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+  svg { height: auto; display: block; overflow: visible; }
+  rect { fill: #f2f2f2; opacity: 0; transform: translateY(6px); transition: fill .25s ease, opacity .6s ease var(--d), transform .6s cubic-bezier(.2,.7,.2,1) var(--d); }
   .pixelword.in rect { opacity: 1; transform: none; }
-  rect.near { fill: #cfcfcf; }
-  rect.nearer { fill: #b3b3b3; }
+  rect.near { fill: #e3e3e3; }
+  rect.nearer { fill: #d2d2d2; }
 </style>
 <script>
   const root = document.querySelector<HTMLElement>('[data-pixelword]');

@@ -6,6 +6,7 @@ const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 
 const external = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
 ---
 <footer id="contact" class="footer">
+  <div class="wrap backdrop"><PixelWord lines={['EKATERINE', 'DADIANI']} /></div>
   <div class="wrap top">
     <div class="doodle-slot"><Doodle /></div>
     <div class="who">
@@ -17,12 +18,14 @@ const external = Object.entries(profile.links).filter(([, v]) => typeof v === 's
       {external.map(([k, v]) => <a href={v} rel="me noopener" target="_blank">{labels[k] ?? k}</a>)}
     </div>
   </div>
-  <div class="wrap word"><PixelWord word="EKATERINE" /></div>
   <div class="wrap copy">© {new Date().getFullYear()} {profile.name}</div>
 </footer>
 <style>
-  .footer { margin-top: 80px; border-top: 1px solid var(--rule); }
-  .top { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; padding-top: 40px; padding-bottom: 28px; }
+  .footer { position: relative; margin-top: 80px; border-top: 1px solid var(--rule); overflow: hidden; min-height: 720px; display: flex; flex-direction: column; }
+  .footer > .wrap { width: 100%; }
+  .backdrop { position: absolute; left: 0; right: 0; top: 240px; z-index: 0; pointer-events: none; }
+  .top, .copy { position: relative; z-index: 1; }
+  .top { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; padding-top: 44px; padding-bottom: 28px; }
   .doodle-slot { flex: none; width: 118px; margin-right: 4px; }
   .who { flex: 1 1 320px; }
   .links { margin-left: auto; }
@@ -32,8 +35,7 @@ const external = Object.entries(profile.links).filter(([, v]) => typeof v === 's
   .links a { color: var(--muted); }
   .links a.mail { color: var(--ink); }
   .links a:hover { color: var(--accent); }
-  .word { padding-top: 40px; padding-bottom: 28px; }
-  .copy { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-bottom: 40px; }
+  .copy { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-bottom: 32px; margin-top: auto; }
   .copy a { color: var(--muted); text-decoration: underline; }
-  @media (max-width: 900px) { .footer { margin-top: 56px; } .links { gap: 16px; } }
+  @media (max-width: 900px) { .footer { margin-top: 56px; min-height: 460px; } .links { gap: 16px; } .backdrop { top: 230px; } }
 </style>
