@@ -9,7 +9,7 @@ thesis:
     figure: /figures/dr_z_bigmac_duals.jpg
     figure_alt: Redshift versus projected separation for DESI DR1 dual AGN and literature candidates
     link: https://arxiv.org/abs/2607.27390
-    extra_link: { label: Interactive figure, url: https://ektrnddn.github.io/dualagn-explorer/ }
+    live: https://ektrnddn.github.io/dualagn-explorer/
   - title: "Connecting current and future dual AGN searches to LISA and PTA gravitational wave detections"
     figure: /figures/papers/gw-merger-rates.jpg
     figure_alt: Expected full-sky massive black hole merger rates from survey-matched mock samples

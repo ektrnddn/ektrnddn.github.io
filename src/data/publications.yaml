@@ -27,7 +27,6 @@
   title: "Catastrophic formation of macro-scale flow and magnetic fields in the relativistic gas of binary systems"
   authors: "Saralidze E., Shatashvili N. L., Mahajan S. M., Dadiani E."
   year: 2025
-  venue: "Astrophysics and Space Science, 370"
   doi: "10.1007/s10509-025-04456-1"
   project: mhd-transients
   first_author: false
@@ -47,7 +46,6 @@
   title: "Self-similarity for astrophysical MHD transients revisited"
   authors: "Rogava A., Poedts S., Dadiani E."
   year: 2022
-  venue: "Advances in Space Research, 69, 474"
   doi: "10.1016/j.asr.2021.09.020"
   project: mhd-transients
   first_author: false
@@ -57,7 +55,6 @@
   title: "Closed Form Formulas of the Indirect Space Charge Wake Function for Axisymmetric Structures"
   authors: "Mounet N., Zannini C., Dadiani E., et al."
   year: 2022
-  venue: "Proceedings of HB2021 (JACoW)"
   url: "https://cds.cern.ch/record/2841806/files/document.pdf?version=1"
   project: cern-wake
   first_author: false

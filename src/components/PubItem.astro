@@ -1,16 +1,16 @@
 ---
 import { pubLink, type Publication } from '../data/load';
-interface Props { pub: Publication; n: number }
+interface Props { pub: Publication; n?: number }
 const { pub, n } = Astro.props;
 const link = pubLink(pub);
 const authors = pub.authors.replace(/Dadiani E\./g, '<strong>Dadiani E.</strong>');
 ---
-<div class="pub grid12">
-  <div class="n">[{n}]</div>
+<div class:list={['pub', 'grid12', n === undefined && 'nonum']}>
+  {n !== undefined && <div class="n">[{n}]</div>}
   <div class="body">
     <span set:html={authors} />, {pub.year}.
     <span class="title">{pub.title}.</span>
-    <span class="venue">{pub.venue}.</span>
+    {pub.venue && <span class="venue">{pub.venue}.</span>}
   </div>
   <div class="links">
     {link && <a href={link.url} target="_blank" rel="noopener">{link.label}</a>}
@@ -20,6 +20,7 @@ const authors = pub.authors.replace(/Dadiani E\./g, '<strong>Dadiani E.</strong>
 <style>
   .pub { padding: 22px 0; border-top: 1px solid var(--rule); }
   .n { grid-column: span 1; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .nonum .body { grid-column: span 10; }
   .body { grid-column: span 9; font-size: 15px; line-height: 1.6; color: var(--text); }
   .body strong { color: var(--ink); font-weight: 500; }
   .title { font-weight: 500; color: var(--ink); }

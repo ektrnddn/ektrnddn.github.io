@@ -37,6 +37,6 @@ const ogImage = new URL(image, Astro.site);
     <Nav />
     <main><slot /></main>
     <Footer />
-    <FactsOrb />
+    {Astro.url.pathname === '/' && <FactsOrb />}
   </body>
 </html>

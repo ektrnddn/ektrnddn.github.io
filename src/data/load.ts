@@ -25,7 +25,7 @@ export interface Profile {
   links: Record<string, string>; research_interests: string[]; skills: { area: string; items: string }[]; hobbies: string[];
 }
 export interface Publication {
-  id: string; title: string; authors: string; year: number; venue: string;
+  id: string; title: string; authors: string; year: number; venue?: string;
   arxiv?: string; doi?: string; url?: string; project?: string;
   first_author: boolean; selected: boolean; extras?: { label: string; url: string }[];
 }
@@ -36,7 +36,7 @@ export interface Experience { role: string; org: string; place: string; start: s
 export interface Award { year: number | string; title: string; place?: string }
 export interface Fact { icon: string | string[]; text: string; link?: string; link_label?: string }
 export interface Photo { src: string; caption?: string; alt?: string }
-export interface Project { title: string; figure?: string; figure_alt?: string; link?: string; extra_link?: { label: string; url: string }; status?: string; description?: string }
+export interface Project { title: string; figure?: string; figure_alt?: string; link?: string; live?: string; status?: string; description?: string }
 export interface Projects { thesis: Project[]; earlier_text: string; earlier: string[] }
 
 export const profile = load<Profile>(profileRaw);

@@ -19,7 +19,7 @@ const talksSorted = talks.filter((t) => t.kind !== 'organizer').sort((a, b) => b
     {byYear.map(({ year, items }) => (
       <div class="year grid12">
         <div class="ylabel mono"><b>{year}</b></div>
-        <div class="ylist">{items.map(({ p, n }) => <PubItem pub={p} n={n} />)}</div>
+        <div class="ylist">{items.map(({ p, n }) => <PubItem pub={p} />)}</div>
       </div>
     ))}
   </section>
