@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Arrow from '../components/Arrow.astro';
+import Sketch from '../components/Sketch.astro';
 import { profile, facts, photos, highlight } from '../data/load';
 const links = [
   { href: '/research/', label: 'Research' },
@@ -11,24 +12,18 @@ const links = [
 ];
 ---
 <Base>
-  <section class="intro wrap">
-    {profile.photo && (
-      <div class="photo">
-        <img src={profile.photo} alt={profile.photo_alt ?? profile.name} width="520" height="640" fetchpriority="high" />
-      </div>
-    )}
-    <div class="text">
+  <section class="hero">
+    <div class="wrap text">
       <p class="greeting">{profile.greeting}</p>
       <h1 set:html={highlight(profile.intro)} />
-      {profile.intro_more && <p class="more">{profile.intro_more}</p>}
       <nav class="links" aria-label="Sections">
         {links.map((l) => <a href={l.href}>{l.label} <Arrow /></a>)}
       </nav>
     </div>
+    <Sketch />
   </section>
 
   <section class="facts wrap">
-    <div class="mono head"><b>A few things about me</b></div>
     <ul>
       {facts.map((f) => (
         <li>
@@ -55,33 +50,32 @@ const links = [
 </Base>
 
 <style>
-  .intro { padding-top: 96px; padding-bottom: 64px; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 56px; align-items: center; }
-  .intro:not(:has(.photo)) { grid-template-columns: minmax(0, 1fr); }
-  .photo { justify-self: end; width: min(100%, 360px); }
-  .photo img { width: 100%; height: auto; border: 1px solid var(--rule); background: var(--paper); padding: 10px; }
-  .text { display: flex; flex-direction: column; gap: 22px; max-width: 760px; }
-  .greeting { font-family: var(--serif); font-style: italic; font-size: 24px; color: var(--accent); }
-  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.38; letter-spacing: -.01em; text-wrap: pretty; }
-  h1 :global(.hl) { font-weight: 500; color: var(--ink); border-bottom: 1px solid #e6c9cc; }
-  .more { font-size: 17px; line-height: 1.6; color: var(--text); text-wrap: pretty; }
-  .links { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 6px; }
+  .hero { position: relative; }
+  .text { position: relative; z-index: 1; padding-top: 72px; display: flex; flex-direction: column; gap: 20px; max-width: calc(var(--max) - 0px); }
+  .greeting { font-family: var(--serif); font-style: italic; font-size: 24px; color: var(--ink); }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(22px, 2.1vw, 28px); line-height: 1.4; letter-spacing: -.005em; text-wrap: pretty; max-width: 620px; }
+  h1 :global(.hl) { font-weight: 500; color: var(--ink); border-bottom: 1px solid var(--rule); }
+  .links { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-top: 4px; }
   .links a { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
-  .links a:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+  .links a:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
+  .hero :global(.sketch) { margin-top: -300px; }
 
-  .facts { padding-top: 32px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 14px; }
-  .facts ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 40px; }
+  .facts { padding-top: 8px; padding-bottom: 24px; }
+  .facts ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
   .facts li { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--rule); font-size: 16px; line-height: 1.5; color: var(--text); }
-  .ico { flex: none; color: var(--accent); margin-top: 3px; }
+  .ico { flex: none; color: var(--ink); margin-top: 3px; }
 
-  .film { padding-top: 40px; display: flex; flex-direction: column; gap: 14px; }
+  .film { padding-top: 48px; display: flex; flex-direction: column; gap: 14px; }
   .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
   .strip figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
   .strip img { width: 100%; height: auto; border: 1px solid var(--rule); background: var(--paper); padding: 8px; }
 
+  @media (max-width: 1100px) { .hero :global(.sketch) { margin-top: -160px; } }
   @media (max-width: 900px) {
-    .intro { grid-template-columns: minmax(0, 1fr); padding-top: 40px; padding-bottom: 32px; gap: 28px; }
-    .photo { justify-self: start; width: min(100%, 260px); }
+    .text { padding-top: 36px; gap: 16px; }
     .greeting { font-size: 21px; }
-    .facts ul { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    h1 { font-size: 21px; }
+    .hero :global(.sketch) { margin-top: -70px; }
+    .facts ul { grid-template-columns: minmax(0, 1fr); }
   }
 </style>

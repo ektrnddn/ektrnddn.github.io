@@ -1,13 +1,13 @@
 /* Design tokens: direction A "Preprint". Warm off-white, ink, one crimson accent. */
 :root {
-  --bg: #faf8f4;
+  --bg: #ffffff;
   --paper: #ffffff;
-  --ink: #1a1714;
-  --text: #3d3833;
-  --muted: #6b645c;
-  --rule: #e3ddd4;
-  --accent: #8b1e2a;
-  --accent-dark: #5c1119;
+  --ink: #141414;
+  --text: #3a3a3a;
+  --muted: #6e6e6e;
+  --rule: #e6e6e6;
+  --accent: #141414;
+  --accent-dark: #000000;
   --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
   --sans: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
   --mono: 'IBM Plex Mono', Menlo, Consolas, monospace;
@@ -77,12 +77,12 @@ h1, h2, h3 { margin: 0; font-weight: 400; }
 .row .what ul { margin: 6px 0 0; padding-left: 18px; color: var(--text); }
 .row .what li + li { margin-top: 4px; }
 
-::selection { background: #f0d9dc; }
+::selection { background: #e9e9e9; }
 
 /* Status chips */
 .chip { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 5px 10px; border: 1px solid var(--rule); border-radius: 999px; color: var(--muted); white-space: nowrap; }
 .chip.published { border-color: #2f6b3a; color: #2f6b3a; }
-.chip.review { border-color: var(--accent); color: var(--accent); }
+.chip.review { border-color: var(--ink); color: var(--ink); }
 .chip.progress { border-color: #a0611a; color: #a0611a; }
 .chip.planned { border-color: var(--muted); }
 

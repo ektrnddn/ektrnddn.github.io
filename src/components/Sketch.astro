@@ -1,0 +1,78 @@
+---
+// A line drawing of layered ridges, a meadow and a small walking figure, drawn from
+// film photos taken in the Georgian mountains. Layers drift with the cursor.
+// Each ridge is drawn twice: a white fill (so nearer ridges hide farther lines) and
+// an open stroke along the ridge only, so no closing edges show.
+interface Ridge { k: number; cls: string; d: string; x0: number; x1: number; hints?: string[] }
+const ridges: Ridge[] = [
+  { k: 0.18, cls: 'far', x0: 560, x1: 1440, d: 'M560 470 C 660 440, 760 360, 880 340 S 1080 250, 1210 270 S 1350 190, 1440 205', hints: ['M760 372 C 800 352, 840 344, 872 342', 'M1230 262 C 1270 240, 1310 222, 1350 212'] },
+  { k: 0.38, cls: 'mid', x0: 470, x1: 1440, d: 'M470 512 C 600 488, 720 430, 850 418 S 1040 356, 1170 372 S 1330 310, 1440 335', hints: ['M900 420 C 940 402, 990 392, 1030 386', 'M1180 370 C 1230 350, 1280 336, 1330 322'] },
+  { k: 0.62, cls: 'near', x0: 0, x1: 520, d: 'M0 506 C 140 502, 290 526, 420 546 S 490 556, 520 556', hints: ['M120 512 C 180 514, 240 524, 300 532'] },
+  { k: 0.62, cls: 'near', x0: 850, x1: 1440, d: 'M850 566 C 960 528, 1120 452, 1440 408', hints: ['M1000 508 C 1060 486, 1120 470, 1180 458'] },
+];
+const meadow = 'M0 558 C 240 548, 480 566, 720 554 S 1120 542, 1440 558';
+const close = (r: Ridge) => `${r.d} L${r.x1} 620 L${r.x0} 620 Z`;
+---
+<div class="sketch" data-sketch aria-hidden="true">
+  <svg viewBox="0 0 1440 620" preserveAspectRatio="xMidYMax slice" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    {ridges.map((r) => (
+      <g data-layer={r.k} class:list={['l', r.cls]}>
+        <path class="f" d={close(r)} />
+        <path class="s" d={r.d} />
+        {r.hints?.map((h) => <path class="h" d={h} />)}
+      </g>
+    ))}
+    <g data-layer="1" class="l meadow">
+      <path class="f" d={`${meadow} L1440 620 L0 620 Z`} />
+      <path class="s" d={meadow} />
+      <path class="grass" d="M96 556 l-2 -12 M118 554 l3 -10 M300 560 l-1 -11 M330 561 l4 -9 M612 556 l-3 -12 M640 555 l2 -9 M902 550 l-2 -11 M930 549 l3 -10 M1180 552 l-2 -12 M1204 552 l3 -9 M1340 556 l-2 -11" />
+      <g class="flowers">
+        <path class="stem" d="M212 553 v-16 M405 559 v-13 M560 552 v-18 M818 548 v-14 M1048 546 v-16 M1275 552 v-13" />
+        <circle cx="212" cy="535" r="2.6" /><circle cx="405" cy="544" r="2.2" /><circle cx="560" cy="532" r="2.8" /><circle cx="818" cy="532" r="2.3" /><circle cx="1048" cy="528" r="2.6" /><circle cx="1275" cy="537" r="2.2" />
+      </g>
+      <g class="figure" transform="translate(478 556)">
+        <path class="body" d="M-1 -84 c-9 0 -14 7 -13 15 c0 6 4 10 6 12 c-3 3 -4 7 -3 10 c0.5 3 3 5 5 6 c2 3 2 7 1 11 c-1 5 -2 10 -3 16 c-2 8 -6 12 -8 14 c-1 1 0 2 1 2 h30 c1 0 2 -1 1 -2 c-3 -4 -5 -9 -6 -16 c-1 -6 -1 -12 0 -18 c1 -4 3 -6 4 -9 c1 -3 0 -6 -2 -8 c2 -3 4 -6 4 -11 c0 -8 -6 -16 -14 -16 z" />
+        <path class="limb" d="M-8 -50 c-3 8 -5 14 -6 20 M8 -48 c2 7 3 12 3 18 M-7 0 c-1 4 -2 8 -3 12 M6 0 c1 4 2 8 3 12" />
+      </g>
+    </g>
+  </svg>
+</div>
+<style>
+  .sketch { width: 100%; height: clamp(260px, 42vw, 560px); overflow: hidden; }
+  svg { width: 100%; height: 100%; display: block; }
+  .l { will-change: transform; }
+  .f { fill: #ffffff; stroke: none; }
+  .s { fill: none; stroke-width: 1.2; }
+  .h { fill: none; stroke-width: 1; opacity: .8; }
+  .far .s, .far .h { stroke: #cfcfcf; }
+  .mid .s, .mid .h { stroke: #a9a9a9; }
+  .near .s, .near .h { stroke: #707070; }
+  .meadow .s { stroke: #141414; stroke-width: 1.4; }
+  .grass { fill: none; stroke: #141414; stroke-width: 1; opacity: .7; }
+  .flowers .stem { fill: none; stroke: #141414; stroke-width: 1; opacity: .6; }
+  .flowers circle { fill: #d98aa0; stroke: none; }
+  .figure .body { fill: #141414; stroke: #141414; stroke-width: 1; }
+  .figure .limb { fill: none; stroke: #141414; stroke-width: 2.4; }
+  @media (max-width: 900px) { .sketch { height: clamp(240px, 72vw, 340px); } }
+</style>
+<script>
+  // Layers drift with the cursor (farther ridges move less) and breathe slowly on their own.
+  const root = document.querySelector<HTMLElement>('[data-sketch]');
+  if (root && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const layers = [...root.querySelectorAll<SVGGElement>('[data-layer]')].map((g) => ({ g, k: parseFloat(g.dataset.layer ?? '1') }));
+    let tx = 0, ty = 0, cx = 0, cy = 0;
+    window.addEventListener('pointermove', (e) => {
+      const r = root.getBoundingClientRect();
+      tx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width - 0.5) * 2));
+      ty = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height - 0.5) * 2));
+    }, { passive: true });
+    document.addEventListener('pointerleave', () => { tx = 0; ty = 0; });
+    const tick = (t: number) => {
+      const ax = tx + 0.25 * Math.sin(t / 4200), ay = ty + 0.18 * Math.cos(t / 5600);
+      cx += (ax - cx) * 0.045; cy += (ay - cy) * 0.045;
+      for (const { g, k } of layers) g.style.transform = `translate(${(cx * 16 * k).toFixed(2)}px, ${(cy * 7 * k).toFixed(2)}px)`;
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+</script>
