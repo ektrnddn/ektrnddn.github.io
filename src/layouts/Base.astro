@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import FactsOrb from '../components/FactsOrb.astro';
 import { profile } from '../data/load';
 
 interface Props { title?: string; description?: string; image?: string }
@@ -36,5 +37,6 @@ const ogImage = new URL(image, Astro.site);
     <Nav />
     <main><slot /></main>
     <Footer />
+    <FactsOrb />
   </body>
 </html>
