@@ -2,7 +2,7 @@
 // A small star on the right edge. It grows on hover; a click opens a panel with a few
 // personal facts. Closes on the ×, a click outside, or Escape.
 import Icon from './Icon.astro';
-import { facts } from '../data/load';
+import { facts, linkify } from '../data/load';
 ---
 <div class="forb" data-forb>
   <button type="button" class="knob" aria-label="A few things about me" aria-expanded="false" aria-controls="facts-panel" data-forb-btn>
@@ -10,14 +10,14 @@ import { facts } from '../data/load';
   </button>
   <div class="panel" id="facts-panel" role="dialog" aria-label="A few things about me" hidden>
     <div class="head">
-      <span class="mono">A few things about me</span>
+      <span class="title">A few things about me</span>
       <button type="button" class="close" aria-label="Close" data-forb-close><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg></button>
     </div>
     <ul>
       {facts.map((f) => (
-        <li>
-          <span class="ico">{(Array.isArray(f.icon) ? f.icon : [f.icon]).map((n) => <Icon name={n} size={18} />)}</span>
-          <span>{f.text} {f.link && <a href={f.link} target="_blank" rel="noopener">{f.link_label ?? f.link}</a>}</span>
+        <li class:list={[!f.text && 'icons']}>
+          <span class="ico">{(Array.isArray(f.icon) ? f.icon : [f.icon]).map((n) => <Icon name={n} size={f.text ? 18 : 26} />)}</span>
+          {f.text && <span set:html={linkify(f.text)} />}
         </li>
       ))}
     </ul>
@@ -35,12 +35,15 @@ import { facts } from '../data/load';
   .panel { position: absolute; right: 52px; top: 50%; width: min(380px, calc(100vw - 96px)); transform: translateY(-50%) scale(.92); transform-origin: right center; background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 18px 8px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.3); opacity: 0; transition: opacity .28s ease, transform .35s cubic-bezier(.2,.7,.2,1); }
   .panel[hidden] { display: block; visibility: hidden; pointer-events: none; }
   .forb.open .panel { opacity: 1; transform: translateY(-50%) scale(1); visibility: visible; pointer-events: auto; }
+  .title { font-size: 15px; color: var(--muted); }
   .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 6px; }
   .close { appearance: none; border: 0; background: none; color: var(--muted); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
   .close:hover { color: var(--ink); background: #f2f2f2; }
   ul { list-style: none; margin: 0; padding: 0; }
   li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 14.5px; line-height: 1.5; color: var(--text); }
   .ico { flex: none; color: var(--ink); display: inline-flex; gap: 5px; margin-top: 3px; }
+  li.icons { padding: 12px 0; }
+  li.icons .ico { margin-top: 0; gap: 12px; }
   li a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #c8c8c8; }
   li a:hover { text-decoration-color: var(--ink); }
   @media (max-width: 900px) {

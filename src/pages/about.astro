@@ -5,13 +5,12 @@ import Arrow from '../components/Arrow.astro';
 import { profile, education, grants, experience, awards, talks } from '../data/load';
 import lastBuilt from '../../public/cv/last-built.txt?raw';
 const pdf = '/cv/Ekaterine_Dadiani_CV.pdf';
-const kinds: Record<string, string> = { talk: 'Talk', organizer: 'Organiser', school: 'School', workshop: 'Workshop' };
-const talksSorted = talks.filter((t) => t.kind !== 'organizer').sort((a, b) => b.year - a.year);
+const kinds: Record<string, string> = { talk: 'Talk', school: 'School', workshop: 'Workshop' };
+const talksSorted = [...talks].sort((a, b) => b.year - a.year);
 const outreach = [
-  { when: 'ongoing', what: 'Host, Astronomy on Tap Pittsburgh', where: 'Public astronomy talks in a pub' },
+  { when: '2025 – present', what: 'Organising committee, Astronomy on Tap Pittsburgh', where: 'Public astronomy talks in a pub' },
   { when: '2024', what: 'Organiser, International Conference of Physics Students (ICPS)', where: 'Tbilisi, Georgia' },
-  { when: '2019', what: 'Local jury and organising committee, International Young Physicists’ Tournament', where: 'Tbilisi, Georgia' },
-  { when: '2017 – 2018', what: 'Physics teacher, Experimentorium science museum', where: 'Tbilisi, Georgia' },
+  { when: '2019', what: 'Local jury and organising committee, International Young Physicists’ Tournament (IYPT)', where: 'Tbilisi, Georgia' },
 ];
 ---
 <Base title="About me" description={`About ${profile.name}: education, research experience, fellowships, talks and awards.`}>
@@ -41,12 +40,13 @@ const outreach = [
   <section class="wrap">
     <SectionHead title="Research and work" />
     <div class="rows">
-      {experience.filter((x) => !/Teacher|Jury/.test(x.role)).map((x) => (
+      {experience.map((x) => (
         <div class="row grid12 r">
           <div class="years">{x.start}{x.end !== x.start && ` – ${x.end}`}</div>
           <div class="what">
             <b>{x.role}</b>, {x.org}, {x.place}.
             {x.bullets && <ul>{x.bullets.map((b) => <li>{b}</li>)}</ul>}
+            {x.links && <div class="xlinks">{x.links.map((l) => <a href={l.url} target="_blank" rel="noopener">{l.label}</a>)}</div>}
           </div>
         </div>
       ))}
@@ -149,6 +149,7 @@ const outreach = [
   .r .what { grid-column: span 10; }
   .r .what b { font-weight: 500; }
   .kind { margin-right: 6px; }
+  .xlinks { display: flex; gap: 16px; font-size: 14px; margin-top: 6px; }
   .interests { padding-top: 20px; max-width: 800px; }
   .cvbox { margin-top: 72px; padding-top: 32px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 32px; flex-wrap: wrap; }
   .cvbox h2 { font-size: 26px; margin-bottom: 8px; }

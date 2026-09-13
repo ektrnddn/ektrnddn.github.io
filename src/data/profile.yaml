@@ -45,7 +45,7 @@ collaborations:
     role: Project 249, Searching for Massive Black Hole Binaries in DESI
     since: 2023
   - name: LISA Consortium
-    role: Astrophysics Working Group
+    role: Astrophysics Working Group; modelling dual AGN hosts and predicting massive black hole binary events with electromagnetic counterparts
     since: 2023
 links:
   github: https://github.com/ektrnddn
@@ -62,10 +62,10 @@ research_interests:
   - Synthetic observation pipelines and machine learning in astrophysics
   - Cosmological simulations
 skills:
-  - { area: Languages, items: "Python, SQL, Bash, LaTeX" }
+  - { area: Languages, items: "Python, SQL, C++, Bash, LaTeX" }
   - { area: Machine learning and data, items: "PyTorch, TensorFlow, scikit-learn, NumPy, Pandas, SciPy, Astropy; autoencoders and unsupervised anomaly detection; image processing for wide-field surveys" }
   - { area: Statistics, items: "Bayesian inference, MCMC, hierarchical models, time-series analysis, hypothesis testing on large catalogues" }
-  - { area: Simulation and computing, items: "Cosmological and N-body simulations (ASTRID), HDF5, HPC and Slurm, Git, Jupyter" }
+  - { area: Simulation and computing, items: "Cosmological and N-body simulations (ASTRID), HDF5, HPC and Slurm, Git and GitHub, Jupyter" }
 hobbies:
   - Film photography
   - Skiing

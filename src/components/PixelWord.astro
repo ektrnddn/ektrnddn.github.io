@@ -33,10 +33,15 @@ const render = (word: string) => {
 };
 const rendered = lines.map(render);
 const maxCols = Math.max(...rendered.map((r) => r.cols));
+// Where the last letter's stem and base bar sit (for the footer sticker), in the last line's units.
+const lastWord = (lines[lines.length - 1] ?? '').toUpperCase();
+const lastGlyph = FONT[lastWord[lastWord.length - 1]] ?? FONT[' '];
+const lastBase = (lastWord.length - 1) * 6;
+const anchor = { stemRight: (lastBase + lastGlyph[1].indexOf('1')) * pitch + cell, capBottom: cell, barTop: (rows - 1) * pitch, barRight: (lastBase + lastGlyph[rows - 1].lastIndexOf('1')) * pitch + cell };
 ---
 <div class="pixelword" data-pixelword aria-hidden="true">
   {rendered.map((line, i) => (
-    <svg viewBox={`0 0 ${line.W} ${line.H}`} preserveAspectRatio="xMidYMid meet" style={`width:${(line.cols / maxCols) * 100}%`}>
+    <svg viewBox={`0 0 ${line.W} ${line.H}`} preserveAspectRatio="xMidYMid meet" style={`width:${(line.cols / maxCols) * 100}%`} data-anchor={i === rendered.length - 1 ? JSON.stringify(anchor) : undefined}>
       {line.bars.map((b) => <rect x={b.x} y={b.y} width={b.w} height={cell} rx="2" style={`--d:${(i * rows + b.r) * 45}ms`} />)}
     </svg>
   ))}

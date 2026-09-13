@@ -14,7 +14,6 @@ const talksSorted = talks.filter((t) => t.kind !== 'organizer').sort((a, b) => b
 <Base title="Publications" description="Papers and talks by Ekaterine Dadiani.">
   <section class="wrap">
     <SectionHead title="Publications">
-      <span class="mono aside-link">{publications.length} papers</span>
     </SectionHead>
     {byYear.map(({ year, items }) => (
       <div class="year grid12">

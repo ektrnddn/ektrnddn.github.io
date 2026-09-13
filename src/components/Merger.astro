@@ -40,7 +40,7 @@ const steps = [
   <ol class="notes">
     {steps.map((st, i) => (
       <li class="note" data-step={i}>
-        <div class="mono stage">{String(i + 1).padStart(2, '0')} · {st.name}</div>
+        <div class="mono stage">{st.name}</div>
         <p>{st.text}</p>
       </li>
     ))}

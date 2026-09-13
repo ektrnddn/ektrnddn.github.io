@@ -6,17 +6,6 @@ const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 
 const external = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
 ---
 <footer id="contact" class="footer">
-  <div class="wrap word"><PixelWord lines={['EKATERINE', 'DADIANI']} /></div>
-  <div class="wrap rise" data-rise>
-    <div class="riser"><Doodle /></div>
-    <div class="note" aria-hidden="true">
-      <span class="mono cap">as drawn by a friend</span>
-      <svg class="arrow" viewBox="0 0 110 80" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-        <path pathLength="1" class="curve" d="M100 6 C 96 30, 70 46, 40 52 C 30 54, 22 60, 16 70" />
-        <path pathLength="1" class="head" d="M10 60 l6 11 l11 -5" />
-      </svg>
-    </div>
-  </div>
   <div class="wrap bottom">
     <div class="left">
       <span class="mono">© {new Date().getFullYear()}</span>
@@ -27,32 +16,71 @@ const external = Object.entries(profile.links).filter(([, v]) => typeof v === 's
       {external.map(([k, v]) => <a href={v} rel="me noopener" target="_blank">{labels[k] ?? k}</a>)}
     </div>
   </div>
+  <div class="wrap word" data-word>
+    <PixelWord lines={['EKATERINE', 'DADIANI']} />
+    <!-- The sketch stands on the base of the last I, as tall as its stem; placed by the script below. -->
+    <div class="tag" data-tag><Doodle /></div>
+    <div class="note" data-note aria-hidden="true">
+      <span class="mono cap">as drawn<br />by a friend</span>
+      <svg class="arrow" viewBox="0 0 60 56" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+        <path pathLength="1" class="curve" d="M50 4 C 52 20, 40 34, 24 40 C 18 42, 12 46, 8 52" />
+        <path pathLength="1" class="head" d="M4 44 l4 9 l9 -3" />
+      </svg>
+    </div>
+  </div>
 </footer>
 <style>
   .footer { margin-top: 96px; }
-  .word { padding-top: 56px; padding-bottom: 0; }
-  .rise { position: relative; height: 200px; margin-top: -96px; overflow: hidden; z-index: 1; }
-  .riser { position: absolute; right: 150px; bottom: 0; transform: translateY(104%); transition: transform 1.3s cubic-bezier(.2,.7,.2,1); }
-  .rise.up .riser { transform: none; }
-  .riser :global(.doodle svg) { max-width: 132px; }
-  .riser :global(.doodle figcaption) { display: none; }
-  .note { position: absolute; right: 0; top: 14px; width: 150px; color: #d9d9d9; }
-  .note .cap { display: block; color: #cfcfcf; opacity: 0; transition: opacity .5s ease 3.2s; white-space: nowrap; }
-  .note .arrow { width: 96px; height: auto; display: block; margin: 2px 0 0 -6px; }
-  .note .arrow path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .7s cubic-bezier(.4,0,.2,1) 3.4s; }
-  .note .arrow .head { transition-delay: 4s; transition-duration: .3s; }
-  .rise.up .note .cap { opacity: 1; }
-  .rise.up .note .arrow path { stroke-dashoffset: 0; }
-  .bottom { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 40px; border-top: 1px solid var(--rule); }
+  .bottom { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 48px; border-top: 1px solid var(--rule); }
   .left { display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap; }
   .aff { font-size: 13px; color: var(--muted); }
   .links { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; }
   .links a { color: var(--muted); }
   .links a.mail { color: var(--ink); }
   .links a:hover { color: var(--accent); }
-  @media (max-width: 900px) { .footer { margin-top: 64px; } .word { padding-top: 36px; } .rise { height: 170px; margin-top: -40px; } .riser { right: 120px; } .riser :global(.doodle svg) { max-width: 110px; } .note { width: 120px; top: 10px; } .note .cap { white-space: normal; font-size: 10px; } .note .arrow { width: 80px; } .links { gap: 14px; } }
+  .word { position: relative; padding-bottom: 0; }
+  .tag { position: absolute; left: 0; top: 0; height: 0; visibility: hidden; }
+  .tag.placed { visibility: visible; }
+  .tag :global(.doodle) { height: 100%; }
+  .tag :global(.doodle svg) { width: auto; height: 100%; max-width: none; }
+  .tag :global(.doodle figcaption) { display: none; }
+  .tag :global(.doodle .ground) { display: none; }
+  .tag :global(.doodle .ground.cat) { display: block; }
+  .note { position: absolute; left: 0; top: 0; width: 84px; color: #d9d9d9; visibility: hidden; }
+  .note.placed { visibility: visible; }
+  .note .cap { display: block; color: #cfcfcf; font-size: 10px; line-height: 1.35; opacity: 0; transition: opacity .5s ease 2.6s; }
+  .note .arrow { width: 44px; height: auto; display: block; margin: 2px 0 0 -14px; }
+  .note .arrow path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .7s cubic-bezier(.4,0,.2,1) 2.8s; }
+  .note .arrow .head { transition-delay: 3.4s; transition-duration: .3s; }
+  .word.up .note .cap { opacity: 1; }
+  .word.up .note .arrow path { stroke-dashoffset: 0; }
+  @media (max-width: 900px) { .footer { margin-top: 64px; } .bottom { padding-bottom: 32px; } .links { gap: 14px; } .note { display: none; } }
 </style>
 <script>
-  const rise = document.querySelector<HTMLElement>('[data-rise]');
-  if (rise) { const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { rise.classList.add('up'); io.disconnect(); } }), { threshold: 0.6 }); io.observe(rise); }
+  // Put the sketch on the base bar of the last letter, right of its stem, as tall as the gap
+  // between the letter's top and base bars; the caption sits just past the cat.
+  const word = document.querySelector<HTMLElement>('[data-word]');
+  if (word) {
+    const svg = word.querySelector<SVGSVGElement>('svg[data-anchor]');
+    const tag = word.querySelector<HTMLElement>('[data-tag]');
+    const note = word.querySelector<HTMLElement>('[data-note]');
+    if (svg && tag && note) {
+      const a = JSON.parse(svg.dataset.anchor ?? '{}');
+      const place = () => {
+        const r = svg.getBoundingClientRect(), w = word.getBoundingClientRect();
+        const s = r.width / svg.viewBox.baseVal.width;
+        const h = (a.barTop - a.capBottom) * s;              // the stem's height
+        const left = r.left - w.left + (a.stemRight + 2) * s;
+        const top = r.top - w.top + a.barTop * s - h * 0.93;  // feet sit on the base bar
+        Object.assign(tag.style, { left: `${left}px`, top: `${top}px`, height: `${h}px` });
+        tag.classList.add('placed');
+        const tw = h * 330 / 430;
+        Object.assign(note.style, { left: `${left + tw + 8}px`, top: `${top + h * 0.12}px` });
+        note.classList.add('placed');
+      };
+      place(); new ResizeObserver(place).observe(word);
+      const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { word.classList.add('up'); io.disconnect(); } }), { threshold: 0.5 });
+      io.observe(word);
+    }
+  }
 </script>

@@ -32,9 +32,9 @@ export interface Publication {
 export interface Talk { year: number; kind: string; event: string; place: string }
 export interface Education { degree: string; institution: string; place: string; start: number; end: number | string; note?: string }
 export interface Grant { name: string; body: string; years: string | number; note?: string }
-export interface Experience { role: string; org: string; place: string; start: string | number; end: string | number; bullets?: string[] }
+export interface Experience { role: string; org: string; place: string; start: string | number; end: string | number; bullets?: string[]; links?: { label: string; url: string }[] }
 export interface Award { year: number | string; title: string; place?: string }
-export interface Fact { icon: string | string[]; text: string; link?: string; link_label?: string }
+export interface Fact { icon: string | string[]; text: string }
 export interface Photo { src: string; caption?: string; alt?: string }
 export interface Project { title: string; figure?: string; figure_alt?: string; link?: string; live?: string; status?: string; description?: string }
 export interface Projects { thesis: Project[]; earlier_text: string; earlier: string[] }
@@ -50,6 +50,8 @@ export const facts = load<Fact[]>(factsRaw);
 export const photos = (load<Photo[] | null>(photosRaw) ?? []);
 export const projects = load<Projects>(projectsRaw);
 
+// [label](url) → link. Content comes from our own YAML, so set:html is safe.
+export const linkify = (s: string) => s.replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 // [[text]] → highlighted span. Content comes from our own YAML, so set:html is safe.
 export const highlight = (s: string) => s.replace(/\[\[(.+?)\]\]/g, '<strong class="hl">$1</strong>');
 
