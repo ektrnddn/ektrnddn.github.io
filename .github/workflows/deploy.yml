@@ -3,12 +3,13 @@
 # Triggers:
 #   - every push to main
 #   - "cv-updated" dispatch sent by the CV repository (see docs/cv-repo-workflow.yml)
-#   - a weekly safety-net run, so the CV PDF never drifts far from the LaTeX source
+#   - a daily run, so the CV PDF follows the LaTeX source within a day
 #   - manual runs from the Actions tab
 #
 # The CV step needs one repository secret, CV_REPO_TOKEN: a fine-grained personal
 # access token with read access to ektrnddn/Ekaterine_Dadiani_CV (Contents: read).
-# Without it the build still succeeds and keeps the committed PDF in public/cv/.
+# Without it, or if the LaTeX fails to compile, the build still succeeds and keeps the
+# committed PDF in public/cv/.
 
 name: Build and deploy
 
@@ -18,7 +19,7 @@ on:
   repository_dispatch:
     types: [cv-updated]
   schedule:
-    - cron: "17 5 * * 1"
+    - cron: "17 5 * * *"
   workflow_dispatch:
 
 permissions:
@@ -55,14 +56,16 @@ jobs:
           echo "Root file: $root"
 
       - name: Compile CV
+        id: compile
         if: env.CV_TOKEN != ''
+        continue-on-error: true
         uses: xu-cheng/latex-action@v3
         with:
           working_directory: cv-src
           root_file: ${{ steps.cvroot.outputs.root }}
 
       - name: Place the CV PDF in the site
-        if: env.CV_TOKEN != ''
+        if: env.CV_TOKEN != '' && steps.compile.outcome == 'success'
         run: |
           pdf="cv-src/${{ steps.cvroot.outputs.root }}"
           pdf="${pdf%.tex}.pdf"

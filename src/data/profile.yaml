@@ -48,11 +48,11 @@ collaborations:
     role: Astrophysics Working Group; modelling dual AGN hosts and predicting massive black hole binary events with electromagnetic counterparts
     since: 2023
 links:
+  ads: "https://ui.adsabs.harvard.edu/search/fq=%7B!type%3Daqp%20v%3D%24fq_database%7D&fq_database=(database%3Aastronomy%20OR%20database%3Aphysics)&q=%20author%3A%22ekaterine%20dadiani%22&sort=date%20desc%2C%20bibcode%20desc&p_=0"
+  orcid: https://orcid.org/0000-0001-6586-4297
   github: https://github.com/ektrnddn
-  ads: "TODO: NASA ADS library or author query URL"
-  scholar: "TODO: Google Scholar profile URL"
   linkedin: https://www.linkedin.com/in/eka-dadiani
-  orcid: "TODO: ORCID iD (optional)"
+  scholar: "TODO: Google Scholar profile URL"
 research_interests:
   - Massive black hole physics and merger dynamics
   - Electromagnetic counterparts of gravitational-wave events
@@ -62,7 +62,7 @@ research_interests:
   - Synthetic observation pipelines and machine learning in astrophysics
   - Cosmological simulations
 skills:
-  - { area: Languages, items: "Python, SQL, C++, Bash, LaTeX" }
+  - { area: Languages, items: "Python (primary), SQL, Bash, LaTeX" }
   - { area: Machine learning and data, items: "PyTorch, TensorFlow, scikit-learn, NumPy, Pandas, SciPy, Astropy; autoencoders and unsupervised anomaly detection; image processing for wide-field surveys" }
   - { area: Statistics, items: "Bayesian inference, MCMC, hierarchical models, time-series analysis, hypothesis testing on large catalogues" }
   - { area: Simulation and computing, items: "Cosmological and N-body simulations (ASTRID), HDF5, HPC and Slurm, Git and GitHub, Jupyter" }

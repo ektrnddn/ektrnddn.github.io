@@ -19,7 +19,7 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
           <div class="entry" data-entry={i} aria-hidden={i === 0 ? undefined : 'true'}>
             <h2>{p.title}</h2>
             <div class="links">
-              {p.link && <a href={p.link} target="_blank" rel="noopener" class="go">Read the full story <Arrow /></a>}
+              {p.link && <a href={p.link} target="_blank" rel="noopener" class="go">Read the paper <Arrow /></a>}
               {p.live && <a href={p.live} target="_blank" rel="noopener" class="go alt" data-live-open={i}>Interactive figure <Arrow kind="ext" /></a>}
               {!p.link && p.status && <span class="mono status">{p.status}</span>}
             </div>
@@ -70,7 +70,7 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
   .go:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
   .go.alt { color: var(--muted); border-color: var(--muted); font-weight: 400; }
   .status { color: var(--muted); }
-  .deck { position: relative; height: 640px; perspective: 1200px; cursor: grab; touch-action: pan-x; user-select: none; -webkit-user-select: none; outline: none; }
+  .deck { position: relative; height: 640px; perspective: 1200px; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; outline: none; }
   .deck:focus-visible { outline: 1px solid var(--ink); outline-offset: 8px; }
   .deck.dragging { cursor: grabbing; }
   .card { position: absolute; left: calc(50% + clamp(0px, (100% - 680px) / 2, 44px)); top: 50%; width: min(100%, 680px); aspect-ratio: 4 / 3; margin-left: min(-50%, -340px); margin-top: -255px; border-radius: 18px; background: #efefef; overflow: hidden; display: flex; align-items: center; justify-content: center; will-change: transform, opacity; transition: box-shadow .3s; }
@@ -101,7 +101,7 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
     .thesis { padding-top: 32px; padding-bottom: 28px; }
     .stage { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-top: 32px; min-height: 0; }
     .deck { height: 380px; }
-    .card { left: 50%; width: min(100%, 320px); margin-left: min(-50%, -160px); margin-top: -120px; }
+    .card { left: 50%; width: min(100%, 320px); margin-left: calc(min(100%, 320px) / -2); margin-top: -120px; }
     .info { min-height: 130px; }
     .expand { opacity: 1; }
   }
@@ -109,23 +109,18 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
   .earlier .prose { max-width: 800px; padding-top: 20px; padding-bottom: 28px; font-size: 17px; }
   .earlier :global(.ref) { color: var(--accent); font-family: var(--mono); font-size: 13px; }
   .pubs :global(.pub:last-child) { border-bottom: 1px solid var(--rule); }
-  @media (max-width: 900px) {
-    .top { padding-top: 32px; }
-    .strip { padding-top: 16px; }
-    .track { gap: 18px; }
-    .card { width: 240px; }
-  }
 </style>
 
 <script>
   // A vertical stack of cards: the current one sits full size, the others flatten into
-  // slabs above and below. Wheel, drag, arrow keys or a click on a slab move the stack.
+  // slabs above and below. Wheel, drag, arrow keys or a click on a slab move the stack; on a
+  // touch screen a sideways swipe does, and an upward one scrolls the page.
   const deck = document.querySelector<HTMLElement>('[data-deck]');
   if (deck) {
     const cards = [...deck.querySelectorAll<HTMLElement>('[data-card]')];
     const entries = [...document.querySelectorAll<HTMLElement>('[data-entry]')];
     const n = cards.length;
-    let target = 0, pos = 0, dragging = false, startY = 0, startPos = 0, moved = 0, wheelAcc = 0, wheelT = 0;
+    let target = 0, pos = 0, dragging = false, touch = false, downCard: HTMLElement | null = null, startX = 0, startY = 0, startPos = 0, moved = 0, wheelAcc = 0, wheelT = 0;
     const clamp = (v: number) => Math.max(0, Math.min(n - 1, v));
     const show = (i: number) => entries.forEach((e, k) => { e.classList.toggle('on', k === i); e.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
     const layout = () => {
@@ -156,8 +151,8 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
       if (Math.abs(wheelAcc) > 60 && now - wheelT > 350) { go(target + Math.sign(wheelAcc)); wheelAcc = 0; wheelT = now; }
       if (Math.abs(wheelAcc) > 400) wheelAcc = 0;
     }, { passive: false });
-    deck.addEventListener('pointerdown', (e) => { dragging = true; startY = e.clientY; startPos = pos; moved = 0; deck.classList.add('dragging'); deck.setPointerCapture(e.pointerId); });
-    deck.addEventListener('pointermove', (e) => { if (!dragging) return; const dy = e.clientY - startY; moved = Math.max(moved, Math.abs(dy)); pos = clamp(startPos - dy / (deck.clientHeight * 0.42)); });
+    deck.addEventListener('pointerdown', (e) => { dragging = true; touch = e.pointerType === 'touch'; downCard = (e.target as HTMLElement).closest<HTMLElement>('[data-card]'); startX = e.clientX; startY = e.clientY; startPos = pos; moved = 0; deck.classList.add('dragging'); deck.setPointerCapture(e.pointerId); });
+    deck.addEventListener('pointermove', (e) => { if (!dragging) return; const d = touch ? e.clientX - startX : e.clientY - startY; moved = Math.max(moved, Math.abs(d)); pos = clamp(startPos - d / (touch ? deck.clientWidth * 0.6 : deck.clientHeight * 0.42)); });
     // Zoom: the active card's figure flies out to a large centred view and back.
     const zoom = document.querySelector<HTMLElement>('[data-zoom]')!;
     const zimg = zoom.querySelector<HTMLImageElement>('[data-zimg]')!;
@@ -213,11 +208,12 @@ const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, '<a class="ref" 
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(); });
     const end = (e: PointerEvent) => {
       if (!dragging) return; dragging = false; deck.classList.remove('dragging');
+      if (e.type === 'pointercancel') { go(pos); return; }
       if (moved < 6) {
-        const c = (e.target as HTMLElement).closest<HTMLElement>('[data-card]');
+        const c = downCard;                          // the deck holds the pointer, so the release lands on it
         if (c) { const i = Number(c.dataset.card); if (i === target && c.querySelector('img')) openZoom(c); else go(i); return; }
       }
-      go(pos + (pos - startPos > 0 ? 0.3 : -0.3) * Math.sign(pos - startPos));
+      go(pos + 0.3 * Math.sign(pos - startPos));
     };
     deck.addEventListener('pointerup', end); deck.addEventListener('pointercancel', end);
     deck.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); go(target + 1); } if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); go(target - 1); } });

@@ -2,18 +2,16 @@
 import Base from '../layouts/Base.astro';
 import SectionHead from '../components/SectionHead.astro';
 import Arrow from '../components/Arrow.astro';
-import { profile, education, grants, experience, awards, talks } from '../data/load';
+import { profile, education, grants, experience, awards } from '../data/load';
 import lastBuilt from '../../public/cv/last-built.txt?raw';
 const pdf = '/cv/Ekaterine_Dadiani_CV.pdf';
-const kinds: Record<string, string> = { talk: 'Talk', school: 'School', workshop: 'Workshop' };
-const talksSorted = [...talks].sort((a, b) => b.year - a.year);
 const outreach = [
   { when: '2025 – present', what: 'Organising committee, Astronomy on Tap Pittsburgh', where: 'Public astronomy talks in a pub' },
   { when: '2024', what: 'Organiser, International Conference of Physics Students (ICPS)', where: 'Tbilisi, Georgia' },
   { when: '2019', what: 'Local jury and organising committee, International Young Physicists’ Tournament (IYPT)', where: 'Tbilisi, Georgia' },
 ];
 ---
-<Base title="About me" description={`About ${profile.name}: education, research experience, fellowships, talks and awards.`}>
+<Base title="About me" description={`About ${profile.name}: education, research experience, fellowships and awards.`}>
   <section class="wrap top">
     <h1>About me</h1>
     <p class="lede">{profile.bio}</p>
@@ -78,18 +76,6 @@ const outreach = [
   </section>
 
   <section class="wrap">
-    <SectionHead title="Talks" />
-    <div class="rows">
-      {talksSorted.map((t) => (
-        <div class="row grid12 r">
-          <div class="years">{t.year}</div>
-          <div class="what"><span class="mono kind">{kinds[t.kind] ?? t.kind}</span> {t.event} <span class="note">· {t.place}</span></div>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <section class="wrap">
     <SectionHead title="Outreach and service" />
     <div class="rows">
       {outreach.map((o) => (
@@ -148,7 +134,6 @@ const outreach = [
   .r .years { grid-column: span 2; }
   .r .what { grid-column: span 10; }
   .r .what b { font-weight: 500; }
-  .kind { margin-right: 6px; }
   .xlinks { display: flex; gap: 16px; font-size: 14px; margin-top: 6px; }
   .interests { padding-top: 20px; max-width: 800px; }
   .cvbox { margin-top: 72px; padding-top: 32px; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 32px; flex-wrap: wrap; }

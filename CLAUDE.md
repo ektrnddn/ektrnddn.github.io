@@ -71,7 +71,7 @@ The old crimson `#8F1D28` is gone.
 
 - Content: `src/data/*.yaml` (loaded through `src/data/load.ts`). `[label](url)` in
   facts makes a link; `[[text]]` in the intro highlights.
-- About/Talks mirror the CV. The CV source is the private Overleaf repo
+- About and the talks on Publications mirror the CV (talks appear only on Publications). The CV source is the private Overleaf repo
   `ektrnddn/Ekaterine_Dadiani_CV` (`main.tex`); read it with
   `gh api repos/ektrnddn/Ekaterine_Dadiani_CV/contents/main.tex --jq .content | base64 -d`
   and update the YAML to match when asked. Entries not in the CV are dropped.
