@@ -1,0 +1,9 @@
+# Python packages for the merger film (numpy, scipy, numba, pyyaml, pillow come with Anaconda).
+numpy
+scipy
+numba
+pyyaml
+pillow
+pytreegrav      # tree gravity for galaxies.py
+skia-python     # drawing for render.py
+imageio-ffmpeg  # ffmpeg with x264 and VP9

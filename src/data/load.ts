@@ -10,6 +10,7 @@ import awardsRaw from './awards.yaml?raw';
 import factsRaw from './facts.yaml?raw';
 import photosRaw from './photos.yaml?raw';
 import projectsRaw from './projects.yaml?raw';
+import movieRaw from './movie.yaml?raw';
 
 function load<T>(raw: string): T {
   return yaml.load(raw) as T;
@@ -38,6 +39,7 @@ export interface Fact { icon: string | string[]; text: string }
 export interface Photo { src: string; caption?: string; alt?: string }
 export interface Project { title: string; figure?: string; figure_alt?: string; link?: string; live?: string; status?: string; description?: string }
 export interface Projects { thesis: Project[]; earlier_text: string; earlier: string[] }
+export interface Chapter { name: string; scale: string; at: number; text: string; projects: string[] }
 
 export const profile = load<Profile>(profileRaw);
 export const publications = load<Publication[]>(publicationsRaw);
@@ -49,6 +51,9 @@ export const awards = load<Award[]>(awardsRaw);
 export const facts = load<Fact[]>(factsRaw);
 export const photos = (load<Photo[] | null>(photosRaw) ?? []);
 export const projects = load<Projects>(projectsRaw);
+export const movie = load<{ chapters: Chapter[] }>(movieRaw);
+// A project named in movie.yaml, with its link or status from projects.yaml.
+export const projectByTitle = (title: string): Project => projects.thesis.find((p) => p.title === title) ?? { title };
 
 // [label](url) → link. Content comes from our own YAML, so set:html is safe.
 export const linkify = (s: string) => s.replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');

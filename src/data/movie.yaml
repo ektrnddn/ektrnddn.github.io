@@ -1,0 +1,23 @@
+# The merger film on the home page (docs/movie renders it into public/movie/). Beside it, one
+# note per stage: the sentence and the projects on that stage (titles as in projects.yaml, which
+# gives their links or status). `at` is the second the stage starts in the film.
+chapters:
+  - name: Dual AGN
+    scale: kpc
+    at: 0
+    text: "Two galaxies collide. Gas pours onto both black holes and they light up a few kiloparsecs apart: a dual AGN."
+    projects:
+      - "Cosmic Pairs: a DESI census of dual and offset AGN as precursors to massive black hole binaries"
+      - "z ∼ 2 dual AGN host galaxies are disky: stellar kinematics in the ASTRID Simulation"
+  - name: Binary
+    scale: sub-pc
+    at: 17.5
+    text: The galaxies become one. The black holes sink to the centre and bind into a binary less than a parsec across, too close for any telescope, not for spectroscopy.
+    projects:
+      - "Cosmic Pairs: a DESI census of massive black hole binaries"
+  - name: Merger
+    scale: gravitational waves
+    at: 24
+    text: The binary spirals in and merges, sending out the gravitational waves that LISA and pulsar timing arrays will hear.
+    projects:
+      - "Connecting current and future dual AGN searches to LISA and PTA gravitational wave detections"

@@ -11,3 +11,6 @@ _archive/
 .vscode/
 .idea/
 *.log
+
+# python
+__pycache__/

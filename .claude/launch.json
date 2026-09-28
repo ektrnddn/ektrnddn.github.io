@@ -15,13 +15,12 @@
     },
     {
       "name": "dist-preview",
-      "runtimeExecutable": "python3",
+      "runtimeExecutable": "npx",
       "runtimeArgs": [
-        "-m",
-        "http.server",
-        "8792",
-        "--directory",
-        "dist"
+        "astro",
+        "preview",
+        "--port",
+        "8792"
       ],
       "port": 8792
     }

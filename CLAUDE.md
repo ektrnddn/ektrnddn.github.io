@@ -42,8 +42,9 @@ Monochrome. Tokens live in `src/styles/global.css`:
 | `--rose`   | `#d98aa0` | the meadow flowers; the only colour   |
 
 If something needs colour, use `--rose` and nothing else: exactly `#d98aa0`, no tints.
-It is used for the flowers in the drawing and for the explorer's "Read the paper" button
-(ink text on rose). The old crimson `#8F1D28` is gone.
+It is used for the flowers in the drawing, for the explorer's "Read the paper" button
+(ink text on rose) and, in the movie, for black holes that are accreting (AGN light).
+The old crimson `#8F1D28` is gone.
 
 ## Interactions that exist (keep them working)
 
@@ -51,8 +52,14 @@ It is used for the flowers in the drawing and for the explorer's "Read the paper
   cursor like a black hole and fade at the horizon; a click on the sky sets them
   floating freely, another click calls them home; no constellation lines. Hovering the
   walker makes her raise binoculars. Drawing layers parallax with the cursor.
-- Home, after the drawing: "See the research" pinned beside the scroll-driven galaxy
-  merger (Dual AGN, Binary, Merger), then "See the publications", "About me".
+- Home, after the drawing: "See the research", then the film (`src/components/Movie.astro`)
+  beside the three stages: Dual AGN (kpc), Binary (sub-pc), Merger (gravitational waves),
+  each with its sentence and the projects on it (linked from `projects.yaml`). The stage on
+  screen is lit and its hairline fills; a click on a stage plays its part. The film is one
+  ~30 s take from far away, with no words: the merger, the two AGN lighting up in rose, one
+  point once they are too close to tell apart, the light going out, gravitational-wave rings
+  leaving the remnant, a faint light again. It plays while on screen (a click or the round
+  button toggles). Then "See the publications", "About me".
 - Floating star (facts panel) only on the home page; it is draggable.
 - Research: vertical card stack; the Cosmic Pairs card opens the live explorer in the
   zoom overlay. Nav orb next to the name unfolds Email (copies) / GitHub / LinkedIn.
@@ -72,6 +79,21 @@ It is used for the flowers in the drawing and for the explorer's "Read the paper
   `docs/scene/build_sketch.py` (stars, interactions, CSS), then run
   `python3 docs/scene/scene_gen.py docs/scene && python3 docs/scene/build_sketch.py docs/scene src/components/Sketch.astro`.
   Never hand-edit `Sketch.astro`.
+- The film is rendered from simulations in `docs/movie/` into `public/movie/` (`merger.mp4`,
+  `merger.webm`, square 1080 px; `poster.jpg`; one 720 px clip per stage in `clips/`). The stage
+  words, the projects under each and the second each stage starts: `src/data/movie.yaml`.
+  Physics: `galaxies.py` is a self-consistent N-body merger (tree gravity, 638k particles, run to
+  1.25 Gyr, ~1.5 h on the M4); `nucleus.py` sinks the pair by dynamical friction below the
+  N-body's resolution; `waves.py` hardens the binary and times the merger; `story.py` ties them to
+  N-body time (when each hole shines, where the nucleus is); `render.py` films it (camera and
+  timing keys at its top). The fiducial pair is 1e8 + 5e7 Msun. The rings at the merger are drawn
+  far larger than the real wavelength (tens of AU) so they show at galaxy scale. Each frame is
+  exposed over sub-frames (motion blur, wider in the binary stage's time-lapse, where a frame
+  spans ~4 Myr); without it the stars flicker from frame to frame.
+  Rebuild (Python deps in `docs/movie/requirements.txt`, CACHE is any scratch folder, ~3 GB):
+  `python3 docs/movie/galaxies.py CACHE/nbody`, then
+  `python3 docs/movie/render.py CACHE CACHE --exposure && python3 docs/movie/render.py CACHE public/movie`.
+  `--stills 3,12.5` renders single frames for checking.
 - The explorer is its own repo (`../dualagn-explorer`, single `index.html`, GitHub
   Pages from `main`). Its styling matches this site: light by default, eye toggle,
   flat chips, no boxes.
@@ -81,6 +103,7 @@ It is used for the flowers in the drawing and for the explorer's "Read the paper
 ## Checking work
 
 Build with `npm run build`; serve `dist/` on :8792 (`.claude/launch.json`,
-`dist-preview`). Headless Chrome screenshots work with a wrapper page that iframes the
+`dist-preview`, which is `astro preview`: it answers range requests, so the film can seek;
+`python3 -m http.server` does not). Headless Chrome screenshots work with a wrapper page that iframes the
 site and dispatches events; the in-app browser pane is usually hidden, so its animation
 frames pause there.
