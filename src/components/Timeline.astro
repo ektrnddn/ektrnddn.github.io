@@ -28,9 +28,6 @@ const along = timeline.along
   });
 ---
 <div class="wl" data-wl>
-  <div class="cols" data-cols aria-hidden="true">
-    <span class="mono"><b>Education</b></span><span class="mono"><b>Research and projects</b></span><span class="mono"><b>Along the way</b></span>
-  </div>
   <svg data-svg aria-hidden="true"></svg>
   <div class="items">
     {eras.map((e) => (
@@ -70,17 +67,15 @@ const along = timeline.along
 
 <style is:global>
   .wl { position: relative; margin-top: 72px; }
-  .wl .cols { display: none; }
   .wl > svg { display: none; }
   /* Without the script: three plain lists. */
   .wl:not(.ready) .lb { margin-bottom: 14px; }
   .wl:not(.ready) .nowlb { display: none; }
 
-  .wl.ready .cols { display: block; position: sticky; top: 73px; z-index: 5; height: 42px; background: rgba(255, 255, 255, .95); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); }
-  .wl.ready .cols span { position: absolute; top: 13px; }
   .wl.ready > svg { display: block; position: absolute; left: 0; top: 0; overflow: visible; z-index: 1; }
-  .wl.ready .lb { position: absolute; z-index: 2; margin: 0; opacity: 0; transform: translateY(6px); transition: opacity .5s ease, transform .6s cubic-bezier(.2, .7, .2, 1); }
-  .wl.ready .lb.on { opacity: 1; transform: none; }
+  /* What the pen has not reached yet waits out of focus and comes into focus as it passes. */
+  .wl.ready .lb { position: absolute; z-index: 2; margin: 0; opacity: .32; filter: blur(2.6px); transition: opacity .6s ease, filter .6s ease; }
+  .wl.ready .lb.on { opacity: 1; filter: none; }
 
   /* Where I studied */
   .wl .era b { display: block; font-size: 20px; font-weight: 500; letter-spacing: -.025em; line-height: 1.3; color: var(--ink); }
@@ -128,12 +123,16 @@ const along = timeline.along
   .wl svg .sdot { fill: #c9c9c9; }
   .wl svg .sdot.w1 { fill: var(--ink); }
   .wl svg .ld { stroke: #d9d9d9; stroke-width: 1; fill: none; }
-  .wl svg .g, .wl svg .ld { opacity: 0; transition: opacity .4s; }
+  .wl svg .ghost { stroke: #e6e6e6; stroke-width: 2; fill: none; stroke-linecap: round; }
+  .wl svg .ghost.w1 { stroke-width: 2.5; }
+  .wl svg .ghost.w2 { stroke-width: 1.6; }
+  .wl svg .ghost-dot { fill: #e6e6e6; }
+  .wl svg .g, .wl svg .ld { opacity: .3; transition: opacity .5s; }
   .wl svg .g.on, .wl svg .ld.on { opacity: 1; }
   .wl svg .g.hl { transform: scale(1.8); transform-box: fill-box; transform-origin: center; }
   .wl svg .pen { fill: var(--ink); }
   .wl svg .nowdot { fill: var(--rose); transform-box: fill-box; transform-origin: center; }
-  .wl svg .future { opacity: 0; transition: opacity 1s ease .2s; }
+  .wl svg .future { opacity: .3; transition: opacity 1s ease .2s; }
   .wl svg .future.on { opacity: 1; }
   .wl svg .future path { stroke: var(--ink); stroke-width: 2; fill: none; stroke-dasharray: 2 5; stroke-linecap: round; }
   .wl svg .future path.w2 { stroke: #9b9b9b; stroke-width: 1.6; }
@@ -159,7 +158,6 @@ const along = timeline.along
   if (wl) {
     const NS = 'http://www.w3.org/2000/svg';
     const svg = wl.querySelector<SVGSVGElement>('[data-svg]')!;
-    const heads = wl.querySelector<HTMLElement>('[data-cols]')!;
     const nowEl = wl.querySelector<HTMLElement>('[data-now]')!;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const today = new Date();
@@ -225,10 +223,6 @@ const along = timeline.along
       svg.textContent = ''; reveal = []; bars = [];
       wl.classList.add('ready');
       const W = wl.clientWidth, mobile = W < 720;
-      const nav = document.querySelector<HTMLElement>('.nav');
-      heads.style.top = `${nav ? nav.offsetHeight : 0}px`;
-      heads.style.display = mobile ? 'none' : '';
-      const headH = mobile ? 0 : heads.offsetHeight;
       const LINE = 6;
       let LG: number, C1X: number, C1W: number, C2B: number, C2X: number, C2W: number, C3X: number, C3W: number;
       if (mobile) {
@@ -238,8 +232,6 @@ const along = timeline.along
         LG = 14; C1X = 30; C1W = Math.round(W * 0.21);
         C2B = C1X + C1W + 26; C2X = C2B + LANES * LG + 12; C2W = Math.round(W * 0.33);
         C3X = C2X + C2W + 60; C3W = W - C3X;
-        const [h1, h2, h3] = heads.querySelectorAll<HTMLElement>('span');
-        h1.style.left = `${C1X}px`; h2.style.left = `${C2B}px`; h3.style.left = `${C3X}px`;
       }
       const laneX = (it: Item) => C2B + (it.k - 1) * LG;
       for (const it of items) {
@@ -253,7 +245,7 @@ const along = timeline.along
       }
 
       // Time runs down at a steady rate; a year with more in it than fits grows taller.
-      const top0 = headH + 34, first = Math.floor(T0), last = Math.floor(NOW), B = mobile ? 84 : 96;
+      const top0 = 34, first = Math.floor(T0), last = Math.floor(NOW), B = mobile ? 84 : 96;
       const need = new Map<string, number>();
       for (const it of items) {
         const yr = Math.min(last, Math.max(first, Math.floor(it.t)));
@@ -302,6 +294,7 @@ const along = timeline.along
       for (const it of imp) {
         const x = laneX(it), y0 = Y(it.t), y1 = Math.max(it.t1 === null ? Y(NOW) : Y(it.t1), y0 + 10), len = y1 - y0;
         const ld = el('path', { d: leader(x + 5, y0, C2X - 6, it.y + it.c), class: 'ld' });
+        el('path', { d: `M${x},${y0} V${y1}`, class: `ghost w${it.w}` });
         const p = el('path', { d: `M${x},${y0} V${y1}`, class: `bar w${it.w}` });
         p.style.strokeDasharray = `${len} ${len}`;
         bars.push({ p, y0, len });
@@ -310,6 +303,7 @@ const along = timeline.along
       }
 
       // The line itself, with a mark where each school begins.
+      el('path', { d: `M${LINE},${Y(T0)} V${Y(NOW)}`, class: 'ghost' });
       life = el('path', { d: `M${LINE},${Y(T0)} V${Y(NOW)}`, class: 'life' });
       const ll = Y(NOW) - Y(T0); life.style.strokeDasharray = `${ll} ${ll}`;
       for (const it of items) {
@@ -330,6 +324,7 @@ const along = timeline.along
       future = el('g', { class: 'future', mask: 'url(#tl-fade-mask)' });
       el('path', { d: `M${LINE},${Y(NOW) + 9} V${Y(NOW) + 90}` }, future);
       for (const it of imp) if (it.t1 === null) el('path', { d: `M${laneX(it)},${Y(NOW) + 6} V${Y(NOW) + 72}`, class: `w${it.w}` }, future);
+      el('circle', { cx: LINE, cy: Y(NOW), r: 5.5, class: 'ghost-dot' });
       nowDot = el('circle', { cx: LINE, cy: Y(NOW), r: 5.5, class: 'nowdot' });
       Object.assign(nowEl.style, { left: `${C1X}px`, top: `${Y(NOW) - 9}px` });
       pen = el('circle', { cx: LINE, cy: Y(T0), r: 3.4, class: 'pen' });

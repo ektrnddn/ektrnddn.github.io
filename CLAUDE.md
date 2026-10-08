@@ -67,11 +67,12 @@ The old crimson `#8F1D28` is gone.
 - About: her portrait (black and white, 3:2, darkest tone the ink colour; it comes up out of
   the white like a print in the developer tray, once), the bio, the CV button, then the
   timeline (`src/components/Timeline.astro`, data in `src/data/timeline.yaml`). Three
-  columns: Education (the schools, big); Research and projects (what mattered most, each with
-  a bar as long as it lasted and the papers it led to beneath it); Along the way (prizes led
-  by the place, talks, juries, schools). Time runs down the page and a busy year grows
-  taller; a line on the far left draws itself on scroll and things appear as it passes; the
-  column names stay pinned under the nav. No year ruler: every item carries its own date.
+  columns, with no titles over them: the schools, big; what mattered most (research,
+  projects, programmes), each with a bar as long as it lasted and the papers it led to
+  beneath it; the small things along the way (prizes led by the place, talks, juries,
+  schools). Time runs down the page and a busy year grows taller. A line on the far left
+  draws itself on scroll; whatever it hasn't reached yet waits blurred and faint, and comes
+  into focus as it passes. No year ruler: every item carries its own date.
   Phones get one column in date order. Technical skills follow the timeline.
 - Footer: contact row, then the block-letter name at the very bottom; the friend's
   sketch stands on the base bar of the last "I" of DADIANI, as tall as its stem, with
