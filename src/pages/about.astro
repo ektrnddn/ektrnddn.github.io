@@ -1,85 +1,100 @@
 ---
 import Base from '../layouts/Base.astro';
-import SectionHead from '../components/SectionHead.astro';
 import Arrow from '../components/Arrow.astro';
 import Timeline from '../components/Timeline.astro';
+import PortraitMeadow from '../components/PortraitMeadow.astro';
 import { profile } from '../data/load';
 import lastBuilt from '../../public/cv/last-built.txt?raw';
 const pdf = '/cv/Ekaterine_Dadiani_CV.pdf';
 const updated = new Date(`${lastBuilt.trim()}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const photoSmall = profile.photo?.replace(/\.jpg$/, '-900.jpg');
+// A skills line from the CV, split into its pieces at commas and semicolons (not inside brackets).
+const pieces = (s: string) => s.split(/[;,]\s*(?![^()]*\))/).map((x) => x.trim()).filter(Boolean);
 ---
 <Base title="About me" description={`About ${profile.name}: education, research and papers, and the small things along the way.`}>
   <section class="wrap grid12 top">
-    <div class="intro">
-      <h1>About me</h1>
+    <h1>About me</h1>
+    <div class="body">
       <p class="lede">{profile.bio}</p>
-      {profile.bio_more && <p class="lede">{profile.bio_more}</p>}
-      <div class="actions">
-        <a class="btn" href={pdf}>CV <Arrow kind="down" /></a>
-        <span class="mono">Updated {updated}</span>
-      </div>
+      {profile.bio_more && <p class="lede more">{profile.bio_more}</p>}
+      <dl class="facts">
+        <dt class="label">Advisors</dt><dd>{profile.advisors.join(' and ')}</dd>
+        <dt class="label">Collaborations</dt><dd>{profile.collaborations.map((c) => c.name).join(' · ')}</dd>
+        <dt class="label">Based in</dt><dd>{profile.location}</dd>
+      </dl>
+    </div>
+    <div class="actions">
+      <a class="btn" href={pdf}>CV <Arrow kind="down" /></a>
+      <span class="label">Updated {updated}</span>
     </div>
     {profile.photo && (
       <figure class="portrait" data-develop>
-        <img src={profile.photo} srcset={`${photoSmall} 900w, ${profile.photo} 1500w`} sizes="(max-width: 900px) 100vw, 50vw" width="1500" height="1000" alt={profile.photo_alt ?? profile.name} />
+        <div class="print">
+          <img src={profile.photo} srcset={`${photoSmall} 900w, ${profile.photo} 1500w`} sizes="(max-width: 900px) 100vw, 576px" width="1500" height="1000" alt={profile.photo_alt ?? profile.name} />
+          <PortraitMeadow />
+        </div>
       </figure>
     )}
   </section>
 
   <section class="wrap">
-    <div class="quick">
-      <div><div class="mono"><b>Advisors</b></div><div>{profile.advisors.join(' and ')}</div></div>
-      <div><div class="mono"><b>Collaborations</b></div><div>{profile.collaborations.map((c) => c.name).join(' · ')}</div></div>
-      <div><div class="mono"><b>Based in</b></div><div>{profile.location}</div></div>
-    </div>
+    <dl class="facts skills">
+      {profile.skills.map((k) => (
+        <>
+          <dt class="label">{k.area}</dt>
+          <dd>{pieces(k.items).map((x, i) => <>{i > 0 && <span class="dot" aria-hidden="true"> · </span>}<span class="sk">{x}</span></>)}</dd>
+        </>
+      ))}
+    </dl>
   </section>
 
   <section class="wrap">
     <Timeline />
   </section>
 
-  <section class="wrap">
-    <SectionHead title="Technical skills" />
-    <div class="rows">
-      {profile.skills.map((k) => (
-        <div class="row grid12 r"><div class="years">{k.area}</div><div class="what">{k.items}</div></div>
-      ))}
-    </div>
-  </section>
 </Base>
 
 <style>
-  .top { padding-top: 72px; padding-bottom: 32px; align-items: end; }
-  .intro { grid-column: 1 / span 6; display: flex; flex-direction: column; gap: 18px; }
-  h1 { font-weight: 400; font-size: clamp(34px, 4vw, 52px); line-height: 1.05; letter-spacing: -.035em; margin-bottom: 4px; }
+  .top { padding-top: 72px; padding-bottom: 32px; row-gap: 0; align-items: start; }
+  h1 { grid-column: 1 / span 6; grid-row: 1; margin-bottom: 22px; font-weight: 400; font-size: var(--t-xl); line-height: 1.15; letter-spacing: -.03em; }
+  .body { grid-column: 1 / span 6; grid-row: 2; display: flex; flex-direction: column; gap: 18px; }
   .lede { max-width: 34em; }
-  .actions { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
-  .portrait { grid-column: 7 / span 6; margin: 0; }
-  .portrait img { display: block; width: 100%; height: auto; }
-  /* The print comes up out of the paper, as in the developer tray. */
-  .portrait.js img { filter: contrast(.16) brightness(1.8); transition: filter 2.8s cubic-bezier(.3, .6, .2, 1); }
-  .portrait.js.in img { filter: none; }
-  .quick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 14px; line-height: 1.5; }
-  .quick .mono { margin-bottom: 4px; }
-  .r { gap: 24px; }
-  .r .years { grid-column: span 2; }
-  .r .what { grid-column: span 10; }
+  .lede.more { font-size: var(--t-md); line-height: 1.6; }
+  .actions { grid-column: 1 / span 6; grid-row: 3; display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-top: 44px; }
+  /* The photo stands beside the words, the full width of its column, its bottom edge just under
+     the last fact; above, it reaches up beside the title as far as it needs to (its sky is cut
+     away, so its top is the tower and the rooftops). Once it is on screen, the sage it was cut
+     from is drawn on past its edges. */
+  .portrait { grid-column: 7 / span 6; grid-row: 1 / 3; align-self: end; margin: 0; }
+  .print { position: relative; }
+  .print img { display: block; width: 100%; height: auto; }
+  .portrait :global(.meadow) { position: absolute; left: -10%; top: 0; width: 120%; height: auto; overflow: visible; pointer-events: none; color: var(--ink); }
+  .portrait :global(.meadow *) { vector-effect: non-scaling-stroke; }
+  .portrait :global(.meadow .fl) { stroke-width: 1; }
+  .portrait.js :global(.meadow path) { stroke-dasharray: 1 2; stroke-dashoffset: 1.05; transition: stroke-dashoffset var(--t, .5s) cubic-bezier(.45, .05, .55, .95) calc(.35s + var(--d, 0s)); }
+  .portrait.js :global(.meadow .fl) { opacity: 0; transition: opacity .4s ease calc(.35s + var(--d, 0s)); }
+  .portrait.js.in :global(.meadow path) { stroke-dashoffset: 0; }
+  .portrait.js.in :global(.meadow .fl) { opacity: 1; }
+  /* Facts and skills read the same way: the label on the left, the answer to its right. */
+  .facts { display: grid; grid-template-columns: 200px minmax(0, 1fr); column-gap: 24px; row-gap: 8px; margin: 26px 0 0; font-size: var(--t-sm); line-height: 1.6; }
+  .facts dt { margin: 0; padding-top: 1px; color: var(--muted); }
+  .facts dd { margin: 0; color: var(--ink); }
+  .skills { margin-top: 64px; row-gap: 12px; }
+  .skills dd { color: var(--text); }
+  .skills .dot { color: var(--faint); }
   @media (max-width: 900px) {
-    .top { padding-top: 24px; gap: 22px; }
-    .intro, .portrait { grid-column: 1 / -1; }
-    .portrait { order: -1; }
-    .lede { font-size: 17px; }
-    .quick { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
-    .r { gap: 2px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .portrait.js img { filter: none; transition: none; }
+    .top { padding-top: 24px; gap: 0; }
+    .top { overflow-x: clip; }
+    h1, .body, .actions, .portrait { grid-row: auto; }
+    .portrait { order: -1; margin: 0 0 48px; }
+    .facts { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
+    .facts dd + dt { margin-top: 10px; }
+    .skills { margin-top: 40px; }
   }
 </style>
 
 <script>
-  // The portrait develops once it is on screen.
+  // Once the portrait is on screen, the sage is drawn on past its edges.
   const fig = document.querySelector<HTMLElement>('[data-develop]');
   if (fig && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     fig.classList.add('js');

@@ -3,38 +3,43 @@ import { profile } from '../data/load';
 import PixelWord from './PixelWord.astro';
 import Doodle from './Doodle.astro';
 const labels: Record<string, string> = { github: 'GitHub', ads: 'ADS', scholar: 'Google Scholar', linkedin: 'LinkedIn', orcid: 'ORCID' };
-const external = Object.entries(profile.links).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
+// The contact row: ADS, GitHub and LinkedIn after the email.
+const external = (['ads', 'github', 'linkedin'] as const).map((k) => [k, profile.links[k]] as const).filter(([, v]) => typeof v === 'string' && v.startsWith('http'));
+// The block-letter name and the friend's sketch sign the home page only.
+const home = Astro.url.pathname === '/';
 ---
 <footer id="contact" class="footer">
-  <div class="wrap bottom">
+  <div class="wrap"><div class="bottom">
     <div class="left">
-      <span class="mono">© {new Date().getFullYear()}</span>
+      <span class="label">© {new Date().getFullYear()}</span>
       <span class="aff">{profile.affiliation}, {profile.location}</span>
     </div>
     <div class="links">
       <a href={`mailto:${profile.email}`} class="mail">{profile.email}</a>
       {external.map(([k, v]) => <a href={v} rel="me noopener" target="_blank">{labels[k] ?? k}</a>)}
     </div>
-  </div>
+  </div></div>
+  {home && (
   <div class="wrap word" data-word>
     <PixelWord lines={['EKATERINE', 'DADIANI']} />
     <!-- The sketch stands on the base of the last I, as tall as its stem; placed by the script below. -->
     <div class="tag" data-tag><Doodle /></div>
     <div class="note" data-note aria-hidden="true">
-      <span class="mono cap">as drawn<br />by a friend</span>
+      <span class="label cap">as drawn<br />by a friend</span>
       <svg class="arrow" viewBox="0 0 60 56" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
         <path pathLength="1" class="curve" d="M50 4 C 52 20, 40 34, 24 40 C 18 42, 12 46, 8 52" />
         <path pathLength="1" class="head" d="M4 44 l4 9 l9 -3" />
       </svg>
     </div>
   </div>
+  )}
 </footer>
 <style>
   .footer { margin-top: 96px; }
   .bottom { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 48px; border-top: 1px solid var(--rule); }
   .left { display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap; }
-  .aff { font-size: 13px; color: var(--muted); }
-  .links { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; }
+  .aff { font-size: var(--t-sm); color: var(--muted); }
+  .links { display: flex; gap: 20px; flex-wrap: wrap; font-size: var(--t-sm); }
   .links a { color: var(--muted); }
   .links a.mail { color: var(--ink); }
   .links a:hover { color: var(--accent); }
@@ -46,9 +51,9 @@ const external = Object.entries(profile.links).filter(([, v]) => typeof v === 's
   .tag :global(.doodle figcaption) { display: none; }
   .tag :global(.doodle .ground) { display: none; }
   .tag :global(.doodle .ground.cat) { display: block; }
-  .note { position: absolute; left: 0; top: 0; width: 84px; color: #d9d9d9; visibility: hidden; }
+  .note { position: absolute; left: 0; top: 0; width: 84px; color: var(--faint); visibility: hidden; }
   .note.placed { visibility: visible; }
-  .note .cap { display: block; color: #cfcfcf; font-size: 10px; line-height: 1.35; opacity: 0; transition: opacity .5s ease 2.6s; }
+  .note .cap { display: block; color: var(--faint); font-size: var(--t-xs); line-height: 1.35; opacity: 0; transition: opacity .5s ease 2.6s; }
   .note .arrow { width: 44px; height: auto; display: block; margin: 2px 0 0 -14px; }
   .note .arrow path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .7s cubic-bezier(.4,0,.2,1) 2.8s; }
   .note .arrow .head { transition-delay: 3.4s; transition-duration: .3s; }

@@ -3,21 +3,21 @@
 # gives their links or status). `at` is the second the stage starts in the film.
 chapters:
   - name: Dual AGN
-    scale: kpc
+    scale: kiloparsec scales
     at: 0
-    text: "Two galaxies collide. Gas pours onto both black holes and they light up a few kiloparsecs apart: a dual AGN."
+    text: "Galaxy mergers drive gas toward the nuclei of both galaxies. A system in which both massive black holes are accreting at kiloparsec separations is a dual AGN; one in which only one black hole is active is an offset AGN."
     projects:
       - "Cosmic Pairs: a DESI census of dual and offset AGN as precursors to massive black hole binaries"
       - "z ∼ 2 dual AGN host galaxies are disky: stellar kinematics in the ASTRID Simulation"
   - name: Binary
-    scale: sub-pc
+    scale: sub-parsec scales
     at: 17.5
-    text: The galaxies become one. The black holes sink to the centre and bind into a binary less than a parsec across, too close for any telescope, not for spectroscopy.
+    text: "Dynamical friction brings the black holes to the centre of the merger remnant, where they form a gravitationally bound binary with a separation below one parsec. Such systems are spatially unresolved except by VLBI at low redshift. Their orbital motion, however, Doppler-shifts the broad emission lines, and that shift changes over years to decades."
     projects:
       - "Cosmic Pairs: a DESI census of massive black hole binaries"
   - name: Merger
     scale: gravitational waves
     at: 24
-    text: The binary spirals in and merges, sending out the gravitational waves that LISA and pulsar timing arrays will hear.
+    text: "Once gravitational-wave emission dominates the orbital decay, the binary inspirals and coalesces. The most massive systems (≳10⁸ M☉), with orbital periods of about a year to decades, contribute to the nanohertz gravitational-wave background for which pulsar timing arrays have reported evidence. Lower-mass systems (~10⁴–10⁷ M☉) merge in the millihertz band targeted by LISA."
     projects:
       - "Connecting current and future dual AGN searches to LISA and PTA gravitational wave detections"

@@ -1,0 +1,95 @@
+---
+// Papers and talks, newest year first: papers on the left, talks and schools on the right, and
+// between them one line with the years on it, as on About. The Publications page shows them all;
+// the home page the most recent years (`recent`).
+import { publications, talks, pubLink } from '../data/load';
+interface Props { recent?: number }
+const { recent } = Astro.props;
+
+const kinds: Record<string, string> = { talk: 'Talk', school: 'School', workshop: 'Workshop' };
+const shownTalks = talks.filter((t) => t.kind !== 'organizer');
+const years = [...new Set([...publications.map((p) => p.year), ...shownTalks.map((t) => t.year)])].sort((a, b) => b - a).slice(0, recent);
+const rows = years.map((year) => ({
+  year,
+  papers: publications.filter((p) => p.year === year),
+  talks: shownTalks.filter((t) => t.year === year),
+}));
+const authors = (s: string) => s.replace(/Dadiani E\./g, '<strong>Dadiani E.</strong>');
+---
+<div class="tl">
+  {rows.map((r) => (
+    <div class="yr">
+      <div class="papers">
+        {r.papers.map((p) => {
+          const link = pubLink(p);
+          return (
+            <article class="paper" id={`pub-${p.id}`}>
+              <h3>{link ? <a href={link.url} target="_blank" rel="noopener">{p.title}</a> : p.title}</h3>
+              <p class="au" set:html={authors(p.authors)} />
+              <p class="meta">
+                {p.venue && <span class="ven">{p.venue}</span>}
+                {link && <a href={link.url} target="_blank" rel="noopener">{link.label}</a>}
+                {p.extras?.map((e) => <a href={e.url} target="_blank" rel="noopener">{e.label}</a>)}
+              </p>
+            </article>
+          );
+        })}
+      </div>
+      <div class="axis"><span class="year">{r.year}</span></div>
+      <div class="talks">
+        {r.talks.map((t) => (
+          <div class="talk"><span class="k">{kinds[t.kind] ?? t.kind}</span><span class="tx"><b>{t.event}</b><span class="pl">{t.place}</span></span></div>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .tl { margin-top: 48px; }
+  .yr { display: grid; grid-template-columns: minmax(0, 7fr) 88px minmax(0, 5fr); column-gap: 24px; }
+  .yr > * { padding-bottom: 52px; }
+  /* The line runs between the papers and the talks; each year sits on it. */
+  .axis { position: relative; text-align: center; }
+  .axis::before { content: ''; position: absolute; left: calc(50% - 1px); top: 0; bottom: 0; width: 2px; background: var(--ink); }
+  .yr:first-child .axis::before { top: 11px; }
+  .yr:last-child .axis::before { bottom: auto; height: 11px; }
+  .year { position: relative; display: inline-block; padding: 0 6px; background: var(--paper); font-variant-numeric: tabular-nums; font-size: var(--t-xs); line-height: 22px; color: var(--ink); }
+
+  .papers { display: flex; flex-direction: column; gap: 26px; }
+  .paper { scroll-margin-top: 100px; }
+  .paper:target h3 a { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .paper h3 { font-size: var(--t-md); font-weight: 500; letter-spacing: -.01em; line-height: 1.35; text-wrap: pretty; }
+  .paper h3 a { color: var(--ink); }
+  .paper h3 a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .au { margin-top: 6px; font-size: var(--t-sm); line-height: 1.6; color: var(--text); }
+  .au :global(strong) { font-weight: 500; color: var(--ink); }
+  .meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-top: 6px; font-size: var(--t-sm); }
+  .meta .ven { color: var(--muted); }
+  .meta a { font-variant-numeric: tabular-nums; font-size: var(--t-xs); color: var(--ink); border-bottom: 1px solid var(--rule); }
+  .meta a:hover { border-color: var(--ink); text-decoration: none; }
+
+  .talks { display: flex; flex-direction: column; gap: 10px; padding-top: 1px; }
+  .talk { display: grid; grid-template-columns: 70px minmax(0, 1fr); column-gap: 10px; align-items: baseline; font-size: var(--t-sm); line-height: 1.5; color: var(--muted); }
+  .talk .k { font-variant-numeric: tabular-nums; font-size: var(--t-xs); color: var(--muted); }
+  .talk b { font-weight: 400; color: var(--text); }
+  .talk .pl::before { content: ' · '; }
+
+  /* Phones: the line moves to the left edge; each year, then its papers, then its talks. */
+  @media (max-width: 719px) {
+    .tl { margin-top: 32px; }
+    .yr { position: relative; grid-template-columns: minmax(0, 1fr); padding-bottom: 40px; }
+    .yr > * { padding-bottom: 0; }
+    .axis { order: -1; position: static; text-align: left; margin-bottom: 14px; }
+    .axis::before { left: 6px; top: 0; bottom: 0; }
+    .yr:first-child .axis::before { top: 11px; }
+    .yr:last-child .axis::before { bottom: auto; height: 11px; }
+    .year { padding: 0 6px 0 0; }
+    .papers, .talks { padding-left: 30px; }
+    .papers:not(:has(*)) { display: none; }
+    .talks:not(:has(*)) { display: none; }
+    .papers { margin-bottom: 18px; }
+    .talk { grid-template-columns: 62px minmax(0, 1fr); font-size: var(--t-sm); }
+    .talk .k { font-size: var(--t-xs); }
+  }
+</style>

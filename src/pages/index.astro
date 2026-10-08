@@ -2,11 +2,19 @@
 import Base from '../layouts/Base.astro';
 import Arrow from '../components/Arrow.astro';
 import Sketch from '../components/Sketch.astro';
-import Movie from '../components/Movie.astro';
-import { profile, photos, highlight } from '../data/load';
+import ResearchFilm from '../components/ResearchFilm.astro';
+import PubTimeline from '../components/PubTimeline.astro';
+import { profile, photos, highlight, projects, publications } from '../data/load';
+// [n] in the earlier-work text becomes a link to that paper in the publications below; on hover
+// it shows the paper's title.
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const earlierHtml = projects.earlier_text.replace(/\[(\d+)\]/g, (_, n) => {
+  const id = projects.earlier[Number(n) - 1], pub = publications.find((p) => p.id === id);
+  return `<a class="ref" href="#pub-${id}" data-tip="${esc(pub ? `${pub.title} (${pub.year})` : '')}">[${n}]</a>`;
+});
 const links = [
-  { href: '/research/', label: 'Research' },
-  { href: '/publications/', label: 'Publications' },
+  { href: '#research', label: 'Research' },
+  { href: '#publications', label: 'Publications' },
   { href: '/about/', label: 'About me' },
   { href: '/cv/Ekaterine_Dadiani_CV.pdf', label: 'CV (PDF)' },
 ];
@@ -23,20 +31,28 @@ const links = [
     <Sketch />
   </section>
 
-  <Movie />
+  <ResearchFilm />
+  <section class="wrap earlier">
+    <h3 class="earlier-h">Earlier work</h3>
+    <p class="prose" set:html={earlierHtml} />
+  </section>
+
+  <section class="wrap sec pubs" id="publications">
+    <h2 class="big-h">Publications</h2>
+    <PubTimeline />
+  </section>
   <section class="wrap go-links">
-    <a href="/publications/" class="big">See the publications <Arrow /></a>
     <a href="/about/" class="big">About me <Arrow /></a>
   </section>
 
   {photos.length > 0 && (
     <section class="film wrap">
-      <div class="mono head"><b>On film</b></div>
+      <div class="label head"><b>On film</b></div>
       <div class="strip">
         {photos.map((p) => (
           <figure>
             <img src={p.src} alt={p.alt ?? p.caption ?? ''} loading="lazy" />
-            {p.caption && <figcaption class="mono">{p.caption}</figcaption>}
+            {p.caption && <figcaption class="label">{p.caption}</figcaption>}
           </figure>
         ))}
       </div>
@@ -48,16 +64,28 @@ const links = [
   .hero { position: relative; }
   .text { position: relative; z-index: 1; padding-top: 56px; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
   .text > * { width: fit-content; }
-  .greeting { font-size: 15px; color: var(--muted); }
-  h1 { font-weight: 400; font-size: clamp(22px, 2.1vw, 28px); line-height: 1.38; letter-spacing: -.02em; text-wrap: pretty; max-width: 640px; color: var(--text); }
+  .greeting { font-size: var(--t-md); color: var(--muted); }
+  h1 { font-weight: 400; font-size: var(--t-lg); line-height: 1.35; letter-spacing: -.02em; text-wrap: pretty; max-width: 640px; color: var(--text); }
   h1 :global(.hl) { font-weight: 500; color: var(--ink); }
   .links { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-top: 4px; }
-  .links a { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
+  .links a { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-size: var(--t-md); font-weight: 500; border-bottom: 1px solid var(--ink); padding-bottom: 1px; }
   .links a:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
   .hero :global(.sketch) { margin-top: -260px; }
 
+  .sec { padding-top: 96px; }
+  .big-h { font-size: var(--t-xl); font-weight: 500; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
+  .earlier { margin-top: 64px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+  .earlier-h { font-size: var(--t-lg); font-weight: 500; letter-spacing: -.02em; line-height: 1.35; color: var(--ink); }
+  .earlier .prose { max-width: 800px; font-size: var(--t-md); }
+  .earlier :global(.ref) { position: relative; font-variant-numeric: tabular-nums; font-size: var(--t-sm); color: var(--ink); }
+  /* The paper's title, above the [n] under the pointer. */
+  .earlier :global(.ref)::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 8px); width: max-content; max-width: 320px; padding: 9px 12px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); box-shadow: 0 14px 30px -18px rgba(0,0,0,.35); font-family: var(--sans); font-size: var(--t-sm); line-height: 1.35; color: var(--ink); white-space: normal; text-align: left; pointer-events: none; opacity: 0; transform: translate(-50%, 4px); transition: opacity .2s ease, transform .25s ease; z-index: 10; }
+  .earlier :global(.ref:hover)::after, .earlier :global(.ref:focus-visible)::after { opacity: 1; transform: translate(-50%, 0); }
+  .earlier :global(.ref:hover) { text-decoration: none; }
+  .pubs { scroll-margin-top: 60px; }
+  :global(#research) { scroll-margin-top: 0; }
   .go-links { padding-top: 24px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 28px; align-items: flex-start; }
-  .big { display: inline-flex; align-items: center; gap: 12px; font-size: clamp(22px, 2.4vw, 32px); font-weight: 500; letter-spacing: -.03em; color: var(--ink); border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
+  .big { display: inline-flex; align-items: center; gap: 12px; font-size: var(--t-xl); font-weight: 500; letter-spacing: -.03em; color: var(--ink); border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
   .big:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
   .big :global(svg) { width: 22px; height: 22px; }
   .film { padding-top: 48px; display: flex; flex-direction: column; gap: 14px; }
@@ -68,7 +96,9 @@ const links = [
   @media (max-width: 1200px) { .hero :global(.sketch) { margin-top: -140px; } }
   @media (max-width: 900px) {
     .text { padding-top: 36px; gap: 16px; }
-    h1 { font-size: 21px; }
+    h1 { font-size: var(--t-lg); }
+    .earlier { margin-top: 48px; }
+    .earlier :global(.ref)::after { max-width: 240px; }
     .hero :global(.sketch) { margin-top: -20px; }
   }
 </style>

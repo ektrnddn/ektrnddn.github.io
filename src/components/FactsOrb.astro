@@ -32,19 +32,19 @@ import { facts, linkify } from '../data/load';
   .forb.open .knob { background: var(--ink); color: var(--bg); transform: scale(1); }
   .knob :global(svg) { transition: transform .35s; }
   .forb.open .knob :global(svg) { transform: rotate(72deg); }
-  .panel { position: absolute; right: 52px; top: 50%; width: min(380px, calc(100vw - 96px)); transform: translateY(-50%) scale(.92); transform-origin: right center; background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 18px 8px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.3); opacity: 0; transition: opacity .28s ease, transform .35s cubic-bezier(.2,.7,.2,1); }
+  .panel { position: absolute; right: 52px; top: 50%; width: min(380px, calc(100vw - 96px)); transform: translateY(-50%) scale(.92); transform-origin: right center; background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 18px 8px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.35); opacity: 0; transition: opacity .28s ease, transform .35s cubic-bezier(.2,.7,.2,1); }
   .panel[hidden] { display: block; visibility: hidden; pointer-events: none; }
   .forb.open .panel { opacity: 1; transform: translateY(-50%) scale(1); visibility: visible; pointer-events: auto; }
-  .title { font-size: 15px; color: var(--muted); }
+  .title { font-size: var(--t-md); color: var(--muted); }
   .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 6px; }
   .close { appearance: none; border: 0; background: none; color: var(--muted); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
-  .close:hover { color: var(--ink); background: #f2f2f2; }
+  .close:hover { color: var(--ink); background: var(--wash); }
   ul { list-style: none; margin: 0; padding: 0; }
-  li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 14.5px; line-height: 1.5; color: var(--text); }
+  li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--rule); font-size: var(--t-sm); line-height: 1.5; color: var(--text); }
   .ico { flex: none; color: var(--ink); display: inline-flex; gap: 5px; margin-top: 3px; }
   li.icons { padding: 12px 0; }
   li.icons .ico { margin-top: 0; gap: 12px; }
-  li a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #c8c8c8; }
+  li a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--faint); }
   li a:hover { text-decoration-color: var(--ink); }
   @media (max-width: 900px) {
     .forb { right: 16px; top: auto; bottom: 22px; transform: none; }
@@ -52,6 +52,7 @@ import { facts, linkify } from '../data/load';
     .forb.open .panel { transform: scale(1); }
     .knob:hover { transform: none; }
   }
+  @media (max-width: 900px) { :global(html.in-film) .forb { opacity: 0; pointer-events: none; transition: opacity .3s; } }
 </style>
 <script>
   const orb = document.querySelector<HTMLElement>('[data-forb]');

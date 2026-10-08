@@ -38,11 +38,12 @@ export interface Experience { role: string; org: string; place: string; start: s
 export interface Award { year: number | string; title: string; place?: string }
 export interface Fact { icon: string | string[]; text: string }
 export interface Photo { src: string; caption?: string; alt?: string }
-export interface Project { title: string; figure?: string; figure_alt?: string; link?: string; live?: string; status?: string; description?: string }
+export interface Project { title: string; figure?: string; figure_alt?: string; link?: string; live?: string; status?: string; description?: string; stage?: string; clip?: string;
+  role?: string; year?: number; finding?: string; code?: string; short?: string }
 export interface Projects { thesis: Project[]; earlier_text: string; earlier: string[] }
 export interface Chapter { name: string; scale: string; at: number; text: string; projects: string[] }
 type When = string | number | Date;
-export interface Era { at: When; title: string; years: string; text: string }
+export interface Era { at: When; to?: When; title: string; years: string; text: string; kind?: 'collaboration' | 'training' }
 export interface TimelinePaper { id?: string; role: string; title: string; venue?: string }
 export interface TimelineProject { from: When; to?: When; when: string; w: 1 | 2 | 3; title: string; text?: string; papers?: TimelinePaper[] }
 export interface AlongTheWay { at: When; w: 1 | 2 | 3; kind: string; title: string; place?: string }

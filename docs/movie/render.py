@@ -251,7 +251,9 @@ def main():
     encode(tmp, len(Ts), a.out)
 
 def encode(tmp, n, out):
-    # The film as H.264 and VP9, a poster, and one clip per chapter (src/data/movie.yaml).
+    # The film as H.264 and VP9, a poster, and one clip per chapter (src/data/movie.yaml); and the
+    # version the home page scrolls through, a keyframe every 6 frames so it seeks smoothly both
+    # ways, with its first frame after the fade-in.
     import imageio_ffmpeg, yaml
     from PIL import Image
     ff = imageio_ffmpeg.get_ffmpeg_exe()
@@ -264,7 +266,9 @@ def encode(tmp, n, out):
         print('wrote', cmd[-1], f'{os.path.getsize(cmd[-1]) / 1e6:.1f} MB', flush=True)
     run(['-c:v', 'libx264', '-preset', 'slow', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', f'{out}/merger.mp4'], range(n))
     run(['-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '37', '-row-mt', '1', '-deadline', 'good', '-cpu-used', '2', '-pix_fmt', 'yuv420p', f'{out}/merger.webm'], range(n))
+    run(['-c:v', 'libx264', '-preset', 'slow', '-crf', '28', '-g', '6', '-keyint_min', '6', '-bf', '0', '-sc_threshold', '0', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', f'{out}/merger-scroll.mp4'], range(n))
     Image.open(f'{tmp}/{int(round(POSTER * FPS)):05d}.png').convert('RGB').save(f'{out}/poster.jpg', quality=86, optimize=True)
+    Image.open(f'{tmp}/{int(round(0.75 * FPS)):05d}.png').convert('RGB').save(f'{out}/scroll-start.jpg', quality=86, optimize=True)
     here = os.path.dirname(os.path.abspath(__file__))
     chapters = yaml.safe_load(open(os.path.join(here, '..', '..', 'src', 'data', 'movie.yaml')))['chapters']
     starts = [ch['at'] for ch in chapters] + [n / FPS]

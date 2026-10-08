@@ -1,0 +1,301 @@
+---
+// The research on the home page, as Powers of Ten with the film: the picture stays while the page
+// scrolls, and the scroll runs the film (forward going down, back going up): two galaxies merge,
+// their black holes light up in rose, sink into one unresolved point and merge in gravitational
+// waves. Beside it, the stage on screen (movie.yaml: her words, and the papers on it); under it,
+// a scale bar read off the film's camera (src/data/film-fov.json, from docs/movie/fov_table.py).
+import Arrow from './Arrow.astro';
+import { movie, projectByTitle } from '../data/load';
+import fov from '../data/film-fov.json';
+const stages = movie.chapters.map((c) => ({ ...c, work: c.projects.map(projectByTitle) }));
+// Scroll progress against film time (s): each stage gets its share of the scroll. The film fades
+// in from white over its first 0.7 s and out over its last 0.8 s; the scroll stays between.
+const ends = [0.7, ...movie.chapters.slice(1).map((c) => c.at), 29.2];
+const shares = [0.5, 0.25, 0.25];
+const stops = ends.map((t, k) => [shares.slice(0, k).reduce((a, b) => a + b, 0), t]);
+---
+<section class="film" id="research" data-film data-stops={JSON.stringify(stops)} data-fov={JSON.stringify(fov)} aria-label="Research">
+  <div class="track" data-track>
+    <div class="wrap stage">
+      <header class="head">
+        <h2 class="big-h">Research</h2>
+        <p class="thesis">From Kiloparsecs to Sub-Parsec Scales: A Multi-Messenger, Multi-Scale Census of <em>Massive Black Hole Pairs</em> Across Cosmic Time</p>
+      </header>
+      <div class="body">
+      <div class="words">
+        <ol class="steps">
+          {stages.map((s, k) => <li><button type="button" class:list={['step', k === 0 && 'on']} data-step={k}>{s.name}</button></li>)}
+        </ol>
+        <div class="panels">
+          {stages.map((s, k) => (
+            <div class:list={['panel', k === 0 && 'on']} data-panel={k}>
+              <p class="label kick">{s.scale}</p>
+              <p class="say">{s.text}</p>
+              <ul class="work">
+                {s.work.map((p) => (
+                  <li>
+                    {p.link ? <a href={p.link} target="_blank" rel="noopener">{p.title}</a> : <span class="pt">{p.title}</span>}
+                    {!p.link && p.status && <span class="label status">{p.status}</span>}
+                    {(p.live || p.code) && p.figure && (
+                      <div class="tool">
+                        <button type="button" class="thumb" data-fig data-live={p.live} data-title={p.live ? p.title : 'blrfit: broad-line profiles of four SDSS quasars, one of each class'} aria-label={p.live ? 'Open the interactive explorer' : 'Enlarge the blrfit figure'}>
+                          <img src={p.figure} alt={p.figure_alt ?? ''} loading="lazy" />
+                        </button>
+                        <div class="tool-txt">
+                          {p.live
+                            ? <><a href={p.live} target="_blank" rel="noopener" data-live-open>Interactive explorer <Arrow kind="ext" /></a><span class="label">every pair in the census</span></>
+                            : <><a href={p.code} target="_blank" rel="noopener">blrfit <Arrow kind="ext" /></a><span class="label">the broad-line fitter behind the search</span></>}
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="view">
+        <video data-video muted playsinline preload="none" poster="/movie/scroll-start.jpg"
+          aria-label="Two simulated galaxies merge; their black holes light up, sink together into one point and merge.">
+          <source src="/movie/merger-scroll.mp4" type="video/mp4" />
+        </video>
+        <div class="bar" aria-hidden="true"><span class="rule" data-rule></span><span class="label" data-label>10 kpc</span></div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div class="zoom" data-zoom hidden>
+    <div class="zbar" data-zbar hidden><a class="label znew" data-znew href="#" target="_blank" rel="noopener">Open in a new tab <Arrow kind="ext" /></a></div>
+    <button type="button" class="zclose" aria-label="Close" data-zclose><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4l10 10M14 4L4 14"/></svg></button>
+    <img alt="" data-zimg />
+    <div class="zcap" data-zcap></div>
+  </div>
+
+</section>
+
+<style>
+  .film { position: relative; margin-top: 96px; }
+  .track { position: relative; height: 480vh; }
+  /* Everything stops when "Research" reaches the top: the heading, the thesis, the words and the
+     film stay, and the scroll runs the film. --nav is the menu's height, set by the script; --lift is
+     how far the heading slides up under it on a small phone, so the words fit. */
+  .stage { position: sticky; top: calc(var(--nav, 73px) - var(--lift, 0px)); max-height: calc(100vh - var(--nav, 73px) + var(--lift, 0px)); display: flex; flex-direction: column; padding-top: 22px; }
+  .big-h { font-size: var(--t-xl); font-weight: 500; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); }
+  .thesis { margin-top: 10px; max-width: 30em; font-size: var(--t-lg); line-height: 1.35; letter-spacing: -.02em; color: var(--text); text-wrap: balance; }
+  .thesis em { font-style: normal; font-weight: 500; color: var(--ink); }
+  .body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; align-content: start; align-items: center; padding: 20px 0 18px; }
+  .words { display: flex; flex-direction: column; gap: 22px; }
+  .kick { margin-top: -10px; font-size: var(--t-sm); }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 22px; }
+  .step { appearance: none; border: 0; background: none; padding: 0; font: inherit; font-size: var(--t-md); font-weight: 500; color: var(--ink); cursor: pointer; opacity: .3; transition: opacity .4s; }
+  .step:hover { opacity: .65; }
+  .step.on { opacity: 1; }
+  .panels { display: grid; }
+  .panel { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 14px; opacity: 0; transform: translateY(-8px); visibility: hidden; transition: opacity .2s ease, transform .3s ease, visibility 0s linear .3s; }
+  .panel.on { opacity: 1; transform: none; visibility: visible; transition: opacity .45s ease .22s, transform .55s cubic-bezier(.2, .7, .2, 1) .22s, visibility 0s; }
+  .say { font-size: var(--t-md); line-height: 1.6; color: var(--text); text-wrap: pretty; max-width: 34em; }
+  .work { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .work li { font-size: var(--t-md); line-height: 1.5; }
+  .work a, .work .pt { color: var(--ink); font-weight: 500; }
+  .work a { border-bottom: 1px solid var(--rule); }
+  .work a:hover { border-color: var(--ink); text-decoration: none; }
+  .work .status { margin-left: 8px; }
+  .tool { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+  .thumb { appearance: none; flex: none; width: 96px; height: 72px; padding: 6px; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); cursor: zoom-in; display: flex; align-items: center; justify-content: center; transition: border-color .2s, transform .3s cubic-bezier(.2, .7, .2, 1); }
+  .thumb:hover { border-color: var(--ink); transform: translateY(-2px); }
+  .thumb:focus { outline: none; }
+  .thumb:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+  .thumb img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+  .tool-txt { display: flex; flex-direction: column; gap: 3px; }
+  .tool-txt a { display: inline-flex; align-items: center; gap: 6px; width: fit-content; font-size: var(--t-sm); font-weight: 500; color: var(--ink); border-bottom: 1px solid var(--ink); }
+  .tool-txt a:hover { color: var(--muted); border-color: var(--muted); text-decoration: none; }
+  .tool-txt :global(svg) { width: 12px; height: 12px; }
+  .zoom { position: fixed; inset: 0; z-index: 60; background: rgba(255,255,255,0); transition: background .35s ease; }
+  .zoom.on { background: rgba(255,255,255,.985); }
+  .zoom img { position: absolute; border-radius: 12px; background: var(--paper); box-shadow: 0 40px 80px -40px rgba(0,0,0,.35); transform-origin: top left; transition: transform .5s cubic-bezier(.2,.7,.2,1), opacity .35s ease .15s; will-change: transform; }
+  .zcap { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); font-size: var(--t-sm); color: var(--muted); max-width: 80vw; text-align: center; opacity: 0; transition: opacity .3s .25s; }
+  .zoom.on .zcap { opacity: 1; }
+  .zoom.live img, .zoom.live .zcap { opacity: 0; }
+  .zbar { position: absolute; top: 0; left: 0; right: 76px; height: 76px; display: flex; align-items: center; justify-content: flex-end; opacity: 0; transition: opacity .3s .2s; }
+  .zoom.framed .zbar { opacity: 1; }
+  .znew { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-xs); color: var(--muted); border-bottom: 1px solid var(--rule); padding-bottom: 1px; }
+  .znew:hover { color: var(--ink); border-color: var(--ink); text-decoration: none; }
+  .zoom :global(.zlive) { position: absolute; left: 0; right: 0; top: 76px; bottom: 0; width: 100%; height: calc(100% - 76px); border: 0; border-top: 1px solid var(--rule); background: var(--paper); opacity: 0; transition: opacity .45s ease; }
+  .zoom :global(.zlive.on) { opacity: 1; }
+  .zclose { position: absolute; top: 18px; right: 18px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+
+  .earlier { padding-top: 0; }
+  .earlier .prose { max-width: 800px; padding-top: 20px; padding-bottom: 20px; font-size: var(--t-md); }
+  .earlier :global(.ref) { color: var(--accent); font-variant-numeric: tabular-nums; font-size: var(--t-sm); }
+
+
+  .view { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  video { display: block; width: min(100%, calc(100vh - var(--nav, 73px) - 250px)); aspect-ratio: 1; background: var(--paper); }
+  .bar { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .rule { display: block; height: 7px; width: 40px; border: 1px solid var(--ink); border-top: 0; }
+  .bar .label { color: var(--ink); }
+
+  @media (max-width: 900px) {
+    .film { margin-top: 64px; }
+    .track { height: 520vh; }
+    .stage { padding-top: 12px; }
+    .thesis { margin-top: 4px; }
+    .body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px; align-items: start; padding: 8px 0 0; }
+    .view { order: -1; gap: 6px; }
+    video { width: min(100%, 24vh); }
+    .words { gap: 14px; }
+    .kick { margin-top: -8px; }
+    .tool { margin-top: 6px; }
+    .thumb, .tool-txt .label { display: none; }
+    .say { font-size: var(--t-sm); line-height: 1.6; }
+    .work li { font-size: var(--t-sm); }
+    .steps { gap: 18px; }
+  }
+</style>
+
+<script>
+  const film = document.querySelector<HTMLElement>('[data-film]');
+  if (film) {
+    const track = film.querySelector<HTMLElement>('[data-track]')!;
+    const stageEl = film.querySelector<HTMLElement>('.stage')!;
+    const video = film.querySelector<HTMLVideoElement>('[data-video]')!;
+    const rule = film.querySelector<HTMLElement>('[data-rule]')!;
+    const label = film.querySelector<HTMLElement>('[data-label]')!;
+    const panels = [...film.querySelectorAll<HTMLElement>('[data-panel]')];
+    const steps = [...film.querySelectorAll<HTMLButtonElement>('[data-step]')];
+    const stops: [number, number][] = JSON.parse(film.dataset.stops!);
+    const fov: { dt: number; kpc: number[] } = JSON.parse(film.dataset.fov!);
+
+    // Scroll progress → film time, and the stage it falls in.
+    const timeAt = (p: number) => {
+      for (let i = 0; i < stops.length - 1; i++) {
+        const [p0, t0] = stops[i], [p1, t1] = stops[i + 1];
+        if (p <= p1) return t0 + (t1 - t0) * ((p - p0) / (p1 - p0));
+      }
+      return stops[stops.length - 1][1];
+    };
+    const stageAt = (p: number) => { let k = 0; stops.slice(0, -1).forEach(([p0], i) => { if (p >= p0) k = i; }); return k; };
+    const kpcAt = (t: number) => { const x = Math.max(0, t / fov.dt), i = Math.min(fov.kpc.length - 2, Math.floor(x)), f = x - i; return Math.exp(Math.log(fov.kpc[i]) * (1 - f) + Math.log(fov.kpc[i + 1]) * f); };
+
+    let target = stops[0][1], raf = 0, stage = -1, loading = false;
+    let nav = 73, pin = 73;
+    const panelsEl = film.querySelector<HTMLElement>('.panels')!;
+    const headEl = film.querySelector<HTMLElement>('.head')!;
+    const measure = () => {
+      nav = pin = document.querySelector<HTMLElement>('.nav')?.offsetHeight ?? 73;
+      film.style.setProperty('--nav', `${nav}px`); film.style.setProperty('--lift', '0px'); video.style.width = '';
+      // On a phone the words sit under the film. If the longest stage runs off the screen, the film
+      // shrinks; if that is not enough, the heading slides up under the menu by what is left.
+      if (matchMedia('(max-width: 900px)').matches) {
+        let over = panelsEl.getBoundingClientRect().bottom - stageEl.getBoundingClientRect().bottom + 12;
+        if (over > 0) { const w = Math.max(120, video.offsetWidth - over); over -= video.offsetWidth - w; video.style.width = `${w}px`; }
+        if (over > 0) { const lift = Math.ceil(Math.min(over, headEl.offsetTop + headEl.offsetHeight)); pin = nav - lift; film.style.setProperty('--lift', `${lift}px`); }
+      }
+    };
+    // 0 when "Research" reaches the menu and everything stops, 1 when it lets go.
+    const progress = () => {
+      const r = track.getBoundingClientRect();
+      return Math.min(1, Math.max(0, (pin - r.top) / Math.max(1, r.height - stageEl.offsetHeight)));
+    };
+    const scale = () => {
+      const across = kpcAt(video.readyState >= 1 ? video.currentTime : target);
+      const unit = Math.pow(10, Math.floor(Math.log10(across * 0.3)));
+      rule.style.width = `${((unit / across) * video.clientWidth).toFixed(1)}px`;
+      label.textContent = `${unit} kpc`;
+    };
+    // The film follows the scroll: it eases toward the time for the scroll position, one seek at a time.
+    const tick = () => {
+      raf = 0;
+      if (video.readyState >= 1 && !video.seeking) {
+        const d = target - video.currentTime;
+        if (Math.abs(d) > 0.02) video.currentTime = video.currentTime + (Math.abs(d) < 0.5 ? d : d * 0.35);
+      }
+      scale();
+      if (video.readyState < 1 || video.seeking || Math.abs(target - video.currentTime) > 0.02) raf = requestAnimationFrame(tick);
+    };
+    const onScroll = () => {
+      const p = progress();
+      target = timeAt(p);
+      const k = stageAt(p);
+      if (k !== stage) {
+        stage = k;
+        panels.forEach((el, j) => el.classList.toggle('on', j === k));
+        steps.forEach((el, j) => el.classList.toggle('on', j === k));
+      }
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    // Load the film when the section comes near, and keep it still: only the scroll moves it.
+    const load = () => { if (loading) return; loading = true; video.preload = 'auto'; video.load(); };
+    new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) load(); }), { rootMargin: '100% 0px' }).observe(track);
+    // While the film fills the screen, the floating star steps aside (it would cover the words on a phone).
+    new IntersectionObserver((es) => es.forEach((e) => document.documentElement.classList.toggle('in-film', e.isIntersecting)), { threshold: 0.05 }).observe(track);
+    video.addEventListener('play', () => video.pause());
+    video.addEventListener('loadedmetadata', () => { video.currentTime = target; onScroll(); });
+    video.addEventListener('seeked', () => { if (!raf) raf = requestAnimationFrame(tick); });
+    // A stage's name takes the page to where that stage begins.
+    steps.forEach((b, k) => b.addEventListener('click', () => {
+      const r = track.getBoundingClientRect(), run = r.height - stageEl.offsetHeight;
+      const top = scrollY + r.top - pin + run * stops[k][0] + (k ? 2 : 0);
+      scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }));
+    // The thumbnails: the Cosmic Pairs figure flies out and the live explorer opens over it (on
+    // small screens, in a new tab); the blrfit figure just opens larger.
+    const zoom = film.querySelector<HTMLElement>('[data-zoom]')!;
+    const zimg = zoom.querySelector<HTMLImageElement>('[data-zimg]')!;
+    const zcap = zoom.querySelector<HTMLElement>('[data-zcap]')!;
+    const zbar = zoom.querySelector<HTMLElement>('[data-zbar]')!;
+    const znew = zoom.querySelector<HTMLAnchorElement>('[data-znew]')!;
+    let zsrc: HTMLElement | null = null, openedAt = 0, zframe: HTMLIFrameElement | null = null;
+    const goLive = (url: string) => {
+      const f = document.createElement('iframe');
+      f.className = 'zlive'; f.title = 'Interactive figure'; f.src = url; f.setAttribute('allow', 'fullscreen');
+      f.addEventListener('load', () => { const wait = Math.max(0, openedAt + 550 - performance.now()); setTimeout(() => { if (f === zframe) { f.classList.add('on'); zoom.classList.add('live'); } }, wait); });
+      zoom.appendChild(f); zframe = f; znew.href = url; zbar.hidden = false; zoom.classList.add('framed');
+    };
+    const endLive = () => {
+      if (!zframe) return 0;
+      const f = zframe; zframe = null; f.classList.remove('on'); zoom.classList.remove('live', 'framed'); zbar.hidden = true;
+      setTimeout(() => f.remove(), 450); return 250;
+    };
+    const fit = (w: number, h: number) => { const mw = innerWidth * 0.94, mh = innerHeight * 0.86; const k = Math.min(mw / w, mh / h); return { w: w * k, h: h * k }; };
+    const openZoom = (fig: HTMLElement) => {
+      const img = fig.querySelector('img'); if (!img) return;
+      const live = fig.dataset.live;
+      if (live && innerWidth < 900) { window.open(live, '_blank', 'noopener'); return; }
+      zsrc = fig; const first = img.getBoundingClientRect();
+      const nat = fit(img.naturalWidth || 4, img.naturalHeight || 3);
+      const left = (innerWidth - nat.w) / 2, top = (innerHeight - nat.h) / 2 - 16;
+      zimg.src = img.currentSrc || img.src; zimg.alt = img.alt; zcap.textContent = fig.dataset.title ?? '';
+      Object.assign(zimg.style, { left: `${left}px`, top: `${top}px`, width: `${nat.w}px`, height: `${nat.h}px`, transition: 'none',
+        transform: `translate(${first.left - left}px, ${first.top - top}px) scale(${first.width / nat.w}, ${first.height / nat.h})` });
+      zoom.hidden = false; openedAt = performance.now(); zimg.getBoundingClientRect();
+      requestAnimationFrame(() => { zimg.style.transition = ''; zimg.style.transform = 'none'; zoom.classList.add('on'); });
+      document.body.style.overflow = 'hidden';
+      if (live) goLive(live);
+    };
+    const closeZoom = () => {
+      if (zoom.hidden || performance.now() - openedAt < 450) return;
+      const img = zsrc?.querySelector('img');
+      const delay = endLive();
+      setTimeout(() => {
+        zoom.classList.remove('on');
+        if (img) { const r = img.getBoundingClientRect(), z = zimg.getBoundingClientRect(); const left = parseFloat(zimg.style.left), top = parseFloat(zimg.style.top); zimg.style.transform = `translate(${r.left - left}px, ${r.top - top}px) scale(${r.width / z.width}, ${r.height / z.height})`; }
+        setTimeout(() => { zoom.hidden = true; document.body.style.overflow = ''; }, 500);
+      }, delay);
+    };
+    zoom.addEventListener('click', closeZoom);
+    znew.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(); });
+    film.querySelectorAll<HTMLElement>('[data-fig]').forEach((f) => f.addEventListener('click', () => openZoom(f)));
+    film.querySelectorAll<HTMLAnchorElement>('[data-live-open]').forEach((a) => a.addEventListener('click', (e) => {
+      if (innerWidth < 900) return;
+      const f = a.closest('.tool')?.querySelector<HTMLElement>('[data-fig]');
+      if (f) { e.preventDefault(); openZoom(f); }
+    }));
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', () => { measure(); onScroll(); });
+    measure(); onScroll();
+    document.fonts?.ready.then(() => { measure(); onScroll(); });
+  }
+</script>

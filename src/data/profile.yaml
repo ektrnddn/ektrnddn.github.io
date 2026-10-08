@@ -38,7 +38,9 @@ bio: >-
   I study massive black hole pairs: where they are, how many there are, and which ones
   LISA will eventually detect. The work follows the whole evolutionary chain, from
   kiloparsec-scale dual AGN to sub-parsec binaries, and their host galaxy parameters.
-bio_more: Before physics I built robots. TeddyBot, a childcare device I co-founded, won Seed Forum Georgia in 2016.
+bio_more: >-
+  Before black holes I worked on magnetohydrodynamics. Before that I built robots: TeddyBot, a
+  childcare device that won Seed Forum Georgia in 2016, and Quark, a guide robot.
 advisors:
   - Antonella Palmese
   - Tiziana Di Matteo
