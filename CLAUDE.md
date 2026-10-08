@@ -43,7 +43,8 @@ Monochrome. Tokens live in `src/styles/global.css`:
 
 If something needs colour, use `--rose` and nothing else: exactly `#d98aa0`, no tints.
 It is used for the flowers in the drawing, for the explorer's "Read the paper" button
-(ink text on rose) and, in the movie, for black holes that are accreting (AGN light).
+(ink text on rose), in the movie for black holes that are accreting (AGN light), and for the
+"now" dot at the end of the About timeline.
 The old crimson `#8F1D28` is gone.
 
 ## Interactions that exist (keep them working)
@@ -63,6 +64,15 @@ The old crimson `#8F1D28` is gone.
 - Floating star (facts panel) only on the home page; it is draggable.
 - Research: vertical card stack; the Cosmic Pairs card opens the live explorer in the
   zoom overlay. Nav orb next to the name unfolds Email (copies) / GitHub / LinkedIn.
+- About: her portrait (black and white, 3:2, darkest tone the ink colour; it comes up out of
+  the white like a print in the developer tray, once), the bio, the CV button, then the
+  timeline (`src/components/Timeline.astro`, data in `src/data/timeline.yaml`). Three
+  columns: Education (the schools, big); Research and projects (what mattered most, each with
+  a bar as long as it lasted and the papers it led to beneath it); Along the way (prizes led
+  by the place, talks, juries, schools). Time runs down the page and a busy year grows
+  taller; a line on the far left draws itself on scroll and things appear as it passes; the
+  column names stay pinned under the nav. No year ruler: every item carries its own date.
+  Phones get one column in date order. Technical skills follow the timeline.
 - Footer: contact row, then the block-letter name at the very bottom; the friend's
   sketch stands on the base bar of the last "I" of DADIANI, as tall as its stem, with
   "as drawn by a friend" and a curly arrow beside it.
@@ -71,10 +81,12 @@ The old crimson `#8F1D28` is gone.
 
 - Content: `src/data/*.yaml` (loaded through `src/data/load.ts`). `[label](url)` in
   facts makes a link; `[[text]]` in the intro highlights.
-- About and the talks on Publications mirror the CV (talks appear only on Publications). The CV source is the private Overleaf repo
+- The talks on Publications and the skills on About mirror the CV. The About timeline mirrors it
+  too but also holds things only in her older CVs (2016-2024): olympiads, hackathons, the
+  Perimeter program, juries; dates marked `?` in `timeline.yaml` are guesses. The CV source is the private Overleaf repo
   `ektrnddn/Ekaterine_Dadiani_CV` (`main.tex`); read it with
   `gh api repos/ektrnddn/Ekaterine_Dadiani_CV/contents/main.tex --jq .content | base64 -d`
-  and update the YAML to match when asked. Entries not in the CV are dropped.
+  and update the YAML to match when asked. Outside the timeline, entries not in the CV are dropped.
 - The drawing is generated: edit `docs/scene/scene_gen.py` (SVG) or
   `docs/scene/build_sketch.py` (stars, interactions, CSS), then run
   `python3 docs/scene/scene_gen.py docs/scene && python3 docs/scene/build_sketch.py docs/scene src/components/Sketch.astro`.

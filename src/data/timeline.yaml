@@ -1,0 +1,142 @@
+# The timeline on the About page, in three columns: where I studied (eras); inside each, what
+# mattered most (projects: research and the papers it led to, programmes, the start-up), each
+# with a bar as long as it lasted; and the small things along the way.
+#
+# Dates are "YYYY", "YYYY-MM" or "YYYY-MM-DD" (quoted); a year alone means some time that year.
+# w is the weight: 1 for what matters most, 2 normal, 3 small.
+# Papers name a publication by its id in publications.yaml (for the link); title and venue
+# here are what the timeline shows. A paper without an id is not out yet.
+# Sources: the current CV and the older CVs (2016-2024). Dates marked "?" are guesses.
+
+eras:
+  - at: "2010-09"
+    title: Komarovi School No. 199
+    years: 2010–2016
+    text: Tbilisi. Physics and mathematics, from seventh grade.
+  - at: "2016-09"
+    title: Tbilisi State University
+    years: 2016–2021
+    text: B.Sc. in Physics on a Presidential Scholarship, GPA 4.0. Then one year of the M.Sc. in Fundamental Physics.
+  - at: "2021-08"
+    title: Carnegie Mellon University
+    years: 2021–
+    text: Pittsburgh. M.Sc. in Physics, 2023; Ph.D. candidate since.
+
+projects:
+  - from: "2011-01"
+    to: "2015-06"
+    when: 2011–15
+    w: 2
+    title: National olympiad in physics and maths
+    text: Among the best ten in Georgia.
+  - from: "2015-09"   # ?
+    to: "2017-06"     # ?
+    when: 2015–17
+    w: 1
+    title: TeddyBot, then Quark
+    text: A start-up with two others; I was CEO and head engineer. TeddyBot, an electronic childcare device, won Seed Forum Georgia and made the top six at Seed Forum Estonia. Quark, a guide robot built on Sphero, had funding offers from the Scientific Library of Georgia.
+  - from: "2016-05-08"
+    to: "2016-05-13"
+    when: May 2016
+    w: 1
+    title: Intel ISEF
+    text: Finalist, Phoenix, Arizona.
+  - from: "2018-10"   # the CVs disagree on these dates
+    to: "2019-10"
+    when: 2018–19
+    w: 1
+    title: Ilia State University
+    text: "Assistant researcher with Andria Rogava: self-similar solutions for astrophysical MHD transients."
+    papers:
+      - { id: rogava2022-self-similarity, role: Co-author, title: Self-similarity for astrophysical MHD transients revisited, venue: "Advances in Space Research, 2022" }
+  - from: "2019-05-27"
+    to: "2019-06-07"
+    when: May–June 2019
+    w: 1
+    title: Perimeter Institute
+    text: "Undergraduate summer program: Monte Carlo algorithms and phase transitions, with Paula Mellado."
+  - from: "2019-07-01"
+    to: "2019-08-23"
+    when: July–August 2019
+    w: 1
+    title: CERN
+    text: "Summer student with Nicolas Mounet: wake functions for a circular beam pipe."
+    papers:
+      - { id: mounet2022-wake, role: Co-author, title: Closed-form formulas of the indirect space-charge wake function, venue: "HB2021, 2022" }
+  - from: "2019-08-30"
+    to: "2019-09-11"
+    when: September 2019
+    w: 2
+    title: KU Leuven
+    text: Visiting scholar with Stefaan Poedts.
+  - from: "2019-10"   # ?
+    to: "2020-06"     # ?
+    when: 2019–20
+    w: 1
+    title: B.Sc. thesis
+    text: "With Nana Shatashvili: flows and magnetic fields in a degenerate electron–ion gas."
+    papers:
+      - { id: saralidze2025-catastrophic, role: Co-author, title: Catastrophic formation of macro-scale flow and magnetic fields in the relativistic gas of binary systems, venue: "Astrophysics and Space Science, 2025" }
+  - from: "2021-08"
+    to: "2023-12"
+    when: 2021–23
+    w: 2
+    title: Teaching assistant
+    text: Electronics, physics for engineers, Matter and Interactions.
+  - from: "2021-09"
+    to: "2024-06"     # ?
+    when: 2021–24
+    w: 1
+    title: Dual AGN hosts in ASTRID
+    text: With Tiziana Di Matteo. The hosts of z ∼ 2 dual AGN are mostly rotating disks.
+    papers:
+      - { id: dadiani2024-disky, role: First author, title: z ∼ 2 dual AGN host galaxies are disky, venue: "The Open Journal of Astrophysics, 2024" }
+  - from: "2024-01"
+    when: 2024–
+    w: 1
+    title: Black hole pairs in DESI
+    text: With Antonella Palmese. A census of dual AGN, and the search for sub-parsec binaries.
+    papers:
+      - { id: dadiani2026-cosmic-pairs, role: First author, title: "Cosmic Pairs: a DESI census of dual and offset AGN", venue: "2026" }
+      - { id: chen2025-connecting, role: Co-author, title: Connecting dual AGN searches to LISA and PTA detections, venue: "2025" }
+      - { role: Writing, title: "Cosmic Pairs: a DESI census of massive black hole binaries" }
+      - { role: Next, title: Variational autoencoders on DESI DR3 }
+  - from: "2025-05"
+    when: 2025–27
+    w: 2
+    title: LSST Discovery Alliance fellowship
+    text: "Data science: statistics, imaging, machine learning, visualisation."
+
+along:
+  - { at: "2013", w: 2, kind: 1st place, title: “Who knows physics well” }
+  - { at: "2014-04", w: 2, kind: 1st place, title: Georgian University olympiad in maths }           # ?
+  - { at: "2014-05", w: 2, kind: 1st place, title: Georgian University team olympiad in maths }      # ?
+  - { at: "2015-03", w: 3, kind: 2nd place, title: Girls in Science Innovation Competition }         # ?
+  - { at: "2015-04", w: 1, kind: 1st place, title: Georgian Young Physicists’ Tournament }           # ?
+  - { at: "2015-05", w: 1, kind: 1st place, title: International Young Naturalists’ Tournament }     # ?
+  - { at: "2015-10", w: 3, kind: 2nd place, title: Garage48 hackathon, place: an eco-battery }       # ?
+  - { at: "2015-11", w: 3, kind: 3rd place, title: Ilia State University hardware hackathon }        # ?
+  - { at: "2016-03", w: 2, kind: 1st place, title: FabJam Georgia, place: the most creative lamp }   # ?
+  - { at: "2016-04", w: 2, kind: 1st place, title: Leonardo da Vinci Competition }                   # ?
+  - { at: "2016-06", w: 3, kind: 3rd place, title: Millennium and TSU innovation challenges }        # ?
+  - { at: "2016-07", w: 1, kind: Team, title: International Young Physicists’ Tournament, place: Ekaterinburg }
+  - { at: "2016-11", w: 2, kind: Talk, title: 7th Young Researchers Meeting, place: Turin }          # ?
+  - { at: "2017-04", w: 2, kind: Top prize, title: Young Physicists Conference, place: Tbilisi }      # ?
+  - { at: "2017-10", w: 2, kind: Talk, title: 8th Young Researchers Meeting, place: Cagliari }       # ?
+  - { at: "2018-07", w: 3, kind: Jury, title: International Young Naturalists’ Tournament }          # ?
+  - { at: "2018-08-10", w: 2, kind: Talk, title: International Conference of Physics Students, place: Helsinki }
+  - { at: "2020-05", w: 3, kind: Talk, title: TSU student conference }                               # ?
+  - { at: "2020-07", w: 3, kind: Jury, title: Online International Young Physicists’ Tournament }    # ?
+  - { at: "2023-03-31", w: 2, kind: Talk, title: Pre-LISA electromagnetic mini-workshop }
+  - { at: "2023-04-06", w: 3, kind: Talk, title: 5th Neighborhood Workshop, place: Penn State }
+  - { at: "2023-06-05", w: 3, kind: School, title: Michigan Cosmology Summer School }
+  - { at: "2023-09", w: 2, kind: Joined, title: DESI and the LISA Consortium }                       # ?
+  - { at: "2023-10", w: 3, kind: Workshop, title: NANOGrav Workshop, place: Pittsburgh }             # ?
+  - { at: "2024-02", w: 2, kind: Talk, title: Cosmology on the Beach, place: Playa del Carmen }      # ?
+  - { at: "2024-07-09", w: 1, kind: Talk, title: DESI collaboration meeting, place: Marseille }
+  - { at: "2024-08", w: 2, kind: Organiser, title: International Conference of Physics Students, place: Tbilisi }  # ?
+  - { at: "2025-02", w: 2, kind: Host, title: Astronomy on Tap Pittsburgh }                          # ?
+  - { at: "2025-06", w: 2, kind: School, title: LISA School, place: Les Houches }                     # ?
+  - { at: "2025-07", w: 3, kind: Training, title: "CI Pathways, data science" }                      # ?
+  - { at: "2026-04", w: 3, kind: Talk, title: 8th Neighborhood Workshop, place: Penn State }         # ?
+  - { at: "2026-07-20", w: 1, kind: Talk, title: 16th LISA Symposium, place: College Park }          # ?

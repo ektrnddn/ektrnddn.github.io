@@ -1,9 +1,10 @@
 # Who I am. Edited by hand; rendered on every page.
 name: Ekaterine Dadiani
 short_name: Eka
-# Portrait shown on the home page. Drop a file in public/photos/ and set the path here.
-photo: ""
-photo_alt: Ekaterine Dadiani
+# Portrait at the top of About: black and white, 3:2, darkest tone the ink colour. The page
+# also uses the 900 px copy next to it (portrait-900.jpg).
+photo: /photos/portrait.jpg
+photo_alt: Ekaterine Dadiani on the Carnegie Mellon campus
 title: Ph.D. candidate in Physics
 affiliation: McWilliams Center for Cosmology and Astrophysics, Carnegie Mellon University
 location: Pittsburgh, PA
@@ -37,6 +38,7 @@ bio: >-
   I study massive black hole pairs: where they are, how many there are, and which ones
   LISA will eventually detect. The work follows the whole evolutionary chain, from
   kiloparsec-scale dual AGN to sub-parsec binaries, and their host galaxy parameters.
+bio_more: Before physics I built robots. TeddyBot, a childcare device I co-founded, won Seed Forum Georgia in 2016.
 advisors:
   - Antonella Palmese
   - Tiziana Di Matteo

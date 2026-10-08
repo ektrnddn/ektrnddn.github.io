@@ -1,0 +1,376 @@
+---
+// The About timeline, from src/data/timeline.yaml. Three columns: where I studied; inside each,
+// what mattered most (research and its papers, programmes, the start-up) with a bar as long as
+// it lasted; on the right, the small things. Time runs down the page and a year with more in it
+// grows taller. A line on the far left draws itself as the page scrolls and things appear as it
+// passes. The labels are plain HTML; without the script they read as three lists.
+import { timeline, publications, pubLink, decimalYear } from '../data/load';
+
+const eras = timeline.eras.map((e) => ({ ...e, t: decimalYear(e.at) }));
+const projects = timeline.projects.map((p) => ({
+  ...p,
+  t0: decimalYear(p.from),
+  t1: p.to === undefined ? null : decimalYear(p.to),
+  papers: (p.papers ?? []).map((x) => {
+    const pub = x.id ? publications.find((q) => q.id === x.id) : undefined;
+    return { ...x, url: pub ? pubLink(pub)?.url : undefined };
+  }),
+}));
+let lastYear = '';
+const along = timeline.along
+  .map((a) => ({ ...a, t: decimalYear(a.at) }))
+  .sort((a, b) => a.t - b.t)
+  .map((a) => {
+    const year = String(Math.floor(a.t));
+    const show = year !== lastYear;
+    lastYear = year;
+    return { ...a, year: show ? year : '' };
+  });
+---
+<div class="wl" data-wl>
+  <div class="cols" data-cols aria-hidden="true">
+    <span class="mono"><b>Education</b></span><span class="mono"><b>Research and projects</b></span><span class="mono"><b>Along the way</b></span>
+  </div>
+  <svg data-svg aria-hidden="true"></svg>
+  <div class="items">
+    {eras.map((e) => (
+      <div class="lb era" data-type="era" data-t={e.t}>
+        <b>{e.title}</b>
+        <span class="yrs">{e.years}</span>
+        <span class="dd">{e.text}</span>
+      </div>
+    ))}
+    {projects.map((p) => (
+      <div class:list={['lb', 'imp', `w${p.w}`]} data-type="imp" data-t={p.t0} data-t1={p.t1 ?? ''} data-w={p.w}>
+        <div class="hd"><b>{p.title}</b><span class="when">{p.when}</span></div>
+        {p.text && <p class="dd">{p.text}</p>}
+        {p.papers.length > 0 && (
+          <ul>
+            {p.papers.map((x) => (
+              <li class:list={[x.role === 'First author' && 'fa', !x.url && 'soon']}>
+                <span class="role">{x.role}</span>
+                {x.url ? <a href={x.url} target="_blank" rel="noopener">{x.title}</a> : <span class="pt">{x.title}</span>}
+                {x.venue && <span class="ven">{x.venue}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    ))}
+    {along.map((a) => (
+      <div class:list={['lb', 'sm', `w${a.w}`]} data-type="sm" data-t={a.t} data-w={a.w}>
+        <span class="y">{a.year}</span>
+        <span class="k">{a.kind}</span>
+        <span class="tx"><b>{a.title}</b>{a.place && <span class="dd">{a.place}</span>}</span>
+      </div>
+    ))}
+    <div class="lb nowlb" data-now>Now</div>
+  </div>
+</div>
+
+<style is:global>
+  .wl { position: relative; margin-top: 72px; }
+  .wl .cols { display: none; }
+  .wl > svg { display: none; }
+  /* Without the script: three plain lists. */
+  .wl:not(.ready) .lb { margin-bottom: 14px; }
+  .wl:not(.ready) .nowlb { display: none; }
+
+  .wl.ready .cols { display: block; position: sticky; top: 73px; z-index: 5; height: 42px; background: rgba(255, 255, 255, .95); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); }
+  .wl.ready .cols span { position: absolute; top: 13px; }
+  .wl.ready > svg { display: block; position: absolute; left: 0; top: 0; overflow: visible; z-index: 1; }
+  .wl.ready .lb { position: absolute; z-index: 2; margin: 0; opacity: 0; transform: translateY(6px); transition: opacity .5s ease, transform .6s cubic-bezier(.2, .7, .2, 1); }
+  .wl.ready .lb.on { opacity: 1; transform: none; }
+
+  /* Where I studied */
+  .wl .era b { display: block; font-size: 20px; font-weight: 500; letter-spacing: -.025em; line-height: 1.3; color: var(--ink); }
+  .wl .era .yrs { display: block; margin-top: 4px; font-family: var(--mono); font-size: 12px; color: var(--ink); }
+  .wl .era .dd { display: block; margin-top: 6px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .wl .nowlb { font-family: var(--mono); font-size: 12px; color: var(--ink); }
+
+  /* What mattered most */
+  .wl .imp .hd { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 10px; }
+  .wl .imp b { font-size: 17px; font-weight: 500; letter-spacing: -.015em; line-height: 1.4; color: var(--ink); }
+  .wl .imp .when { font-family: var(--mono); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+  .wl .imp .dd { margin-top: 4px; font-size: 14px; line-height: 1.55; color: var(--text); text-wrap: pretty; }
+  .wl .imp.w2 b { font-size: 15px; color: var(--text); }
+  .wl .imp.w2 .dd { color: var(--muted); }
+  .wl .imp ul { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .wl .imp li { position: relative; padding-left: 17px; font-size: 14px; line-height: 1.45; color: var(--text); }
+  .wl .imp li::before { content: ''; position: absolute; left: 1px; top: .42em; width: 7px; height: 7px; border: 1.3px solid var(--ink); background: var(--paper); }
+  .wl .imp li.fa::before { background: var(--ink); }
+  .wl .imp li.soon::before { border-color: #b5b5b5; }
+  .wl .imp li .role { margin-right: 7px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .wl .imp li.fa .role { color: var(--ink); }
+  .wl .imp li a, .wl .imp li .pt { color: var(--ink); }
+  .wl .imp li.fa a { font-weight: 500; }
+  .wl .imp li.soon .pt { color: var(--muted); }
+  .wl .imp li a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .wl .imp li .ven { color: var(--muted); }
+  .wl .imp li .ven::before { content: ' · '; }
+
+  /* The small things */
+  .wl .sm { display: grid; grid-template-columns: 38px 74px minmax(0, 1fr); column-gap: 10px; align-items: baseline; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+  .wl .sm .y, .wl .sm .k { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .wl .sm b { font-weight: 400; color: var(--text); }
+  .wl .sm .dd::before { content: ' · '; }
+  .wl .sm.w1 b { font-weight: 500; color: var(--ink); }
+  .wl .sm.w1 .k { color: var(--ink); }
+  .wl .sm.w3 b { color: var(--muted); }
+  .wl .lb.hl b { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+  .wl svg .life { stroke: var(--ink); stroke-width: 2; fill: none; stroke-linecap: round; }
+  .wl svg .node { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+  .wl svg .bar { stroke: var(--ink); stroke-width: 2.5; fill: none; stroke-linecap: round; transition: stroke-width .2s; }
+  .wl svg .bar.w2 { stroke: #9b9b9b; stroke-width: 1.6; }
+  .wl svg .bar.hl { stroke-width: 4; }
+  .wl svg .guide { stroke: var(--rule); stroke-width: 1; }
+  .wl svg .sdot { fill: #c9c9c9; }
+  .wl svg .sdot.w1 { fill: var(--ink); }
+  .wl svg .ld { stroke: #d9d9d9; stroke-width: 1; fill: none; }
+  .wl svg .g, .wl svg .ld { opacity: 0; transition: opacity .4s; }
+  .wl svg .g.on, .wl svg .ld.on { opacity: 1; }
+  .wl svg .g.hl { transform: scale(1.8); transform-box: fill-box; transform-origin: center; }
+  .wl svg .pen { fill: var(--ink); }
+  .wl svg .nowdot { fill: var(--rose); transform-box: fill-box; transform-origin: center; }
+  .wl svg .future { opacity: 0; transition: opacity 1s ease .2s; }
+  .wl svg .future.on { opacity: 1; }
+  .wl svg .future path { stroke: var(--ink); stroke-width: 2; fill: none; stroke-dasharray: 2 5; stroke-linecap: round; }
+  .wl svg .future path.w2 { stroke: #9b9b9b; stroke-width: 1.6; }
+  .wl.done svg .nowdot { animation: tl-breathe 2.6s ease-in-out infinite; }
+  @keyframes tl-breathe { 50% { transform: scale(1.35); } }
+
+  @media (max-width: 719px) {
+    .wl { margin-top: 56px; }
+    .wl .era b { font-size: 19px; }
+    .wl .imp b { font-size: 16px; }
+    .wl .imp.w2 b { font-size: 14.5px; }
+    .wl .sm { grid-template-columns: 34px 66px minmax(0, 1fr); column-gap: 8px; font-size: 13px; }
+    .wl .sm .y, .wl .sm .k { font-size: 10.5px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wl.ready .lb, .wl svg .g, .wl svg .ld, .wl svg .future { transition: none; }
+    .wl.done svg .nowdot { animation: none; }
+  }
+</style>
+
+<script>
+  const wl = document.querySelector<HTMLElement>('[data-wl]');
+  if (wl) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = wl.querySelector<SVGSVGElement>('[data-svg]')!;
+    const heads = wl.querySelector<HTMLElement>('[data-cols]')!;
+    const nowEl = wl.querySelector<HTMLElement>('[data-now]')!;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const today = new Date();
+    const NOW = today.getFullYear() + (today.getMonth() + (today.getDate() - 1) / 31) / 12;
+
+    type Item = { el: HTMLElement; type: string; col: number; t: number; t1: number | null; w: number; k: number; h: number; c: number; g: number; y: number; mark?: SVGElement };
+    const items: Item[] = [...wl.querySelectorAll<HTMLElement>('.lb[data-type]')].map((el) => {
+      const type = el.dataset.type!;
+      const t1 = el.dataset.t1 ? Number(el.dataset.t1) : null;
+      return { el, type, col: type === 'era' ? 1 : type === 'imp' ? 2 : 3, t: Number(el.dataset.t), t1, w: Number(el.dataset.w ?? 1), k: 0, h: 0, c: 0, g: 0, y: 0 };
+    });
+    const T0 = Math.min(...items.map((it) => it.t));
+    const imp = items.filter((it) => it.type === 'imp').sort((a, b) => a.t - b.t);
+    // Overlapping bars sit side by side.
+    const laneEnd: number[] = [];
+    for (const it of imp) {
+      let k = laneEnd.findIndex((e) => e < it.t - 0.01);
+      if (k < 0) { k = laneEnd.length; laneEnd.push(0); }
+      laneEnd[k] = it.t1 ?? Infinity; it.k = k + 1;
+    }
+    const LANES = laneEnd.length;
+
+    const el = (tag: string, attrs: Record<string, string | number>, parent: Element = svg) => {
+      const n = document.createElementNS(NS, tag);
+      for (const a in attrs) n.setAttribute(a, String(attrs[a]));
+      parent.appendChild(n);
+      return n as SVGElement;
+    };
+
+    type Slot = { it: Item; want: number; h: number; g: number; y: number };
+    // Blocks never start before their date.
+    const stack = (list: Slot[]) => {
+      list.sort((a, b) => a.want - b.want);
+      let prev = -Infinity;
+      for (const m of list) { m.y = Math.max(m.want, prev); prev = m.y + m.h + m.g; }
+    };
+    // Small things that would overlap form a group centred on where they want to be.
+    const spread = (list: Slot[]) => {
+      list.sort((a, b) => a.want - b.want);
+      const blocks: { its: Slot[]; top: number; h: number }[] = [];
+      for (const it of list) {
+        blocks.push({ its: [it], top: it.want, h: it.h });
+        while (blocks.length > 1) {
+          const c = blocks[blocks.length - 1], p = blocks[blocks.length - 2];
+          if (c.top >= p.top + p.h + p.its[p.its.length - 1].g) break;
+          p.its.push(...c.its);
+          let off = 0, sum = 0;
+          for (const m of p.its) { sum += m.want - off; off += m.h + m.g; }
+          p.h = off - p.its[p.its.length - 1].g; p.top = sum / p.its.length;
+          blocks.pop();
+        }
+      }
+      for (const b of blocks) { let y = b.top; for (const m of b.its) { m.y = y; y += m.h + m.g; } }
+    };
+
+    let Y: (t: number) => number = (t) => t;
+    let H = 0, cur = -1, raf = 0;
+    let reveal: { nodes: Element[]; y: number }[] = [];
+    let bars: { p: SVGElement; y0: number; len: number }[] = [];
+    let life: SVGElement, pen: SVGElement, nowDot: SVGElement, future: SVGElement;
+
+    const layout = () => {
+      svg.textContent = ''; reveal = []; bars = [];
+      wl.classList.add('ready');
+      const W = wl.clientWidth, mobile = W < 720;
+      const nav = document.querySelector<HTMLElement>('.nav');
+      heads.style.top = `${nav ? nav.offsetHeight : 0}px`;
+      heads.style.display = mobile ? 'none' : '';
+      const headH = mobile ? 0 : heads.offsetHeight;
+      const LINE = 6;
+      let LG: number, C1X: number, C1W: number, C2B: number, C2X: number, C2W: number, C3X: number, C3W: number;
+      if (mobile) {
+        LG = 10; C2B = 26; const X = C2B + LANES * LG + 10;
+        [C1X, C1W, C2X, C2W, C3X, C3W] = [X, W - X, X, W - X, X, W - X];
+      } else {
+        LG = 14; C1X = 30; C1W = Math.round(W * 0.21);
+        C2B = C1X + C1W + 26; C2X = C2B + LANES * LG + 12; C2W = Math.round(W * 0.33);
+        C3X = C2X + C2W + 60; C3W = W - C3X;
+        const [h1, h2, h3] = heads.querySelectorAll<HTMLElement>('span');
+        h1.style.left = `${C1X}px`; h2.style.left = `${C2B}px`; h3.style.left = `${C3X}px`;
+      }
+      const laneX = (it: Item) => C2B + (it.k - 1) * LG;
+      for (const it of items) {
+        const [x, w] = it.col === 1 ? [C1X, C1W] : it.col === 2 ? [C2X, C2W] : [C3X, C3W];
+        Object.assign(it.el.style, { left: `${x}px`, width: `${w}px` });
+      }
+      for (const it of items) {
+        it.h = it.el.offsetHeight;
+        it.c = it.type === 'era' ? 14 : it.type === 'imp' ? (it.w === 1 ? 12 : 11) : 10;   // middle of the first line
+        it.g = it.type === 'sm' ? (mobile ? 8 : 5) : mobile ? 18 : 30;                       // space after it
+      }
+
+      // Time runs down at a steady rate; a year with more in it than fits grows taller.
+      const top0 = headH + 34, first = Math.floor(T0), last = Math.floor(NOW), B = mobile ? 84 : 96;
+      const need = new Map<string, number>();
+      for (const it of items) {
+        const yr = Math.min(last, Math.max(first, Math.floor(it.t)));
+        const key = mobile ? `${yr}` : `${yr}:${it.col}`;
+        need.set(key, (need.get(key) ?? 0) + it.h + it.g);
+      }
+      const segs: { a: number; b: number; y: number; h: number }[] = [];
+      let acc = top0;
+      for (let yr = first; yr <= last; yr++) {
+        const a = Math.max(T0, yr), b = Math.min(NOW, yr + 1);
+        if (b <= a) continue;
+        const n = mobile ? need.get(`${yr}`) ?? 0 : Math.max(...[1, 2, 3].map((c) => need.get(`${yr}:${c}`) ?? 0));
+        const h = Math.max(B * (b - a), n * 1.04);
+        segs.push({ a, b, y: acc, h }); acc += h;
+      }
+      Y = (t: number) => {
+        t = Math.max(T0, Math.min(NOW, t));
+        const sg = segs.find((x) => t < x.b) ?? segs[segs.length - 1];
+        return sg.y + ((t - sg.a) / (sg.b - sg.a)) * sg.h;
+      };
+      const groups = mobile ? [items] : [1, 2, 3].map((c) => items.filter((it) => it.col === c));
+      for (const grp of groups) {
+        const list: Slot[] = grp.map((it) => ({ it, want: Y(it.t) - it.c, h: it.h, g: it.g, y: 0 }));
+        if (!mobile && grp[0].col !== 3) stack(list); else spread(list);
+        for (const r of list) { r.it.y = r.y; r.it.el.style.top = `${r.y}px`; }
+      }
+
+      const leader = (x1: number, y1: number, x2: number, y2: number) => {
+        const m = (x2 - x1) * 0.5;
+        return Math.abs(y2 - y1) < 0.6 ? `M${x1},${y1} H${x2}` : `M${x1},${y1} C${x1 + m},${y1} ${x2 - m},${y2} ${x2},${y2}`;
+      };
+
+      // The small things hang off a faint line of their own (on phones, off the main one).
+      const gx = mobile ? LINE : C3X - 20;
+      if (!mobile) el('path', { d: `M${gx},${Y(T0)} V${Y(NOW)}`, class: 'guide' });
+      for (const it of items) {
+        if (it.type !== 'sm') continue;
+        const y = Y(it.t);
+        const ld = el('path', { d: leader(gx + 4, y, C3X - 6, it.y + it.c), class: 'ld' });
+        const dot = el('circle', { cx: gx, cy: y, r: it.w === 1 ? 3.2 : 2.5, class: 'g sdot' + (it.w === 1 ? ' w1' : '') });
+        reveal.push({ nodes: [it.el, ld, dot], y });
+        it.mark = dot;
+      }
+
+      // Bars for what mattered most, as long as it lasted, with its block beside it.
+      for (const it of imp) {
+        const x = laneX(it), y0 = Y(it.t), y1 = Math.max(it.t1 === null ? Y(NOW) : Y(it.t1), y0 + 10), len = y1 - y0;
+        const ld = el('path', { d: leader(x + 5, y0, C2X - 6, it.y + it.c), class: 'ld' });
+        const p = el('path', { d: `M${x},${y0} V${y1}`, class: `bar w${it.w}` });
+        p.style.strokeDasharray = `${len} ${len}`;
+        bars.push({ p, y0, len });
+        reveal.push({ nodes: [it.el, ld], y: y0 });
+        it.mark = p;
+      }
+
+      // The line itself, with a mark where each school begins.
+      life = el('path', { d: `M${LINE},${Y(T0)} V${Y(NOW)}`, class: 'life' });
+      const ll = Y(NOW) - Y(T0); life.style.strokeDasharray = `${ll} ${ll}`;
+      for (const it of items) {
+        if (it.type !== 'era') continue;
+        const y = Y(it.t);
+        const ld = el('path', { d: leader(LINE + 8, y, C1X - 6, it.y + it.c), class: 'ld' });
+        const node = el('circle', { cx: LINE, cy: y, r: 6, class: 'g node' });
+        reveal.push({ nodes: [it.el, ld, node], y });
+      }
+
+      // After now: dashed and fading, for the line and for what is still going on.
+      const defs = el('defs', {});
+      const grad = el('linearGradient', { id: 'tl-fade', x1: 0, y1: Y(NOW), x2: 0, y2: Y(NOW) + 90, gradientUnits: 'userSpaceOnUse' }, defs);
+      el('stop', { offset: 0, 'stop-color': '#fff', 'stop-opacity': 1 }, grad);
+      el('stop', { offset: 1, 'stop-color': '#fff', 'stop-opacity': 0 }, grad);
+      const mask = el('mask', { id: 'tl-fade-mask', maskUnits: 'userSpaceOnUse', x: 0, y: Y(NOW), width: W, height: 96 }, defs);
+      el('rect', { x: 0, y: Y(NOW), width: W, height: 96, fill: 'url(#tl-fade)' }, mask);
+      future = el('g', { class: 'future', mask: 'url(#tl-fade-mask)' });
+      el('path', { d: `M${LINE},${Y(NOW) + 9} V${Y(NOW) + 90}` }, future);
+      for (const it of imp) if (it.t1 === null) el('path', { d: `M${laneX(it)},${Y(NOW) + 6} V${Y(NOW) + 72}`, class: `w${it.w}` }, future);
+      nowDot = el('circle', { cx: LINE, cy: Y(NOW), r: 5.5, class: 'nowdot' });
+      Object.assign(nowEl.style, { left: `${C1X}px`, top: `${Y(NOW) - 9}px` });
+      pen = el('circle', { cx: LINE, cy: Y(T0), r: 3.4, class: 'pen' });
+
+      H = Math.max(Y(NOW) + 100, ...items.map((it) => it.y + it.h)) + 30;
+      wl.style.height = `${H}px`;
+      svg.setAttribute('width', String(W)); svg.setAttribute('height', String(H)); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+      // Hovering a block marks its bar; hovering a small thing marks its dot.
+      for (const it of items) {
+        const mark = it.mark;
+        if (!mark) continue;
+        it.el.onmouseenter = () => { mark.classList.add('hl'); it.el.classList.add('hl'); };
+        it.el.onmouseleave = () => { mark.classList.remove('hl'); it.el.classList.remove('hl'); };
+      }
+      cur = Math.min(cur, H); draw(true);
+    };
+
+    // Scrolling moves a pen down the line; whatever it has passed is drawn.
+    const target = () => {
+      if (reduce) return H + 1;
+      const end = scrollY + innerHeight >= document.documentElement.scrollHeight - 4;
+      return end ? H + 1 : innerHeight * 0.6 - wl.getBoundingClientRect().top;
+    };
+    const draw = (jump: boolean) => {
+      const t = Math.max(-1, Math.min(H + 1, target()));
+      cur = jump ? t : cur + (t - cur) * 0.14;
+      if (Math.abs(t - cur) < 0.4) cur = t;
+      const y0 = Y(T0), yN = Y(NOW);
+      life.style.strokeDashoffset = String(yN - y0 - Math.max(0, Math.min(yN - y0, cur - y0)));
+      for (const b of bars) b.p.style.strokeDashoffset = String(b.len - Math.max(0, Math.min(b.len, cur - b.y0)));
+      for (const r of reveal) { const on = cur >= r.y - 1; for (const n of r.nodes) n.classList.toggle('on', on); }
+      const done = cur >= yN - 0.5;
+      pen.setAttribute('cy', String(Math.min(cur, yN))); pen.style.opacity = cur > y0 && !done ? '1' : '0';
+      nowDot.style.opacity = done ? '1' : '0'; nowEl.classList.toggle('on', done);
+      future.classList.toggle('on', done); wl.classList.toggle('done', done);
+      raf = cur !== t ? requestAnimationFrame(() => draw(false)) : 0;
+    };
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => draw(false)); }, { passive: true });
+    let rt = 0;
+    addEventListener('resize', () => { clearTimeout(rt); rt = window.setTimeout(layout, 120); });
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(layout);
+  }
+</script>
