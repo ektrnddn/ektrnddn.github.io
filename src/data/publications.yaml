@@ -4,7 +4,7 @@
   title: "Cosmic Pairs: A DESI Census of Dual and Offset AGN as Precursors to Massive Black Hole Binaries"
   authors: "Dadiani E., Palmese A., Zhou Y., Chen N., Di Matteo T., Eróstegui A., Mezcua M., et al. (DESI Collaboration)"
   year: 2026
-  venue: "Submitted"
+  venue: "Submitted to ApJ"
   arxiv: "2607.27390"
   project: dual-agn-census
   first_author: true
@@ -14,11 +14,11 @@
       url: https://ektrnddn.github.io/dualagn-explorer/
 
 - id: chen2025-connecting
-  title: "Connecting current and future dual AGN searches to LISA and PTA gravitational wave detections"
-  authors: "Chen N., Zhou Y., Dadiani E., Di Matteo T., Wang C., Palmese A., Shen Y., Li J., Foord A., Bird S., Ni Y., Yang Y., Croft R."
-  year: 2025
-  venue: "arXiv e-print"
-  arxiv: "2512.16844"
+  title: "Connecting Current and Future Dual Active Galactic Nucleus Searches to LISA and Pulsar Timing Array Gravitational-wave Detections"
+  authors: "Chen N., Zhou Y., Dadiani E., Di Matteo T., Wang X., Palmese A., Shen Y., Li J., Foord A., Bird S., Ni Y., Yang Y., Croft R."
+  year: 2026
+  venue: "The Astrophysical Journal, 1008"
+  doi: "10.3847/1538-4357/ae84ce"
   project: dual-agn-census
   first_author: false
   selected: true

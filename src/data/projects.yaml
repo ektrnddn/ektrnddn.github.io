@@ -15,11 +15,11 @@ thesis:
     short: From dual AGN to LISA and PTA
     stage: Merger
     role: Co-author, built the DESI mock samples
-    year: 2025
+    year: 2026
     finding: "Survey-matched dual AGN followed forward in ASTRID, to see which become gravitational-wave sources."
     figure: /figures/papers/gw-merger-rates.jpg
     figure_alt: Expected full-sky massive black hole merger rates from survey-matched mock samples
-    link: https://arxiv.org/abs/2512.16844
+    link: https://doi.org/10.3847/1538-4357/ae84ce
   - title: "Cosmic Pairs: a DESI census of dual and offset AGN as precursors to massive black hole binaries"
     short: "Cosmic Pairs: dual AGN in DESI"
     stage: Dual AGN

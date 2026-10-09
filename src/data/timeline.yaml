@@ -16,7 +16,7 @@ eras:
   - at: "2010-09"
     title: Komarovi School No. 199
     years: 2010–2016
-    text: Tbilisi. Physics and mathematics, from seventh grade.
+    text: Advanced Physics & Mathematics track. Graduated with a 4.0 GPA and a National Gold Medal for top academic performance.
   - at: "2016-09"
     title: Tbilisi State University
     years: 2016–2021
@@ -42,11 +42,11 @@ eras:
     years: 2025–27
     text: Six week-long sessions in data science.
   - at: "2025-06-02"   # ?
-    to: "2025-06-13"     # eleven days
+    to: "2025-06-13"     # two weeks
     kind: training
     title: LISA School
     years: 2025
-    text: Les Houches, eleven days.
+    text: Les Houches, 2 weeks.
   - at: "2025-06-16"   # ?
     to: "2025-08-22"     # ten weeks
     kind: training
@@ -65,7 +65,7 @@ projects:
     to: "2017-06"     # ?
     when: 2015–17
     w: 1
-    title: TeddyBot, then Quark
+    title: TeddyBot & Quark
     text: A start-up with two others; I was CEO and head engineer. TeddyBot, an electronic childcare device, won Seed Forum Georgia and made the top six at Seed Forum Estonia. Quark, a guide robot built on Sphero, had funding offers from the Scientific Library of Georgia.
   - from: "2016-05-08"
     to: "2016-05-13"
@@ -129,8 +129,8 @@ projects:
     title: Black hole pairs in DESI
     text: With Antonella Palmese. A census of dual AGN, and the search for sub-parsec binaries.
     papers:
-      - { id: dadiani2026-cosmic-pairs, role: First author, title: "Cosmic Pairs: a DESI census of dual and offset AGN", venue: "2026" }
-      - { id: chen2025-connecting, role: Co-author, title: Connecting dual AGN searches to LISA and PTA detections, venue: "2025" }
+      - { id: dadiani2026-cosmic-pairs, role: First author, title: "Cosmic Pairs: a DESI census of dual and offset AGN", venue: "Submitted to ApJ, 2026" }
+      - { id: chen2025-connecting, role: Co-author, title: Connecting dual AGN searches to LISA and PTA detections, venue: "The Astrophysical Journal, 2026" }
       - { role: Writing, title: "Cosmic Pairs: a DESI census of massive black hole binaries" }
       - { role: Next, title: Variational autoencoders on DESI DR3 }
   - from: "2025-02"   # ? the CV says 2025 – present (organizing committee)

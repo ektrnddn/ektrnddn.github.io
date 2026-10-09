@@ -1,7 +1,7 @@
 # Talks, posters, schools and workshops. `kind`: talk | school | workshop
 - { year: 2026, kind: talk, event: "16th International LISA Symposium", place: "College Park, Maryland" }
 - { year: 2026, kind: talk, event: "8th Neighborhood Workshop", place: "Penn State University" }
-- { year: 2025, kind: school, event: "LISA School for Early-Career Scientists, an eleven-day programme", place: "École de Physique des Houches, France" }
+- { year: 2025, kind: school, event: "LISA School for Early-Career Scientists, a 2-week programme", place: "École de Physique des Houches, France" }
 - { year: 2024, kind: talk, event: "Cosmology on the Beach", place: "Playa del Carmen, Mexico" }
 - { year: 2024, kind: talk, event: "DESI Collaboration Meeting", place: "Marseille, France" }
 - { year: 2023, kind: talk, event: "First Pre-LISA Electromagnetic Mini-Workshop", place: "online" }
