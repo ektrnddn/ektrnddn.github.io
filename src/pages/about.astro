@@ -33,6 +33,8 @@ const pieces = (s: string) => s.split(/[;,]\s*(?![^()]*\))/).map((x) => x.trim()
           <img src={profile.photo} srcset={`${photoSmall} 900w, ${profile.photo} 1500w`} sizes="(max-width: 900px) 100vw, 576px" width="1500" height="1000" alt={profile.photo_alt ?? profile.name} />
           <PortraitMeadow />
         </div>
+        {/* hide the sage before the first paint, so it is drawn in rather than shown and then redrawn */}
+        <script is:inline>(function (f) { if (!matchMedia('(prefers-reduced-motion: reduce)').matches) f.classList.add('js'); })(document.currentScript.parentNode);</script>
       </figure>
     )}
   </section>
@@ -71,10 +73,11 @@ const pieces = (s: string) => s.split(/[;,]\s*(?![^()]*\))/).map((x) => x.trim()
   .portrait :global(.meadow) { position: absolute; left: -10%; top: 0; width: 120%; height: auto; overflow: visible; pointer-events: none; color: var(--ink); }
   .portrait :global(.meadow *) { vector-effect: non-scaling-stroke; }
   .portrait :global(.meadow .fl) { stroke-width: 1; }
-  .portrait.js :global(.meadow path) { stroke-dasharray: 1 2; stroke-dashoffset: 1.05; transition: stroke-dashoffset var(--t, .5s) cubic-bezier(.45, .05, .55, .95) calc(.35s + var(--d, 0s)); }
-  .portrait.js :global(.meadow .fl) { opacity: 0; transition: opacity .4s ease calc(.35s + var(--d, 0s)); }
-  .portrait.js.in :global(.meadow path) { stroke-dashoffset: 0; }
-  .portrait.js.in :global(.meadow .fl) { opacity: 1; }
+  /* Hidden at once (no transition), then drawn stroke by stroke: the transitions live on .in only. */
+  .portrait.js :global(.meadow path) { stroke-dasharray: 1 2; stroke-dashoffset: 1.05; }
+  .portrait.js :global(.meadow .fl) { opacity: 0; }
+  .portrait.js.in :global(.meadow path) { stroke-dashoffset: 0; transition: stroke-dashoffset var(--t, .5s) cubic-bezier(.45, .05, .55, .95) calc(.35s + var(--d, 0s)); }
+  .portrait.js.in :global(.meadow .fl) { opacity: 1; transition: opacity .4s ease calc(.35s + var(--d, 0s)); }
   /* Facts and skills read the same way: the label on the left, the answer to its right. */
   .facts { display: grid; grid-template-columns: 200px minmax(0, 1fr); column-gap: 24px; row-gap: 8px; margin: 26px 0 0; font-size: var(--t-sm); line-height: 1.6; }
   .facts dt { margin: 0; padding-top: 1px; color: var(--muted); }
@@ -96,8 +99,7 @@ const pieces = (s: string) => s.split(/[;,]\s*(?![^()]*\))/).map((x) => x.trim()
 <script>
   // Once the portrait is on screen, the sage is drawn on past its edges.
   const fig = document.querySelector<HTMLElement>('[data-develop]');
-  if (fig && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    fig.classList.add('js');
+  if (fig?.classList.contains('js')) {
     new IntersectionObserver((es, io) => es.forEach((e) => {
       if (e.isIntersecting) { setTimeout(() => fig.classList.add('in'), 250); io.disconnect(); }
     }), { threshold: 0.4 }).observe(fig);
