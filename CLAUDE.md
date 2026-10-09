@@ -156,6 +156,10 @@ The old crimson `#8F1D28` is gone.
   `ektrnddn/Ekaterine_Dadiani_CV` (`main.tex`); read it with
   `gh api repos/ektrnddn/Ekaterine_Dadiani_CV/contents/main.tex --jq .content | base64 -d`
   and update the YAML to match when asked. Outside the timeline, entries not in the CV are dropped.
+  The CV PDF on the site is `public/cv/Ekaterine_Dadiani_CV.pdf` (with `last-built.txt`, shown as
+  "Updated …" on About). Build it here with tectonic (installed with Homebrew):
+  `tectonic -X compile main.tex` in a copy of the CV repo, then copy `main.pdf` over it. After
+  editing the CV repo on GitHub, she pulls the change into Overleaf (Menu, GitHub, Pull).
 - The drawing is generated: edit `docs/scene/scene_gen.py` (SVG) or
   `docs/scene/build_sketch.py` (stars, interactions, CSS), then run
   `python3 docs/scene/scene_gen.py docs/scene && python3 docs/scene/build_sketch.py docs/scene src/components/Sketch.astro`.
