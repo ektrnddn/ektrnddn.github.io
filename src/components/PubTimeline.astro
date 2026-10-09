@@ -57,7 +57,7 @@ const authors = (s: string) => s.replace(/Dadiani E\./g, '<strong>Dadiani E.</st
   .year { position: relative; display: inline-block; padding: 0 6px; background: var(--paper); font-variant-numeric: tabular-nums; font-size: var(--t-xs); line-height: 22px; color: var(--ink); }
 
   .papers { display: flex; flex-direction: column; gap: 26px; }
-  .paper { scroll-margin-top: 100px; }
+  .paper { scroll-margin-top: calc(var(--nav, 73px) + 150px); }
   .paper:target h3 a { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
   .paper h3 { font-size: var(--t-md); font-weight: 500; letter-spacing: -.01em; line-height: 1.35; text-wrap: pretty; }
   .paper h3 a { color: var(--ink); }

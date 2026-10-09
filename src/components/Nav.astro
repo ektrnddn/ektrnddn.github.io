@@ -84,4 +84,7 @@ const isActive = (href: string) => !href.includes('#') && path.startsWith(href);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
     document.addEventListener('pointerdown', (e) => { if (!orb.contains(e.target as Node)) close(); });
   }
+  // The menu's height, for what pins itself under it ("Publications" on the home page).
+  const navEl = document.querySelector<HTMLElement>('.nav');
+  if (navEl) { const h = () => document.documentElement.style.setProperty('--nav', `${navEl.offsetHeight}px`); h(); addEventListener('resize', h); }
 </script>

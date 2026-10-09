@@ -38,7 +38,8 @@ const links = [
   </section>
 
   <section class="wrap sec pubs" id="publications">
-    <h2 class="big-h">Publications</h2>
+    <span class="pin-at" aria-hidden="true"></span>
+    <h2 class="big-h pin" data-pin>Publications</h2>
     <PubTimeline />
   </section>
   <section class="wrap go-links">
@@ -83,6 +84,12 @@ const links = [
   .earlier :global(.ref:hover)::after, .earlier :global(.ref:focus-visible)::after { opacity: 1; transform: translate(-50%, 0); }
   .earlier :global(.ref:hover) { text-decoration: none; }
   .pubs { scroll-margin-top: 60px; }
+  /* "Publications" stays under the menu, like "Research", while the list runs up beneath it and
+     fades out just under the heading. */
+  .pubs .pin { position: sticky; top: var(--nav, 73px); z-index: 3; margin: -22px 0 -18px; padding: 22px 0 18px; background: var(--paper); }
+  .pubs .pin::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 64px; background: linear-gradient(var(--paper), rgba(255, 255, 255, 0)); pointer-events: none; opacity: 0; transition: opacity .3s; }
+  .pubs .pin.stuck::after { opacity: 1; }
+  .pin-at { display: block; }
   :global(#research) { scroll-margin-top: 0; }
   .go-links { padding-top: 24px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 28px; align-items: flex-start; }
   .big { display: inline-flex; align-items: center; gap: 12px; font-size: var(--t-xl); font-weight: 500; letter-spacing: -.03em; color: var(--ink); border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
@@ -102,3 +109,13 @@ const links = [
     .hero :global(.sketch) { margin-top: -20px; }
   }
 </style>
+
+<script>
+  // The fade under "Publications" shows only while the heading is held under the menu.
+  const pin = document.querySelector<HTMLElement>('[data-pin]');
+  if (pin) {
+    const at = pin.previousElementSibling as HTMLElement;
+    const check = () => pin.classList.toggle('stuck', pin.getBoundingClientRect().top - (at.getBoundingClientRect().top - 22) > 0.5);
+    addEventListener('scroll', check, { passive: true }); addEventListener('resize', check); check();
+  }
+</script>

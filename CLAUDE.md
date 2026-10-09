@@ -94,7 +94,9 @@ The old crimson `#8F1D28` is gone.
 - Publications (`src/components/PubTimeline.astro`, every paper and talk, never cut to a
   selection): newest year first, papers on the left (no bullets; her name bold in the authors),
   talks and schools on the right, and between them one line with the years on it. Phones: the
-  line at the left, each year then its papers then its talks.
+  line at the left, each year then its papers then its talks. Like "Research", the heading
+  "Publications" stays under the menu while the list runs up beneath it, fading out just under the
+  heading (the fade shows only while it is held there).
 - Earlier versions of the research, kept for reference only: `_archive/research-cards/` (a hand
   of cards), `_archive/research-zoom/` (Powers of Ten drawn on a canvas),
   `_archive/research-constellation/`, `_archive/research-v2/`, `_archive/research-v3/` (results
