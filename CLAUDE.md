@@ -122,12 +122,25 @@ The old crimson `#8F1D28` is gone.
   not joined to it, as in the second column: ink for collaborations, grey for trainings); what
   mattered most (research, projects,
   programmes), each with a bar as long as it lasted and the papers it led to beneath it; the
-  small things along the way (prizes led by the place, talks, juries, small schools). One
-  time scale for all three columns: a date sits at the same height across the page, and
-  wherever a column needs room, time stretches there for every column. A line on the far left
-  draws itself on scroll (its tip sits at 85% of the window height); whatever it hasn't
-  reached yet waits blurred and faint, and comes into focus as it passes. No year ruler:
-  every item carries its own date. Phones get one column in date order.
+  small things along the way (prizes led by the place, talks, juries, small schools). Now is
+  at the top (the rose dot, with dashes running on above it for what is still going on) and
+  the page runs back in time; each label sits at its latest date (now, for what is ongoing),
+  ties earliest begun first (so the first column opens with Carnegie Mellon, then DESI and LISA,
+  then LSST). The school she is at now starts at the now dot itself (no ring of its own), with
+  "Now" just above its name. One time scale for all three columns: a date sits at the same height across the
+  page, and wherever a column needs room, time stretches there for every column; something that
+  lasted a while may instead hang a little lower along its own bar (time stretches at the bar's
+  start if the bar would not reach it), so the other columns still start at the top. The first
+  column is a little over a quarter of the width, the second about a third, the third (the small
+  things) the rest, about a quarter. Leaders are straight
+  lines only, straight across from the bar or dot to the label (no curves). The schools in the
+  first column start where the collaborations' labels do, clear of their bars. A line on the
+  far left draws itself down from now on scroll (its tip sits at 85% of the window height);
+  whatever it hasn't reached yet waits blurred and faint, and comes into focus as it passes. The
+  years sit to the left of that line, each at its 1 January with a small tick, out in the page
+  margin (on phones the line moves in to make room), so a date reads across all three columns;
+  the third column carries no years of its own, only the kind (Talk, 1st place). Phones get one
+  column, newest first.
 - Footer: contact row; on the home page only, the block-letter name at the very bottom; the friend's
   sketch (with a small mouse by the cat's paw, added in the same line) stands on the base bar
   of the last "I" of DADIANI, as tall as its stem, with "as drawn by a friend" and a curly

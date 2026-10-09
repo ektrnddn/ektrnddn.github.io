@@ -1,12 +1,13 @@
 ---
 // The About timeline, from src/data/timeline.yaml. Three columns: where I studied; inside each,
 // what mattered most (research and its papers, programmes, the start-up) with a bar as long as
-// it lasted; on the right, the small things. Time runs down the page and a year with more in it
-// grows taller. A line on the far left draws itself as the page scrolls and things appear as it
-// passes. The labels are plain HTML; without the script they read as three lists.
+// it lasted; on the right, the small things. Now is at the top and the page runs back in time;
+// a year with more in it grows taller. A line on the far left draws itself down from now as the
+// page scrolls and things appear as it passes. The labels are plain HTML; without the script they
+// read as three lists, newest first.
 import { timeline, publications, pubLink, decimalYear } from '../data/load';
 
-const eras = timeline.eras.map((e) => ({ ...e, t: decimalYear(e.at), t1: e.to === undefined ? null : decimalYear(e.to) }));
+const eras = timeline.eras.map((e) => ({ ...e, t: decimalYear(e.at), t1: e.to === undefined ? null : decimalYear(e.to) })).sort((a, b) => b.t - a.t);
 const projects = timeline.projects.map((p) => ({
   ...p,
   t0: decimalYear(p.from),
@@ -15,17 +16,10 @@ const projects = timeline.projects.map((p) => ({
     const pub = x.id ? publications.find((q) => q.id === x.id) : undefined;
     return { ...x, url: pub ? pubLink(pub)?.url : undefined };
   }),
-}));
-let lastYear = '';
+})).sort((a, b) => (b.t1 ?? Infinity) - (a.t1 ?? Infinity) || b.t0 - a.t0);
 const along = timeline.along
   .map((a) => ({ ...a, t: decimalYear(a.at) }))
-  .sort((a, b) => a.t - b.t)
-  .map((a) => {
-    const year = String(Math.floor(a.t));
-    const show = year !== lastYear;
-    lastYear = year;
-    return { ...a, year: show ? year : '' };
-  });
+  .sort((a, b) => b.t - a.t);
 ---
 <div class="wl" data-wl>
   <svg data-svg aria-hidden="true"></svg>
@@ -56,7 +50,6 @@ const along = timeline.along
     ))}
     {along.map((a) => (
       <div class:list={['lb', 'sm', `w${a.w}`]} data-type="sm" data-t={a.t} data-w={a.w}>
-        <span class="y">{a.year}</span>
         <span class="k">{a.kind}</span>
         <span class="tx"><b>{a.title}</b>{a.place && <span class="dd">{a.place}</span>}</span>
       </div>
@@ -66,7 +59,7 @@ const along = timeline.along
 </div>
 
 <style is:global>
-  .wl { position: relative; margin-top: 72px; }
+  .wl { position: relative; margin-top: 40px; }
   .wl > svg { display: none; }
   /* Without the script: three plain lists. */
   .wl:not(.ready) .lb { margin-bottom: 14px; }
@@ -105,8 +98,8 @@ const along = timeline.along
   .wl .imp li .ven::before { content: ' · '; }
 
   /* The small things */
-  .wl .sm { display: grid; grid-template-columns: 40px 78px minmax(0, 1fr); column-gap: 10px; align-items: baseline; font-size: var(--t-sm); line-height: 1.5; color: var(--muted); }
-  .wl .sm .y, .wl .sm .k { font-variant-numeric: tabular-nums; font-size: var(--t-xs); color: var(--muted); white-space: nowrap; }
+  .wl .sm { display: grid; grid-template-columns: 78px minmax(0, 1fr); column-gap: 10px; align-items: baseline; font-size: var(--t-sm); line-height: 1.5; color: var(--muted); }
+  .wl .sm .k { font-variant-numeric: tabular-nums; font-size: var(--t-xs); color: var(--muted); white-space: nowrap; }
   .wl .sm b { font-weight: 400; color: var(--text); }
   .wl .sm .dd::before { content: ' · '; }
   .wl .sm.w1 b { font-weight: 500; color: var(--ink); }
@@ -125,6 +118,8 @@ const along = timeline.along
   .wl svg .sdot.w1 { fill: var(--ink); }
   .wl svg .sdot.w3 { fill: var(--faint); }
   .wl svg .ld { stroke: var(--faint); stroke-width: 1; fill: none; }
+  .wl svg .yt { stroke: var(--soft); stroke-width: 1; fill: none; }
+  .wl svg .yr { font-size: var(--t-xs); font-variant-numeric: tabular-nums; fill: var(--muted); text-anchor: end; }
   .wl svg .ghost { stroke: var(--rule); stroke-width: 2; fill: none; stroke-linecap: round; }
   .wl svg .ghost.w1 { stroke-width: 2.5; }
   .wl svg .ghost.w2 { stroke-width: 1.6; }
@@ -139,21 +134,21 @@ const along = timeline.along
   .wl svg .future path { stroke: var(--ink); stroke-width: 2; fill: none; stroke-dasharray: 2 5; stroke-linecap: round; }
   .wl svg .future path.w2 { stroke: var(--soft); stroke-width: 1.6; }
   .wl svg .future path.w3 { stroke: var(--faint); stroke-width: 1.3; }
-  .wl.done svg .nowdot { animation: tl-breathe 2.6s ease-in-out infinite; }
+  .wl.live svg .nowdot { animation: tl-breathe 2.6s ease-in-out infinite; }
   @keyframes tl-breathe { 50% { transform: scale(1.35); } }
 
   @media (max-width: 719px) {
-    .wl { margin-top: 56px; }
+    .wl { margin-top: 24px; }
     .wl .era b { font-size: var(--t-lg); }
     .wl .imp b { font-size: var(--t-md); }
     .wl .imp.w2 b { font-size: var(--t-sm); }
     .wl .era.minor b { font-size: var(--t-md); }
-    .wl .sm { grid-template-columns: 36px 70px minmax(0, 1fr); column-gap: 8px; font-size: var(--t-sm); }
-    .wl .sm .y, .wl .sm .k { font-size: var(--t-xs); }
+    .wl .sm { grid-template-columns: 70px minmax(0, 1fr); column-gap: 8px; font-size: var(--t-sm); }
+    .wl .sm .k { font-size: var(--t-xs); }
   }
   @media (prefers-reduced-motion: reduce) {
     .wl.ready .lb, .wl svg .g, .wl svg .ld, .wl svg .future { transition: none; }
-    .wl.done svg .nowdot { animation: none; }
+    .wl.live svg .nowdot { animation: none; }
   }
 </style>
 
@@ -167,15 +162,23 @@ const along = timeline.along
     const today = new Date();
     const NOW = today.getFullYear() + (today.getMonth() + (today.getDate() - 1) / 31) / 12;
 
-    type Item = { el: HTMLElement; type: string; col: number; t: number; t1: number | null; w: number; k: number; h: number; c: number; g: number; y: number; minor: boolean; training: boolean; mark?: SVGElement };
+    // a: the item's latest date, where its label sits (now, for what is still going on);
+    // ya: the height its label's first line sits at.
+    type Item = { el: HTMLElement; type: string; col: number; t: number; t1: number | null; a: number; ya: number; w: number; k: number; h: number; c: number; g: number; y: number; minor: boolean; training: boolean; mark?: SVGElement };
     const items: Item[] = [...wl.querySelectorAll<HTMLElement>('.lb[data-type]')].map((el) => {
       const type = el.dataset.type!;
       let t1 = el.dataset.t1 ? Number(el.dataset.t1) : null;
       if (t1 !== null && t1 >= NOW) t1 = null;                    // still going on
-      return { el, type, col: type === 'era' ? 1 : type === 'imp' ? 2 : 3, t: Number(el.dataset.t), t1, w: Number(el.dataset.w ?? 1), k: 0, h: 0, c: 0, g: 0, y: 0,
+      return { el, type, col: type === 'era' ? 1 : type === 'imp' ? 2 : 3, t: Number(el.dataset.t), t1, a: 0, ya: 0, w: Number(el.dataset.w ?? 1), k: 0, h: 0, c: 0, g: 0, y: 0,
         minor: el.dataset.minor !== undefined, training: el.dataset.kind === 'training' };
     });
+    // A school lasts until the next one begins.
+    const schools = items.filter((it) => it.type === 'era' && !it.minor).sort((a, b) => a.t - b.t);
+    schools.forEach((it, i) => { it.t1 = i + 1 < schools.length ? schools[i + 1].t : null; });
+    const current = schools.find((it) => it.t1 === null);       // the school now, which starts at the now dot
+    for (const it of items) it.a = it.type === 'sm' ? it.t : it.t1 ?? NOW;
     const T0 = Math.min(...items.map((it) => it.t));
+    const U = (t: number) => NOW - Math.max(T0, Math.min(NOW, t)), UEND = NOW - T0;
     const imp = items.filter((it) => it.type === 'imp').sort((a, b) => a.t - b.t);
     // Overlapping bars sit side by side.
     const laneEnd: number[] = [];
@@ -185,7 +188,7 @@ const along = timeline.along
       laneEnd[k] = it.t1 ?? Infinity; it.k = k + 1;
     }
     const LANES = laneEnd.length;
-    // In the first column, the collaborations and trainings branch off the line, side by side.
+    // In the first column, the collaborations and trainings run beside the line, side by side.
     const minors = items.filter((it) => it.minor).sort((a, b) => a.t - b.t);
     const laneEnd1: number[] = [];
     for (const it of minors) {
@@ -202,7 +205,7 @@ const along = timeline.along
       return n as SVGElement;
     };
 
-    let Y: (t: number) => number = (t) => t;
+    let Y: (u: number) => number = (u) => u;
     let H = 0, cur = -1, raf = 0;
     let reveal: { nodes: Element[]; y: number }[] = [];
     let bars: { p: SVGElement; y0: number; len: number }[] = [];
@@ -212,15 +215,18 @@ const along = timeline.along
       svg.textContent = ''; reveal = []; bars = [];
       wl.classList.add('ready');
       const W = wl.clientWidth, mobile = W < 720;
-      const LINE = 6;
+      // the line sits far left; the years hang to its left, in the page's margin (pushed in if the margin is too narrow)
+      const LINE = Math.max(6, Math.round(44 - wl.getBoundingClientRect().left));
       let LG: number, L1G: number, C1X: number, C1W: number, C1M: number, C2B: number, C2X: number, C2W: number, C3X: number, C3W: number;
       if (mobile) {
         LG = 10; L1G = 9; C2B = LINE + LANES1 * L1G + 14; const X = C2B + LANES * LG + 10;
         [C1X, C1W, C1M, C2X, C2W, C3X, C3W] = [X, W - X, X, X, W - X, X, W - X];
       } else {
-        LG = 14; L1G = 13; C1X = 30; C1W = Math.round(W * 0.21); C1M = LINE + LANES1 * L1G + 20;
-        C2B = C1X + C1W + 26; C2X = C2B + LANES * LG + 12; C2W = Math.round(W * 0.32);
-        C3X = C2X + C2W + 52; C3W = W - C3X;
+        // the schools start where the collaborations do, clear of their bars, which now run past them
+        const R1 = 30 + Math.round(W * 0.28);
+        LG = 14; L1G = 13; C1M = LINE + LANES1 * L1G + 20; C1X = C1M; C1W = R1 - C1X;
+        C2B = R1 + 26; C2X = C2B + LANES * LG + 12; C2W = Math.round(W * 0.34);
+        C3X = C2X + C2W + 44; C3W = W - C3X;
       }
       const laneX = (it: Item) => C2B + (it.k - 1) * LG;
       const laneX1 = (it: Item) => LINE + it.k * L1G;
@@ -230,126 +236,143 @@ const along = timeline.along
       }
       for (const it of items) {
         it.h = it.el.offsetHeight;
-        it.c = it.type === 'era' ? (it.el.dataset.minor !== undefined ? 12 : 14) : it.type === 'imp' ? (it.w === 1 ? 12 : 11) : 11;   // middle of the first line
-        it.g = it.type === 'sm' ? (mobile ? 9 : 7) : it.el.dataset.minor !== undefined ? 18 : mobile ? 18 : 30;   // space after it
+        it.c = it.type === 'era' ? (it.minor ? 12 : 14) : it.type === 'imp' ? (it.w === 1 ? 12 : 11) : 11;   // middle of the first line
+        it.g = it.type === 'sm' ? (mobile ? 9 : 7) : it.minor ? 18 : mobile ? 18 : 30;   // space after it
       }
 
       // One time scale for all three columns, so a date sits at the same height across the page.
-      // Time runs down at a steady rate; going through the items in date order, wherever a column
-      // still needs room for the block above, time pauses there for every column. Each block
-      // starts at its own date; only blocks that share a date in one column stack.
-      const top0 = 34, B = mobile ? 84 : 96;
-      const kts: number[] = [T0], kys: number[] = [top0];        // the scale's breakpoints
-      const free = new Map<string, number>();                     // where each column is free again
-      const ahead = (t: number) => kys[kys.length - 1] + (t - kts[kts.length - 1]) * B;
-      const place = (t: number, need: number) => {
-        const later = t > kts[kts.length - 1] + 1e-6;
-        if (later && need > ahead(t)) {
+      // From now down, time runs back at a steady rate; going through the items newest first,
+      // wherever a column still needs room for the block above, time pauses there for every
+      // column. Something that lasted (a school, a project, a collaboration) can instead hang a
+      // little lower along its own bar, if its bar reaches that far; a single date cannot.
+      const top0 = 96, B = mobile ? 84 : 96;
+      let kus: number[] = [0], kys: number[] = [top0];             // the scale's breakpoints
+      const ahead = (u: number) => kys[kys.length - 1] + (u - kus[kus.length - 1]) * B;
+      const place = (u: number, need: number) => {
+        if (need > ahead(u)) {
           // time pauses just before this date: the room opens there instead of being spread
           // over the months before, so what lasts a few days still looks short
-          const tp = t - 0.004;
-          if (tp > kts[kts.length - 1] + 1e-6) { kts.push(tp); kys.push(ahead(tp)); }
-          kts.push(t); kys.push(need);
+          const up = u - 0.004;
+          if (up > kus[kus.length - 1] + 1e-6) { const yp = ahead(up); kus.push(up); kys.push(yp); }
+          kus.push(u); kys.push(need);
           return need;
         }
-        const y = Math.max(ahead(t), need);
-        if (later) { kts.push(t); kys.push(y); }
+        const y = ahead(u);
+        kus.push(u); kys.push(y);
         return y;
       };
-      for (const it of [...items].sort((a, b) => a.t - b.t)) {
+      const order = [...items].sort((a, b) => U(a.a) - U(b.a) || a.t - b.t);    // ties: earliest begun first
+      // A label that hangs lower along its bar needs the bar to reach it: the scale must be at
+      // least that low by the bar's start, and time stretches there if it isn't.
+      kus = [0]; kys = [top0];
+      const floors: [number, number][] = [];
+      const settle = (u: number) => {
+        floors.sort((a, b) => a[0] - b[0]);
+        while (floors.length && floors[0][0] <= u) {
+          const [fu, fy] = floors.shift()!;
+          if (fu > kus[kus.length - 1] + 1e-6) place(fu, fy);
+        }
+      };
+      const free = new Map<string, number>([[mobile ? 'all' : '1', current ? -Infinity : top0 + 22]]);   // room for "Now", if no school is under it
+      for (const it of order) {
         const col = mobile ? 'all' : String(it.col);
-        const y = place(Math.max(T0, Math.min(NOW, it.t)), (free.get(col) ?? -Infinity) + it.c);
-        it.y = y - it.c; it.el.style.top = `${it.y}px`;
+        const need = (free.get(col) ?? -Infinity) + it.c;
+        const u = Math.max(U(it.a), kus[kus.length - 1] + 1e-4);
+        settle(u);
+        let y: number;
+        // something that lasted a while hangs lower along its bar; a single date, or something
+        // short, makes time pause at it instead
+        if (it.type !== 'sm' && need > ahead(u) && ahead(U(it.t)) - ahead(u) >= 60) { y = need; floors.push([U(it.t), need + 8]); }
+        else y = place(u, need);
+        it.ya = y; it.y = y - it.c;
         free.set(col, it.y + it.h + it.g);
       }
-      const nowCol = mobile ? 'all' : '1';
-      place(NOW, (free.get(nowCol) ?? -Infinity) + 14);            // room for "Now"
-      Y = (t: number) => {
-        t = Math.max(T0, Math.min(NOW, t));
+      settle(Infinity);
+      for (const it of items) it.el.style.top = `${it.y}px`;
+      Y = (u: number) => {
+        u = Math.max(0, Math.min(UEND, u));
         let i = 0;
-        while (i < kts.length - 1 && kts[i + 1] < t) i++;
-        if (i >= kts.length - 1) return ahead(t);
-        return kys[i] + ((t - kts[i]) / (kts[i + 1] - kts[i])) * (kys[i + 1] - kys[i]);
+        while (i < kus.length - 1 && kus[i + 1] < u) i++;
+        if (i >= kus.length - 1) return ahead(u);
+        return kys[i] + ((u - kus[i]) / (kus[i + 1] - kus[i])) * (kys[i + 1] - kys[i]);
       };
-
-      const leader = (x1: number, y1: number, x2: number, y2: number) => {
-        const m = (x2 - x1) * 0.5;
-        return Math.abs(y2 - y1) < 0.6 ? `M${x1},${y1} H${x2}` : `M${x1},${y1} C${x1 + m},${y1} ${x2 - m},${y2} ${x2},${y2}`;
-      };
+      const Yt = (t: number) => Y(U(t));
+      const yTop = Y(0), yEnd = Y(UEND);
+      // Straight leaders only: across from the mark to its label, at the label's height.
+      const leader = (x1: number, x2: number, y: number) => `M${x1},${y} H${x2}`;
 
       // The small things hang off a faint line of their own (on phones, off the main one).
       const gx = mobile ? LINE : C3X - 20;
       if (!mobile) {
-        el('path', { d: `M${gx},${Y(T0)} V${Y(NOW)}`, class: 'guide' });
-        const gp = el('path', { d: `M${gx},${Y(T0)} V${Y(NOW)}`, class: 'guide-ink' });
-        const gl = Y(NOW) - Y(T0); gp.style.strokeDasharray = `${gl} ${gl}`;
-        bars.push({ p: gp, y0: Y(T0), len: gl });
+        el('path', { d: `M${gx},${yTop} V${yEnd}`, class: 'guide' });
+        const gp = el('path', { d: `M${gx},${yTop} V${yEnd}`, class: 'guide-ink' });
+        const gl = yEnd - yTop; gp.style.strokeDasharray = `${gl} ${gl}`;
+        bars.push({ p: gp, y0: yTop, len: gl });
       }
       for (const it of items) {
         if (it.type !== 'sm') continue;
-        const y = Y(it.t);
-        const ld = el('path', { d: leader(gx + 4, y, C3X - 6, it.y + it.c), class: 'ld' });
+        const y = it.ya;
+        const ld = el('path', { d: leader(gx + 4, C3X - 6, y), class: 'ld' });
         const dot = el('circle', { cx: gx, cy: y, r: it.w === 1 ? 3.4 : it.w === 2 ? 2.8 : 2.4, class: `g sdot w${it.w}` });
         reveal.push({ nodes: [it.el, ld, dot], y });
         it.mark = dot;
       }
 
-      // Bars for what mattered most, as long as it lasted, with its block beside it.
-      for (const it of imp) {
-        const x = laneX(it), y0 = Y(it.t), y1 = Math.max(it.t1 === null ? Y(NOW) : Y(it.t1), y0 + 10), len = y1 - y0;
-        const ld = el('path', { d: leader(x + 5, y0, C2X - 6, it.y + it.c), class: 'ld' });
-        el('path', { d: `M${x},${y0} V${y1}`, class: `ghost w${it.w}` });
-        const p = el('path', { d: `M${x},${y0} V${y1}`, class: `bar w${it.w}` });
-        p.style.strokeDasharray = `${len} ${len}`;
-        bars.push({ p, y0, len });
-        reveal.push({ nodes: [it.el, ld], y: y0 });
-        it.mark = p;
-      }
-
-      // The collaborations and trainings: a bar beside the line from start to end, as in the
-      // second column (not joined to the line); those still going on run to now and on, dashed.
-      for (const it of minors) {
-        const x = laneX1(it), y0 = Y(it.t), y1 = Math.max(it.t1 === null ? Y(NOW) : Y(it.t1), y0 + 10), len = y1 - y0;
-        const w = it.training ? 'w2' : 'w1';
-        const ld = el('path', { d: leader(x + 5, y0, C1M - 6, it.y + it.c), class: 'ld' });
+      // A bar from when it ended (or now) back to when it began, and a leader straight across
+      // to its label; a label that had to wait sits a little lower along its bar.
+      const bar = (it: Item, x: number, lx: number, w: string) => {
+        const y0 = Yt(it.t1 ?? NOW), ya = it.ya, y1 = Math.max(Yt(it.t), y0 + 10, ya), len = y1 - y0;
+        const ld = el('path', { d: leader(x + 5, lx - 6, ya), class: 'ld' });
         el('path', { d: `M${x},${y0} V${y1}`, class: `ghost ${w}` });
         const p = el('path', { d: `M${x},${y0} V${y1}`, class: `bar ${w}` });
         p.style.strokeDasharray = `${len} ${len}`;
         bars.push({ p, y0, len });
-        reveal.push({ nodes: [it.el, ld], y: y0 });
+        reveal.push({ nodes: [it.el, ld], y: ya });
         it.mark = p;
-      }
+      };
+      for (const it of imp) bar(it, laneX(it), C2X, `w${it.w}`);
+      // The collaborations and trainings: the same, beside the line (not joined to it); ink for
+      // collaborations, grey for trainings.
+      for (const it of minors) bar(it, laneX1(it), C1M, it.training ? 'w2' : 'w1');
 
-      // The line itself, with a mark where each school begins.
-      el('path', { d: `M${LINE},${Y(T0)} V${Y(NOW)}`, class: 'ghost' });
-      life = el('path', { d: `M${LINE},${Y(T0)} V${Y(NOW)}`, class: 'life' });
-      const ll = Y(NOW) - Y(T0); life.style.strokeDasharray = `${ll} ${ll}`;
-      for (const it of items) {
-        if (it.type !== 'era' || it.minor) continue;
-        const y = Y(it.t);
-        const ld = el('path', { d: leader(LINE + 8, y, C1X - 6, it.y + it.c), class: 'ld' });
+      // The line itself, with a mark at each school.
+      el('path', { d: `M${LINE},${yTop} V${yEnd}`, class: 'ghost' });
+      life = el('path', { d: `M${LINE},${yTop} V${yEnd}`, class: 'life' });
+      const ll = yEnd - yTop; life.style.strokeDasharray = `${ll} ${ll}`;
+      // Each year at its 1 January, small, to the left of the line, so a date reads across all three columns.
+      for (let yr = Math.floor(NOW); yr > T0; yr--) {
+        const y = Yt(yr);
+        const tick = el('path', { d: `M${LINE - 7},${y} H${LINE - 2}`, class: 'g yt' });
+        const tx = el('text', { x: LINE - 11, y: y + 4, class: 'g yr' });
+        tx.textContent = String(yr);
+        reveal.push({ nodes: [tick, tx], y });
+      }
+      for (const it of schools) {
+        const y = it.ya;
+        const ld = el('path', { d: leader(LINE + 8, C1X - 6, y), class: 'ld' });
+        if (it === current) { reveal.push({ nodes: [it.el, ld], y }); continue; }   // its mark is the now dot
         const node = el('circle', { cx: LINE, cy: y, r: 6, class: 'g node' });
         reveal.push({ nodes: [it.el, ld, node], y });
       }
 
-      // After now: dashed and fading, for the line and for what is still going on.
+      // Past now, above it: dashed and fading, for the line and for what is still going on.
       const defs = el('defs', {});
-      const grad = el('linearGradient', { id: 'tl-fade', x1: 0, y1: Y(NOW), x2: 0, y2: Y(NOW) + 90, gradientUnits: 'userSpaceOnUse' }, defs);
+      const grad = el('linearGradient', { id: 'tl-fade', x1: 0, y1: yTop, x2: 0, y2: yTop - 84, gradientUnits: 'userSpaceOnUse' }, defs);
       el('stop', { offset: 0, 'stop-color': '#fff', 'stop-opacity': 1 }, grad);
       el('stop', { offset: 1, 'stop-color': '#fff', 'stop-opacity': 0 }, grad);
-      const mask = el('mask', { id: 'tl-fade-mask', maskUnits: 'userSpaceOnUse', x: 0, y: Y(NOW), width: W, height: 96 }, defs);
-      el('rect', { x: 0, y: Y(NOW), width: W, height: 96, fill: 'url(#tl-fade)' }, mask);
+      const mask = el('mask', { id: 'tl-fade-mask', maskUnits: 'userSpaceOnUse', x: 0, y: yTop - 90, width: W, height: 92 }, defs);
+      el('rect', { x: 0, y: yTop - 90, width: W, height: 92, fill: 'url(#tl-fade)' }, mask);
       future = el('g', { class: 'future', mask: 'url(#tl-fade-mask)' });
-      el('path', { d: `M${LINE},${Y(NOW) + 9} V${Y(NOW) + 90}` }, future);
-      for (const it of imp) if (it.t1 === null) el('path', { d: `M${laneX(it)},${Y(NOW) + 6} V${Y(NOW) + 72}`, class: `w${it.w}` }, future);
-      for (const it of minors) if (it.t1 === null) el('path', { d: `M${laneX1(it)},${Y(NOW) + 6} V${Y(NOW) + 72}`, class: it.training ? 'w2' : '' }, future);
-      if (!mobile) el('path', { d: `M${gx},${Y(NOW) + 6} V${Y(NOW) + 72}`, class: 'w3' }, future);
-      el('circle', { cx: LINE, cy: Y(NOW), r: 5.5, class: 'ghost-dot' });
-      nowDot = el('circle', { cx: LINE, cy: Y(NOW), r: 5.5, class: 'nowdot' });
-      Object.assign(nowEl.style, { left: `${C1M}px`, top: `${Y(NOW) - 9}px` });
-      pen = el('circle', { cx: LINE, cy: Y(T0), r: 3.4, class: 'pen' });
+      el('path', { d: `M${LINE},${yTop - 9} V${yTop - 84}` }, future);
+      for (const it of imp) if (it.t1 === null) el('path', { d: `M${laneX(it)},${yTop - 6} V${yTop - 66}`, class: `w${it.w}` }, future);
+      for (const it of minors) if (it.t1 === null) el('path', { d: `M${laneX1(it)},${yTop - 6} V${yTop - 66}`, class: it.training ? 'w2' : '' }, future);
+      if (!mobile) el('path', { d: `M${gx},${yTop - 6} V${yTop - 66}`, class: 'w3' }, future);
+      el('circle', { cx: LINE, cy: yTop, r: 5.5, class: 'ghost-dot' });
+      nowDot = el('circle', { cx: LINE, cy: yTop, r: 5.5, class: 'nowdot' });
+      Object.assign(nowEl.style, { left: `${C1M}px`, top: `${yTop - (current ? 38 : 9)}px` });   // above the school, if there is one
+      pen = el('circle', { cx: LINE, cy: yTop, r: 3.4, class: 'pen' });
 
-      H = Math.max(Y(NOW) + 100, ...items.map((it) => it.y + it.h)) + 30;
+      H = Math.max(yEnd + 20, ...items.map((it) => it.y + it.h)) + 30;
       wl.style.height = `${H}px`;
       svg.setAttribute('width', String(W)); svg.setAttribute('height', String(H)); svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
@@ -363,7 +386,7 @@ const along = timeline.along
       cur = Math.min(cur, H); draw(true);
     };
 
-    // Scrolling moves a pen down the line; whatever it has passed is drawn.
+    // Scrolling moves a pen down the line, from now back in time; whatever it has passed is drawn.
     const target = () => {
       if (reduce) return H + 1;
       const end = scrollY + innerHeight >= document.documentElement.scrollHeight - 4;
@@ -373,14 +396,14 @@ const along = timeline.along
       const t = Math.max(-1, Math.min(H + 1, target()));
       cur = jump ? t : cur + (t - cur) * 0.14;
       if (Math.abs(t - cur) < 0.4) cur = t;
-      const y0 = Y(T0), yN = Y(NOW);
-      life.style.strokeDashoffset = String(yN - y0 - Math.max(0, Math.min(yN - y0, cur - y0)));
+      const y0 = Y(0), yE = Y(UEND);
+      life.style.strokeDashoffset = String(yE - y0 - Math.max(0, Math.min(yE - y0, cur - y0)));
       for (const b of bars) b.p.style.strokeDashoffset = String(b.len - Math.max(0, Math.min(b.len, cur - b.y0)));
       for (const r of reveal) { const on = cur >= r.y - 1; for (const n of r.nodes) n.classList.toggle('on', on); }
-      const done = cur >= yN - 0.5;
-      pen.setAttribute('cy', String(Math.min(cur, yN))); pen.style.opacity = cur > y0 && !done ? '1' : '0';
-      nowDot.style.opacity = done ? '1' : '0'; nowEl.classList.toggle('on', done);
-      future.classList.toggle('on', done); wl.classList.toggle('done', done);
+      const live = cur >= y0 - 0.5, done = cur >= yE - 0.5;
+      pen.setAttribute('cy', String(Math.max(y0, Math.min(cur, yE)))); pen.style.opacity = cur > y0 + 6 && !done ? '1' : '0';
+      nowDot.style.opacity = live ? '1' : '0'; nowEl.classList.toggle('on', live);
+      future.classList.toggle('on', live); wl.classList.toggle('live', live);
       raf = cur !== t ? requestAnimationFrame(() => draw(false)) : 0;
     };
     addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => draw(false)); }, { passive: true });
